@@ -17,7 +17,6 @@ export default class SpatialManager {
         this.reverse[x + y*this.cols |0] = {x:x*cellsize, y:y*cellsize};
       }
     }
-    console.log(this.reverse);
 
     this.clearBuckets();
   }
@@ -40,20 +39,16 @@ export default class SpatialManager {
   }
   getIdForObject (obj) {
     var bucketsObjIsIn = new Set();
-
-    var max = {
-      x: obj.x + obj.width,
-      y: obj.y + obj.width
-    };
+    var maxX = obj.x + obj.width, maxY = obj.y + obj.width, cf = this.cf, cols = this.cols;
 
     //TopLeft
-    this.addBucket(obj.x, obj.y, this.cf, this.cols, bucketsObjIsIn);
+    this.addBucket(obj.x, obj.y, cf, cols, bucketsObjIsIn);
     //TopRight
-    this.addBucket(max.x, obj.y, this.cf, this.cols, bucketsObjIsIn);
+    this.addBucket(maxX, obj.y, cf, cols, bucketsObjIsIn);
     //BottomRight
-    this.addBucket(max.x, max.y, this.cf, this.cols, bucketsObjIsIn);
+    this.addBucket(maxX, maxY, cf, cols, bucketsObjIsIn);
     //BottomLeft
-    this.addBucket(obj.x, max.y, this.cf, this.cols, bucketsObjIsIn);
+    this.addBucket(obj.x, maxX, cf, cols, bucketsObjIsIn);
 
     return bucketsObjIsIn;
   }
@@ -65,14 +60,23 @@ export default class SpatialManager {
     }
   }
   getNearby (obj) {
-    var id;
     var nearby = new Set();
-    var ids = this.getIdForObject(obj);
+    var ids = this.getIdForObject(obj).values();
 
-    for (id of ids) {
-      let bucket = this.buckets.get(id);
-      for (let oobj of bucket) {
-        nearby.add(oobj);
+    var i;
+    while (1) {
+      i = ids.next();
+      if (i.done) {
+        break;
+      }
+      let bucket = this.buckets.get(i.value).values();
+      var b;
+      while (1) {
+        b = bucket.next();
+        if (b.done) {
+          break;
+        }
+        nearby.add(b.value);
       }
     }
     return nearby;

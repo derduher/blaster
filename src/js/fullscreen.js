@@ -21,6 +21,6 @@ export function toggleFullScreen (el) {
   if (el && !document[fullScreenElementProp]) {
     requestFullScreen.call(el);
   } else {
-    cancelFullScreen(el);
+    cancelFullScreen.call(document);
   }
 }

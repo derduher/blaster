@@ -54,6 +54,10 @@ Craft.prototype.tick = function tick (now) {
   } else {
     this.vy = 0;
   }
+  if (this.ctrl.touch) {
+    this.x = this.ctrl.touchX;
+    this.y = this.ctrl.touchY;
+  }
 
   if (this.ctrl.f && pdt > pSpeed) {
     let p = new Projectile(this);
