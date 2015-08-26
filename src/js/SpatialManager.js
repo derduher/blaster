@@ -28,48 +28,47 @@ export default class SpatialManager {
     }
   }
   registerObject (obj) {
-    var cells = this.getIdForObject(obj);
-    var cell, cellId;
-    for (cellId of cells) {
-      cell = this.buckets.get(cellId);
+    var cells = this.getIdForObject(obj.x|0, obj.y|0, obj.width|0);
+    var cell;
+    for (var i = 0; i < cells.length; i++) {
+      cell = this.buckets.get(cells[i]);
       if (cell) {
         cell.add(obj);
       }
     }
   }
-  getIdForObject (obj) {
-    var bucketsObjIsIn = new Set();
-    var maxX = obj.x + obj.width, maxY = obj.y + obj.width, cf = this.cf, cols = this.cols;
+  getIdForObject (x, y, width) {
+    var bucketsObjIsIn = [];
+    var maxX = x + width,
+        maxY = y + width,
+        cf = this.cf,
+        cols = this.cols;
 
     //TopLeft
-    this.addBucket(obj.x, obj.y, cf, cols, bucketsObjIsIn);
+    this.addBucket(x, y, cf, cols, bucketsObjIsIn);
     //TopRight
-    this.addBucket(maxX, obj.y, cf, cols, bucketsObjIsIn);
+    this.addBucket(maxX, y, cf, cols, bucketsObjIsIn);
     //BottomRight
     this.addBucket(maxX, maxY, cf, cols, bucketsObjIsIn);
     //BottomLeft
-    this.addBucket(obj.x, maxX, cf, cols, bucketsObjIsIn);
+    this.addBucket(x, maxY, cf, cols, bucketsObjIsIn);
 
     return bucketsObjIsIn;
   }
   addBucket (x, y, cf, cols, set) {
     // ignore collisions offscreen
     var id = (x*cf | 0) + (y*cf |0)*cols |0;
-    if (id >= 0 && id < this.numbuckets) {
-      set.add(id);
+    if (id >= 0 && id < this.numbuckets && set.indexOf(id) === -1) {
+      set.push(id);
     }
   }
-  getNearby (obj) {
+  getNearby (x, y, width) {
     var nearby = new Set();
-    var ids = this.getIdForObject(obj).values();
+    var ids = this.getIdForObject(x, y, width);
 
     var i;
-    while (1) {
-      i = ids.next();
-      if (i.done) {
-        break;
-      }
-      let bucket = this.buckets.get(i.value).values();
+    for (i = 0; i < ids.length; i++) {
+      let bucket = this.buckets.get(ids[i]).values();
       var b;
       while (1) {
         b = bucket.next();

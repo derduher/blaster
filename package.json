@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf build/*",
-    "build": "cp -R src/* build/ & cp node_modules/babel-core/browser-polyfill.min.js build/js/vendor/browser-polyfill.min.js & npm run build:jade & npm run build:js & npm run build:less & wait",
+    "build": "cp -R src/* build/ & cp node_modules/babel-core/browser-polyfill.js build/js/vendor/browser-polyfill.min.js & npm run build:jade & npm run build:js & npm run build:less & wait",
     "build:js": "browserify src/js/main.js -t [ babelify --blacklist es6.forOf ] --outfile build/js/main.js",
     "build:jade": "jade src/*.jade -o build/",
     "build:less": "lessc --source-map-map-inline src/css/main.less > build/css/main.css",
