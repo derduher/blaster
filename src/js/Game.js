@@ -186,7 +186,7 @@ export default class Game {
   }
   update (tickTime) {
     var cullQ = [];
-    if (Math.random() > 0.9) {
+    if (Math.random() > 0.99) {
       this.stage.items.push(new Roid(this.stage.canvas.width));
     }
     this.stage.spatialManager.clearBuckets();
