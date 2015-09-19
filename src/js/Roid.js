@@ -1,5 +1,7 @@
 'use strict';
 /*jshint bitwise: false*/
+import Geo from './Geo.js';
+import Point2 from './Point2.js';
 
 function getX (ang, mag) {
   return mag * Math.cos(ang);
@@ -19,6 +21,7 @@ function getMag (max) {
 
 export default function Roid (cw) {
   this.color = 'black';
+  this.geo = new Geo();
 
 
   this.path = new Path2D();
@@ -30,15 +33,17 @@ export default function Roid (cw) {
   var m = getMag(mrad); //magnitude
   var startX = s * (m + mrad),
       startY = s * mrad;
-  this.min = {
+
+  this.geo.aabb.min = {
     x: Number.POSITIVE_INFINITY,
     y: Number.POSITIVE_INFINITY
   };
-  this.max = {
+
+  this.geo.aabb.max = {
     x: s * (m + mrad),
     y: Number.NEGATIVE_INFINITY
   };
-  this.points = [startX, startY];
+  this.geo.points.push(new Point2(startX, startY));
   var i = 1;
   var a = 0;
   var inc = 2 * Math.PI / numPoints;
@@ -56,45 +61,32 @@ export default function Roid (cw) {
     x += mrad;
     x *= s;
     y *= s;
-    this.points.push(x, y);
-    if (x > this.max.x) {
-      this.max.x = x;
-    } else if (x < this.min.x) {
-      this.min.x = x;
+    this.geo.points.push(new Point2(x, y));
+    if (x > this.geo.aabb.max.x) {
+      this.geo.aabb.max.x = x;
+    } else if (x < this.geo.aabb.min.x) {
+      this.geo.aabb.min.x = x;
     }
     //reverse order of x because its technically possible for 
     // a completely ascending order of maxes 
-    if (y < this.min.y) {
-      this.min.y = y;
-    } else if (y > this.max.y) {
-      this.max.y = y;
+    if (y < this.geo.aabb.min.y) {
+      this.geo.aabb.min.y = y;
+    } else if (y > this.geo.aabb.max.y) {
+      this.geo.aabb.max.y = y;
 
     }
     this.path.lineTo(x, y);
     i++;
   }
   this.path.lineTo(startX, startY);
-  this.width = this.max.x - this.min.x;
+  this.width = this.geo.aabb.max.x - this.geo.aabb.min.x;
   this.health = this.initialHealth = (0.5 + Math.random()) * this.width * this.width | 0;
-  this.x = cw * Math.random();
-  this.y = 0 - this.max.y;
-  this.vx = 0.2 * (-0.5 + Math.random());
-  this.vy = 1 * Math.random();
+  this.geo.pos.x = cw * Math.random();
+  this.geo.pos.y = 0 - this.geo.aabb.max.y;
+  this.geo.v.x = 0.2 * (-0.5 + Math.random());
+  this.geo.v.y = Math.random();
 }
 
-
-  //line segments
-  //for (i=0; i < points.length; i+=2) {
-    //var bx;
-    //if (i === points.length - 2) {
-      //bx = points[0];
-      //by = points[1];
-    //} else {
-      //bx = points[i+2];
-      //by = points[i+3];
-    //}
-    //console.log(points[i].toFixed(0), points[i+1].toFixed(0), bx.toFixed(0), by.toFixed(0))
-  //}
 
 Roid.prototype.tick = function tick () {};
 
@@ -102,7 +94,7 @@ Roid.prototype.draw = function draw (ctx) {
   ctx.save();
   ctx.strokeStyle = 'rgb(' + (148 + 107 * (1 - this.health / this.initialHealth) | 0) + ',0,234)';
   //ctx.fillStyle = this.color;
-  ctx.translate(this.x, this.y);
+  ctx.translate(this.geo.pos.x, this.geo.pos.y);
   ctx.stroke(this.path);
   ctx.restore();
 };

@@ -3,7 +3,7 @@
     "esnext": true,
     "devel": true,
     "browser": true,
-    "bitwise": true,
+    "bitwise": false,
     "curly": true,
     "eqeqeq": true,
     "forin": true,

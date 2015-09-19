@@ -24,7 +24,7 @@ export default class Game {
     this.hitboxes = new Set();
     this.debug = debug;
     this.lastRender = window.performance.now();
-    this.tickLength = 16.25;
+    this.tickLength = 16.7;
     this.ctrl = new Controls();
     this.lastTick = this.lastRender;
     this.debug.lastRender = this.lastRender;
@@ -80,8 +80,11 @@ export default class Game {
     if (tFrame > nextTick) {
       timeSinceTick = tFrame - this.lastTick;
       numTicks = (timeSinceTick / this.tickLength) | 0;
-      if (numTicks > 30) {
-        numTicks = 30;
+      //if (numTicks !== 1) {
+        //console.log(numTicks);
+      //}
+      if (numTicks > 4) {
+        numTicks = 4;
       }
     }
     this.updates(numTicks);
@@ -154,20 +157,20 @@ export default class Game {
   }
   boundNTick (i, tickTime) {
     i.tick(tickTime);
-    var x = i.x + i.vx,
-      y = i.y + i.vy,
+    var x = i.geo.pos.x + i.geo.v.x,
+      y = i.geo.pos.y + i.geo.v.y,
       cull = false;
 
-    if (((i.vx <= 0 || x < this.stage.xmax - i.width) && (i.vx >= 0 || x > this.stage.xmin)) ||
+    if (((i.geo.v.x <= 0 || x < this.stage.xmax - i.width) && (i.geo.v.x >= 0 || x > this.stage.xmin)) ||
         !i.boundToCanvas && x < this.stage.xmax && x > -100
        ) {
-         i.x = x;
+         i.geo.pos.x = x;
        } else if (!i.boundToCanvas) {
          cull = true;
        }
-       if (((i.vy <= 0 || y < this.stage.ymax - i.width) && (i.vy >= 0 || y > this.stage.ymin)) ||
+       if (((i.geo.v.y <= 0 || y < this.stage.ymax - i.width) && (i.geo.v.y >= 0 || y > this.stage.ymin)) ||
            !i.boundToCanvas && y < this.stage.ymax && y > -100) {
-         i.y = y;
+         i.geo.pos.y = y;
        } else if (!i.boundToCanvas) {
          cull = true;
        }
@@ -177,7 +180,7 @@ export default class Game {
        return cull;
   }
   testIntersect (item, i, o, cullQ) {
-    if (this.intersect(item, o)) {
+    if (this.intersect(item.geo, o.geo)) {
       item.health -= 200;
       if (item.health < 9) {
         cullQ.push(i);
@@ -220,9 +223,15 @@ export default class Game {
     cullQ.forEach( v => this.stage.items.splice(v - culled++, 1));
   }
   intersect (a, b) {
+    let aminx = a.pos.x + a.aabb.min.x,
+        bminx = b.pos.x + b.aabb.min.x,
+        aminy = a.pos.y + a.aabb.min.y,
+        bminy = b.pos.y + b.aabb.min.y;
     //foo
-    return ((a.x < b.x && a.x + a.width > b.x) || (b.x < a.x && b.x + b.width > a.x)) &&
-      ((a.y < b.y && a.y + a.width > b.y) || (b.y < a.y && b.y + b.width > a.y));
+    return ((aminx < bminx && a.pos.x + a.aabb.max.x > bminx) ||
+            (bminx < aminx && b.pos.x + b.aabb.max.x > aminx)) &&
+      ((aminy < bminy && a.pos.y + a.aabb.max.y > bminy) ||
+       (bminy < aminy && b.pos.y + b.aabb.max.y > aminy));
     //return a.x > b.x && a.x < b.x + b.width && a.y > b.y && a.y < b.y + b.width;
   }
   pause () {
