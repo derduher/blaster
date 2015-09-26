@@ -180,7 +180,7 @@ export default class Game {
        return cull;
   }
   testIntersect (item, i, o, cullQ) {
-    if (this.intersect(item.geo, o.geo)) {
+    if (item.geo.intersectsWith(o.geo)) {
       item.health -= 200;
       if (item.health < 9) {
         cullQ.push(i);
@@ -221,18 +221,6 @@ export default class Game {
       return a > b ? 1 : 0;
     });
     cullQ.forEach( v => this.stage.items.splice(v - culled++, 1));
-  }
-  intersect (a, b) {
-    let aminx = a.pos.x + a.aabb.min.x,
-        bminx = b.pos.x + b.aabb.min.x,
-        aminy = a.pos.y + a.aabb.min.y,
-        bminy = b.pos.y + b.aabb.min.y;
-    //foo
-    return ((aminx < bminx && a.pos.x + a.aabb.max.x > bminx) ||
-            (bminx < aminx && b.pos.x + b.aabb.max.x > aminx)) &&
-      ((aminy < bminy && a.pos.y + a.aabb.max.y > bminy) ||
-       (bminy < aminy && b.pos.y + b.aabb.max.y > aminy));
-    //return a.x > b.x && a.x < b.x + b.width && a.y > b.y && a.y < b.y + b.width;
   }
   pause () {
     window.cancelAnimationFrame(this.stopMain);

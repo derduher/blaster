@@ -10,6 +10,7 @@ export default function Projectile (craft) {
   this.geo.aabb.min.y = 0;
   this.geo.aabb.max.x = this.width;
   this.geo.aabb.max.y = this.width;
+  this.geo.treatAsPoint = true;
   this.health = 150;
   this.boundToCanvas = false;
 }
