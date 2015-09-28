@@ -1,5 +1,5 @@
 'use strict'
-/*jshint bitwise: false*/
+/* jshint bitwise: false*/
 var pSpeed = 50
 
 const speed = 5

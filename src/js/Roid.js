@@ -1,5 +1,5 @@
 'use strict'
-/*jshint bitwise: false*/
+/* jshint bitwise: false*/
 import Geo from './Geo.js'
 import Point2 from './Point2.js'
 
@@ -23,16 +23,15 @@ export default function Roid (cw) {
   this.color = 'black'
   this.geo = new Geo()
 
-
   this.path = new Path2D()
   var s = 3
-  var mrad = 4 + 28 * Math.random(); //max radius
+  var mrad = 4 + 28 * Math.random() // max radius
   var numPoints = 12
 
   // starting point
-  var m = getMag(mrad); //magnitude
-  var startX = s * (m + mrad),
-      startY = s * mrad
+  var m = getMag(mrad) // magnitude
+  var startX = s * (m + mrad)
+  var startY = s * mrad
 
   this.geo.aabb.min = {
     x: Number.POSITIVE_INFINITY,
@@ -48,7 +47,6 @@ export default function Roid (cw) {
   var a = 0
   var inc = 2 * Math.PI / numPoints
   var x, y
-
 
   this.path.moveTo(startX, startY)
 
@@ -67,14 +65,14 @@ export default function Roid (cw) {
     } else if (x < this.geo.aabb.min.x) {
       this.geo.aabb.min.x = x
     }
-    //reverse order of x because its technically possible for 
-    // a completely ascending order of maxes 
+    // reverse order of x because its technically possible for
+    // a completely ascending order of maxes
     if (y < this.geo.aabb.min.y) {
       this.geo.aabb.min.y = y
     } else if (y > this.geo.aabb.max.y) {
       this.geo.aabb.max.y = y
-
     }
+
     this.path.lineTo(x, y)
     i++
   }
@@ -87,13 +85,12 @@ export default function Roid (cw) {
   this.geo.v.y = Math.random()
 }
 
-
 Roid.prototype.tick = function tick () {}
 
 Roid.prototype.draw = function draw (ctx) {
   ctx.save()
   ctx.strokeStyle = 'rgb(' + (148 + 107 * (1 - this.health / this.initialHealth) | 0) + ',0,234)'
-  //ctx.fillStyle = this.color
+  // ctx.fillStyle = this.color
   ctx.translate(this.geo.pos.x, this.geo.pos.y)
   ctx.stroke(this.path)
   ctx.restore()

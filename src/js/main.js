@@ -1,6 +1,6 @@
 'use strict'
 import Game from './Game'
-import {onVisibilityChange, visProp} from './visibility'
+import { onVisibilityChange, visProp } from './visibility'
 
 function init () {
   var game = new Game(document.getElementById('tutorial'))

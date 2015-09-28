@@ -1,16 +1,16 @@
 'use strict'
-const a = 65,
-  d = 68,
-  w = 87,
-  s = 83,
-  space = 32,
-  left = 37,
-  right = 39,
-  up = 38,
-  down = 40,
-  esc = 27
+const a = 65
+const d = 68
+const w = 87
+const s = 83
+const space = 32
+const left = 37
+const right = 39
+const up = 38
+const down = 40
+const esc = 27
 
-import {fullScreenElementProp} from './fullScreen'
+import { fullScreenElementProp } from './fullScreen'
 
 export default class Controls {
   constructor () {

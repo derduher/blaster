@@ -15,8 +15,7 @@ if (document.fullscreenElement !== undefined) {
   fullScreenElementProp = 'msFullscreenElement'
 }
 
-export {fullScreenElementProp}
-
+export { fullScreenElementProp }
 export function toggleFullScreen (el) {
   if (el && !document[fullScreenElementProp]) {
     requestFullScreen.call(el)
