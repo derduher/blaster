@@ -1,16 +1,16 @@
-'use strict';
-import Game from './Game';
-import {onVisibilityChange, visProp} from './visibility';
+'use strict'
+import Game from './Game'
+import { onVisibilityChange, visProp } from './visibility'
 
 function init () {
-  var game = new Game(document.getElementById('tutorial'));
+  var game = new Game(document.getElementById('tutorial'))
   onVisibilityChange(function (e) {
     if (document[visProp]) {
-      game.pause();
+      game.pause()
     } else {
-      game.resume();
+      game.resume()
     }
-  });
+  })
 }
 
-document.body.onload = init;
+document.body.onload = init
