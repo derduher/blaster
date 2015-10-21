@@ -1,5 +1,4 @@
 'use strict'
-/* jshint bitwise: false*/
 
 // import Projectile from './Projectile.js'
 var debug = {
@@ -29,28 +28,42 @@ export default class Game {
     this.lastTick = this.lastRender
     this.debug.lastRender = this.lastRender
     this.stage = {items: [], spatialManager: null, canvas: null, padding: 3}
+    this.started = false
 
     this.stage.canvas = canvas
 
-    this.stage.canvas.onclick = () => toggleFullScreen(this.stage.canvas)
-    window.onresize = () => this.updateCanvasBoundaries()
-    this.updateCanvasBoundaries()
-    document.onkeyup = this.ctrl.ku.bind(this.ctrl)
+    this.isTouchInterface = 'ontouchend' in document.documentElement
+
+    this.stage.canvas.onclick = () => {
+      if (this.isTouchInterface || this.started) {
+        toggleFullScreen(this.stage.canvas)
+      }
+      if (!this.started) {
+        this.resume()
+      }
+    }
+    document.addEventListener('keyup', this.pausedOnKeyUp.bind(this))
+    document.addEventListener('keyup', this.ctrl.ku.bind(this.ctrl))
     document.onkeydown = this.ctrl.kd.bind(this.ctrl)
     document.ontouchstart = this.ctrl.ts.bind(this.ctrl)
     document.ontouchmove = this.ctrl.tm.bind(this.ctrl)
-    document.ontouchend = this.ctrl.te.bind(this.ctrl)
-    this.stage.spatialManager = new SpatialManager(this.stage.canvas.width, this.stage.canvas.height, 109)
+    document.addEventListener('touchend', this.ctrl.te.bind(this.ctrl))
+    document.addEventListener('touchend', this.pausedOnTap.bind(this))
+    window.onresize = () => this.updateCanvasBoundaries()
+
+    this.stage.spatialManager = new SpatialManager(document.documentElement.clientWidth, document.documentElement.clientHeight, 109)
 
     this.craft = new Craft(this.stage, this.ctrl)
     this.stage.spatialManager.registerObject(this.craft)
     this.stage.items.push(this.craft)
 
     this.ctx = this.stage.canvas.getContext('2d')
-
-    window.requestAnimationFrame(this.main.bind(this))
+    this.updateCanvasBoundaries()
+    this.showInstructions()
   }
+
   main (tFrame) {
+    this.started = true
     var timeSinceTick
     var nextTick = this.lastTick + this.tickLength
     var numTicks = 0
@@ -69,6 +82,7 @@ export default class Game {
     // }
 
     if (this.ctrl.toggleFS) {
+      this.pause()
       toggleFullScreen()
     }
 
@@ -94,6 +108,7 @@ export default class Game {
     this.draw(tFrame)
     this.lastRender = tFrame
   }
+
   updateCanvasBoundaries () {
     if (document[fullScreenElementProp]) {
       this.stage.canvas.width = window.screen.width
@@ -113,7 +128,7 @@ export default class Game {
     if (this.stage.canvas.height / w > max) {
       max = this.stage.canvas.height / w
     }
-    this.debug.text++
+    // this.debug.text++
     // this.stage.items = []
     // for (var i=0; i<8; i++) {
     // for (var j=0;j < 5; j++) {
@@ -122,7 +137,12 @@ export default class Game {
     // }
     this.stage.spatialManager = new SpatialManager(this.stage.canvas.width, this.stage.canvas.height, 109)
     this.stage.items.forEach(this.stage.spatialManager.registerObject, this.stage.spatialManager)
+    if (this.started && !this.stopMain) {
+      this.draw()
+      this.showPause()
+    }
   }
+
   updates (numTicks) {
     var i
     for (i = 0; i < numTicks; i++) {
@@ -130,6 +150,7 @@ export default class Game {
       this.update(this.lastTick)
     }
   }
+
   draw (tFrame) {
     this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
     // var fs = 70
@@ -154,6 +175,7 @@ export default class Game {
   }
   */
   }
+
   boundNTick (i, tickTime) {
     i.tick(tickTime)
     var x = i.geo.pos.x + i.geo.v.x
@@ -178,6 +200,7 @@ export default class Game {
     }
     return cull
   }
+
   testIntersect (item, i, o, cullQ) {
     if (item.geo.intersectsWith(o.geo)) {
       item.health -= 200
@@ -186,6 +209,7 @@ export default class Game {
       }
     }
   }
+
   update (tickTime) {
     var cullQ = []
     if (Math.random() > 0.99) {
@@ -221,10 +245,68 @@ export default class Game {
     })
     cullQ.forEach(v => this.stage.items.splice(v - culled++, 1))
   }
+
+  showInstructions () {
+    this.ctx.textAlign = 'center'
+    this.ctx.save()
+    this.ctx.font = '64px roboto'
+    var prompt
+    if (this.isTouchInterface) {
+      prompt = 'Tap to start'
+    } else {
+      prompt = 'Click to start'
+    }
+    this.ctx.fillText(prompt, this.stage.canvas.width / 2, this.stage.canvas.height / 2)
+    this.ctx.restore()
+    this.ctx.save()
+    this.ctx.font = '48px roboto'
+    if (this.isTouchInterface) {
+      prompt = 'drag to move the craft'
+    } else {
+      prompt = 'use wasd/arrow keys to move, spacebar to fire'
+    }
+    this.ctx.fillText(prompt, this.stage.canvas.width / 2, this.stage.canvas.height / 2 + 72)
+    this.ctx.restore()
+  }
+
+  showPause () {
+    this.ctx.textAlign = 'center'
+    this.ctx.save()
+    this.ctx.font = '64px roboto'
+    this.ctx.fillText('Paused', this.stage.canvas.width / 2, this.stage.canvas.height / 2)
+    this.ctx.restore()
+    this.ctx.save()
+    this.ctx.font = '48px roboto'
+    var prompt
+    if (this.isTouchInterface) {
+      prompt = 'Tap to resume'
+    } else {
+      prompt = 'Press space to resume'
+    }
+    this.ctx.fillText(prompt, this.stage.canvas.width / 2, this.stage.canvas.height / 2 + 72)
+    this.ctx.restore()
+  }
+
+  pausedOnKeyUp (e) {
+    if (!this.stopMain && e.keyCode === 32) {
+      this.resume()
+    }
+  }
+
+  pausedOnTap (e) {
+    if (!this.stopMain) {
+      this.resume()
+    }
+  }
+
   pause () {
     window.cancelAnimationFrame(this.stopMain)
+    this.stopMain = null
+    this.showPause()
   }
+
   resume () {
-    this.main(window.performance.now())
+    this.lastTick = window.performance.now()
+    this.main(this.lastTick)
   }
 }

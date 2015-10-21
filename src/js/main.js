@@ -7,8 +7,6 @@ function init () {
   onVisibilityChange(function (e) {
     if (document[visProp]) {
       game.pause()
-    } else {
-      game.resume()
     }
   })
 }
