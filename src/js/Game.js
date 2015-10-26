@@ -1,9 +1,8 @@
 'use strict'
-/* jshint bitwise: false*/
 
 // import Projectile from './Projectile.js'
 var debug = {
-  on: true,
+  on: false,
   fps: 50,
   text: 0,
   numUpdates: 0,
@@ -11,8 +10,9 @@ var debug = {
   drawRate: 250
 }
 
-// const fpsFilter = 75
+const fpsFilter = 75
 
+import Stage from './Stage.js'
 import SpatialManager from './SpatialManager.js'
 import Roid from './Roid.js'
 import Craft from './Craft.js'
@@ -28,47 +28,62 @@ export default class Game {
     this.ctrl = new Controls()
     this.lastTick = this.lastRender
     this.debug.lastRender = this.lastRender
-    this.stage = {items: [], spatialManager: null, canvas: null, padding: 3}
+    this.stage = new Stage(canvas)
+    this.started = false
 
-    this.stage.canvas = canvas
+    this.isTouchInterface = 'ontouchend' in document.documentElement
 
-    this.stage.canvas.onclick = () => toggleFullScreen(this.stage.canvas)
-    window.onresize = () => this.updateCanvasBoundaries()
-    this.updateCanvasBoundaries()
-    document.onkeyup = this.ctrl.ku.bind(this.ctrl)
+    this.stage.canvas.onclick = () => {
+      if (this.isTouchInterface || this.started) {
+        toggleFullScreen(this.stage.canvas)
+      }
+      if (!this.started) {
+        this.resume()
+      }
+    }
+    document.addEventListener('keyup', this.pausedOnKeyUp.bind(this))
+    document.addEventListener('keyup', this.ctrl.ku.bind(this.ctrl))
     document.onkeydown = this.ctrl.kd.bind(this.ctrl)
     document.ontouchstart = this.ctrl.ts.bind(this.ctrl)
     document.ontouchmove = this.ctrl.tm.bind(this.ctrl)
-    document.ontouchend = this.ctrl.te.bind(this.ctrl)
-    this.stage.spatialManager = new SpatialManager(this.stage.canvas.width, this.stage.canvas.height, 109)
+    document.addEventListener('touchend', this.ctrl.te.bind(this.ctrl))
+    document.addEventListener('touchend', this.pausedOnTap.bind(this))
+    window.onresize = () => this.updateCanvasBoundaries()
+
+    this.stage.spatialManager = new SpatialManager(document.documentElement.clientWidth, document.documentElement.clientHeight, 109)
 
     this.craft = new Craft(this.stage, this.ctrl)
     this.stage.spatialManager.registerObject(this.craft)
     this.stage.items.push(this.craft)
 
     this.ctx = this.stage.canvas.getContext('2d')
-
-    window.requestAnimationFrame(this.main.bind(this))
+    this.updateCanvasBoundaries()
+    this.showInstructions()
   }
+
   main (tFrame) {
+    this.started = true
     var timeSinceTick
     var nextTick = this.lastTick + this.tickLength
     var numTicks = 0
+    var ud = 0
+    var thisFrameFPS = 60.1
 
     this.stopMain = window.requestAnimationFrame(this.main.bind(this))
 
-    // if (this.debug.on) {
-    // ud = tFrame - this.debug.lastRender > this.debug.drawRate
+    if (this.debug.on) {
+      ud = tFrame - this.debug.lastRender > this.debug.drawRate
 
-    // if (ud) {
-    // thisFrameFPS = 1000 / (tFrame - this.lastRender)
-    // this.debug.fps += (thisFrameFPS - this.debug.fps) / fpsFilter
-    // this.debug.lastRender = tFrame
-    // this.debug.itemL = this.stage.items.length
-    // }
-    // }
+      if (ud) {
+        thisFrameFPS = 1000 / (tFrame - this.lastRender)
+        this.debug.fps += (thisFrameFPS - this.debug.fps) / fpsFilter
+        this.debug.lastRender = tFrame
+        this.debug.itemL = this.stage.items.length
+      }
+    }
 
     if (this.ctrl.toggleFS) {
+      this.pause()
       toggleFullScreen()
     }
 
@@ -86,14 +101,17 @@ export default class Game {
         numTicks = 4
       }
     }
+
     this.updates(numTicks)
-    // if (this.debug.on && ud) {
-    // this.debug.numUpdates = numTicks
-    // }
+
+    if (this.debug.on && ud) {
+      this.debug.numUpdates = numTicks
+    }
 
     this.draw(tFrame)
     this.lastRender = tFrame
   }
+
   updateCanvasBoundaries () {
     if (document[fullScreenElementProp]) {
       this.stage.canvas.width = window.screen.width
@@ -113,7 +131,7 @@ export default class Game {
     if (this.stage.canvas.height / w > max) {
       max = this.stage.canvas.height / w
     }
-    this.debug.text++
+    // this.debug.text++
     // this.stage.items = []
     // for (var i=0; i<8; i++) {
     // for (var j=0;j < 5; j++) {
@@ -122,7 +140,12 @@ export default class Game {
     // }
     this.stage.spatialManager = new SpatialManager(this.stage.canvas.width, this.stage.canvas.height, 109)
     this.stage.items.forEach(this.stage.spatialManager.registerObject, this.stage.spatialManager)
+    if (this.started && !this.stopMain) {
+      this.draw()
+      this.showPause()
+    }
   }
+
   updates (numTicks) {
     var i
     for (i = 0; i < numTicks; i++) {
@@ -130,30 +153,30 @@ export default class Game {
       this.update(this.lastTick)
     }
   }
+
   draw (tFrame) {
     this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
-    // var fs = 70
+    var fs = 70
     for (var i = 0; i < this.stage.items.length; i++) {
       this.stage.items[i].draw(this.ctx)
     }
 
-  /*
-  if (this.debug.on) {
-    this.ctx.font = '64px roboto'
-    this.ctx.fillText(this.debug.fps.toFixed(1), 0, fs)
-    this.ctx.fillText(this.debug.itemL, 0, fs * 2)
-    this.ctx.fillText(this.debug.numUpdates, 0, fs * 3)
-    this.ctx.fillText(this.debug.text, this.stage.canvas.width / 2, this.stage.canvas.height /2)
+    if (this.debug.on) {
+      this.ctx.font = '64px roboto'
+      this.ctx.fillText(this.debug.fps.toFixed(1), 0, fs)
+      this.ctx.fillText(this.debug.itemL, 0, fs * 2)
+      this.ctx.fillText(this.debug.numUpdates, 0, fs * 3)
+      this.ctx.fillText(this.debug.text, this.stage.canvas.width / 2, this.stage.canvas.height / 2)
 
-    this.ctx.stroke(this.hatches)
-    this.ctx.save()
-    this.ctx.strokeStyle = 'green'
-    this.ctx.lineWidth = 3
-    this.hitboxes.forEach (xy => this.ctx.strokeRect(xy.x, xy.y, 109, 109))
-    this.ctx.restore()
+      this.ctx.stroke(this.hatches)
+      this.ctx.save()
+      this.ctx.strokeStyle = 'green'
+      this.ctx.lineWidth = 3
+      this.hitboxes.forEach(xy => this.ctx.strokeRect(xy.x, xy.y, 109, 109))
+      this.ctx.restore()
+    }
   }
-  */
-  }
+
   boundNTick (i, tickTime) {
     i.tick(tickTime)
     var x = i.geo.pos.x + i.geo.v.x
@@ -178,6 +201,7 @@ export default class Game {
     }
     return cull
   }
+
   testIntersect (item, i, o, cullQ) {
     if (item.geo.intersectsWith(o.geo)) {
       item.health -= 200
@@ -186,6 +210,7 @@ export default class Game {
       }
     }
   }
+
   update (tickTime) {
     var cullQ = []
     if (Math.random() > 0.99) {
@@ -221,10 +246,74 @@ export default class Game {
     })
     cullQ.forEach(v => this.stage.items.splice(v - culled++, 1))
   }
+
+  messageModal (msg) {
+    let x = this.stage.canvas.width / 2
+    let y = this.stage.canvas.height / 2
+    this.ctx.textAlign = 'center'
+    this.ctx.save()
+    this.ctx.font = '64px roboto'
+    this.ctx.fillText(msg[0], x, y)
+    this.ctx.restore()
+    if (msg.length > 1) {
+      this.ctx.save()
+      this.ctx.font = '48px roboto'
+      this.ctx.fillText(msg[1], x, y + 72)
+      this.ctx.restore()
+    }
+  }
+
+  showInstructions () {
+    let msg = []
+    if (this.isTouchInterface) {
+      msg[0] = 'Tap to start'
+    } else {
+      msg[0] = 'Click to start'
+    }
+
+    if (this.isTouchInterface) {
+      msg[1] = 'drag to move the craft'
+    } else {
+      msg[1] = 'use wasd/arrow keys to move, spacebar to fire'
+    }
+
+    this.messageModal(msg)
+  }
+
+  showPause () {
+    let msg = []
+
+    if (this.isTouchInterface) {
+      msg[0] = 'Tap to resume'
+    } else {
+      msg[0] = 'Press space to resume'
+    }
+
+    this.messageModal(msg)
+  }
+
+  pausedOnKeyUp (e) {
+    if (!this.stopMain && e.keyCode === 32) {
+      this.resume()
+    }
+  }
+
+  pausedOnTap (e) {
+    if (!this.stopMain) {
+      this.resume()
+    }
+  }
+
   pause () {
     window.cancelAnimationFrame(this.stopMain)
+    this.stopMain = null
+    this.showPause()
   }
+
   resume () {
-    this.main(window.performance.now())
+    // prevents the engine from trying to catch up from all the lost cycles
+    // before pause
+    this.lastTick = window.performance.now()
+    this.main(this.lastTick)
   }
 }

@@ -23,7 +23,7 @@ export default function Craft (stage, ctrl) {
   this.path.lineTo(this.width, this.width)
   this.geo.points.push(new Point2(this.width, this.width))
   this.path.lineTo(this.width / 2, 0)
-  this.geo.points.push(new Point2(0, this.width / 2))
+  this.geo.points.push(new Point2(this.width / 2, 0))
 
   this.path.closePath()
 
@@ -32,8 +32,8 @@ export default function Craft (stage, ctrl) {
   this.geo.aabb.max.x = this.width
   this.geo.aabb.max.y = this.width
 
-  this.geo.pos.x = stage.canvas.width / 2 - this.width / 2
-  this.geo.pos.y = stage.canvas.height - this.width - stage.padding
+  this.geo.pos.x = document.documentElement.clientWidth / 2 - this.width / 2
+  this.geo.pos.y = document.documentElement.clientHeight - this.width - stage.padding
   this.ctrl = ctrl
 }
 
