@@ -4,6 +4,7 @@ export default class SpatialManager {
   constructor (scenewidth, sceneheight, cellsize) {
     this.SceneWidth = scenewidth
     this.SceneHeight = sceneheight
+    this.cellsize = cellsize
     this.cf = 1 / cellsize
 
     this.cols = Math.ceil(scenewidth * this.cf)
@@ -28,7 +29,7 @@ export default class SpatialManager {
     }
   }
   registerObject (obj) {
-    var cells = this.getIdForObject(obj.x | 0, obj.y | 0, obj.width | 0)
+    var cells = this.getIdForObject(obj.geo.pos.x | 0, obj.geo.pos.y | 0, obj.width | 0)
     var cell
     for (var i = 0; i < cells.length; i++) {
       cell = this.buckets.get(cells[i])
@@ -37,21 +38,18 @@ export default class SpatialManager {
       }
     }
   }
-  getIdForObject (x, y, width) {
+  getIdForObject (x, y, radius) {
     var bucketsObjIsIn = []
-    var maxX = x + width
-    var maxY = y + width
+    var maxX = x + radius
+    var maxY = y + radius
     var cf = this.cf
     var cols = this.cols
 
-    // TopLeft
-    this.addBucket(x, y, cf, cols, bucketsObjIsIn)
-    // TopRight
-    this.addBucket(maxX, y, cf, cols, bucketsObjIsIn)
-    // BottomRight
-    this.addBucket(maxX, maxY, cf, cols, bucketsObjIsIn)
-    // BottomLeft
-    this.addBucket(x, maxY, cf, cols, bucketsObjIsIn)
+    for (let i = x; i <= maxX; i += this.cellsize) {
+      for (let j = y; j <= maxY; j += this.cellsize) {
+        this.addBucket(i, j, cf, cols, bucketsObjIsIn)
+      }
+    }
 
     return bucketsObjIsIn
   }
@@ -62,9 +60,9 @@ export default class SpatialManager {
       set.push(id)
     }
   }
-  getNearby (x, y, width) {
+  getNearby (x, y, radius) {
     var nearby = new Set()
-    var ids = this.getIdForObject(x, y, width)
+    var ids = this.getIdForObject(x, y, radius)
 
     var i
     for (i = 0; i < ids.length; i++) {

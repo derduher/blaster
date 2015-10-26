@@ -227,7 +227,7 @@ export default class Game {
     var i, item
     for (i = 0; i < this.stage.items.length; i++) {
       item = this.stage.items[i]
-      let nearby = this.stage.spatialManager.getNearby(item.x | 0, item.y | 0, item.width | 0).values()
+      let nearby = this.stage.spatialManager.getNearby(item.geo.pos.x | 0, item.geo.pos.y | 0, item.width | 0).values()
       while (1) {
         let o = nearby.next()
         if (o.done) {
