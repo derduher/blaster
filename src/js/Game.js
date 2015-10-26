@@ -2,7 +2,7 @@
 
 // import Projectile from './Projectile.js'
 var debug = {
-  on: true,
+  on: false,
   fps: 50,
   text: 0,
   numUpdates: 0,
@@ -10,8 +10,9 @@ var debug = {
   drawRate: 250
 }
 
-// const fpsFilter = 75
+const fpsFilter = 75
 
+import Stage from './Stage.js'
 import SpatialManager from './SpatialManager.js'
 import Roid from './Roid.js'
 import Craft from './Craft.js'
@@ -27,10 +28,8 @@ export default class Game {
     this.ctrl = new Controls()
     this.lastTick = this.lastRender
     this.debug.lastRender = this.lastRender
-    this.stage = {items: [], spatialManager: null, canvas: null, padding: 3}
+    this.stage = new Stage(canvas)
     this.started = false
-
-    this.stage.canvas = canvas
 
     this.isTouchInterface = 'ontouchend' in document.documentElement
 
@@ -67,6 +66,8 @@ export default class Game {
     var timeSinceTick
     var nextTick = this.lastTick + this.tickLength
     var numTicks = 0
+    var ud = 0
+    var thisFrameFPS = 60.1
 
     this.stopMain = window.requestAnimationFrame(this.main.bind(this))
 
@@ -155,7 +156,7 @@ export default class Game {
 
   draw (tFrame) {
     this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
-    // var fs = 70
+    var fs = 70
     for (var i = 0; i < this.stage.items.length; i++) {
       this.stage.items[i].draw(this.ctx)
     }
@@ -165,13 +166,13 @@ export default class Game {
       this.ctx.fillText(this.debug.fps.toFixed(1), 0, fs)
       this.ctx.fillText(this.debug.itemL, 0, fs * 2)
       this.ctx.fillText(this.debug.numUpdates, 0, fs * 3)
-      this.ctx.fillText(this.debug.text, this.stage.canvas.width / 2, this.stage.canvas.height /2)
+      this.ctx.fillText(this.debug.text, this.stage.canvas.width / 2, this.stage.canvas.height / 2)
 
       this.ctx.stroke(this.hatches)
       this.ctx.save()
       this.ctx.strokeStyle = 'green'
       this.ctx.lineWidth = 3
-      this.hitboxes.forEach (xy => this.ctx.strokeRect(xy.x, xy.y, 109, 109))
+      this.hitboxes.forEach(xy => this.ctx.strokeRect(xy.x, xy.y, 109, 109))
       this.ctx.restore()
     }
   }

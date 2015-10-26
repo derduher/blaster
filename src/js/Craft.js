@@ -23,7 +23,7 @@ export default function Craft (stage, ctrl) {
   this.path.lineTo(this.width, this.width)
   this.geo.points.push(new Point2(this.width, this.width))
   this.path.lineTo(this.width / 2, 0)
-  this.geo.points.push(new Point2(0, this.width / 2))
+  this.geo.points.push(new Point2(this.width / 2, 0))
 
   this.path.closePath()
 
