@@ -11,6 +11,15 @@ export default class Geo {
     this.aabb = {min: new Point2(), max: new Point2()}
     this.treatAsPoint = false
   }
+
+  // A^2 + B^2 = C^2
+  distanceTo (pos) {
+    return Math.sqrt(Math.pow(pos.x - this.pos.x, 2) + Math.pow(pos.y - this.pos.y, 2))
+  }
+
+  distanceToObj (obj) {
+    return this.distanceTo(obj.geo.pos)
+  }
   // This can probably be simplified.
   aabbIntersects (b) {
     let aminx = this.pos.x + this.aabb.min.x
@@ -119,5 +128,3 @@ export default class Geo {
     return collision
   }
 }
-
-// line segments

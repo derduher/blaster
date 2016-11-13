@@ -1,10 +1,17 @@
 'use strict'
+import Vector2 from './Vector2.js'
 import Geo from './Geo.js'
-export default function Projectile (craft) {
-  var vy = -10 + craft.geo.v.y
-  this.geo = new Geo(craft.geo.pos.x + craft.width / 2, craft.geo.pos.y + vy,
-    craft.geo.v.x, vy,
-    -0.004, -0.004)
+export default function Projectile (craft, dv = (new Vector2(0, -10))) {
+  var vy = dv.y + craft.geo.v.y
+  var vx = dv.x + craft.geo.v.x
+  this.geo = new Geo(
+    craft.geo.pos.x + craft.width / 2 + vx,
+    craft.geo.pos.y + vy,
+    vx,
+    vy,
+    -0.004,
+    -0.004
+  )
   this.width = 3
   this.geo.aabb.min.x = 0
   this.geo.aabb.min.y = 0

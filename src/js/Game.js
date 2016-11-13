@@ -16,6 +16,8 @@ import Stage from './Stage.js'
 import SpatialManager from './SpatialManager.js'
 import Roid from './Roid.js'
 import Craft from './Craft.js'
+import NPC from './NPC.js'
+import Point2 from './Point2.js'
 import { toggleFullScreen, fullScreenElementProp } from './fullScreen'
 import Controls from './Controls.js'
 
@@ -55,10 +57,15 @@ export default class Game {
     this.craft = new Craft(this.stage, this.ctrl)
     this.stage.spatialManager.registerObject(this.craft)
     this.stage.items.push(this.craft)
+    this.stage.craft = this.craft
 
     this.ctx = this.stage.canvas.getContext('2d')
     this.updateCanvasBoundaries()
     this.showInstructions()
+
+    this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientWidth / 2), this.stage)
+    this.stage.spatialManager.registerObject(this.npc)
+    this.stage.items.push(this.npc)
   }
 
   main (tFrame) {
