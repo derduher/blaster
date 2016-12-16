@@ -1,23 +1,14 @@
-import Geo from './Geo.js'
 import Point2 from './Point2.js'
 import Vector2 from './Vector2.js'
 import Projectile from './Projectile.js'
-var pSpeed = 100
+import Obj from './Object.js'
+const pSpeed = 100
 
-export default class NPC {
+export default class NPC extends Obj {
   constructor (pos, stage) {
+    super(pos, stage)
     this.lastFire = window.performance.now() - pSpeed
-    this.stage = stage
-    this.geo = new Geo()
-
-    this.path = new Path2D()
-
     this.width = 10
-    this.geo.aabb.min = {
-      x: 0,
-      y: 0
-    }
-
     this.geo.aabb.max = {
       x: this.width,
       y: this.width
@@ -33,15 +24,7 @@ export default class NPC {
     this.geo.points.push(new Point2(this.width / 2, this.width))
 
     this.path.closePath()
-    this.health = 10
-    this.geo.pos = pos
-  }
-
-  draw (ctx) {
-    ctx.save()
-    ctx.translate(this.geo.pos.x, this.geo.pos.y)
-    ctx.stroke(this.path)
-    ctx.restore()
+    this.health = 100
   }
 
   ai () {

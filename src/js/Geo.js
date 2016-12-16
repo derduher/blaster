@@ -1,4 +1,3 @@
-'use strict'
 import Vector2 from './Vector2.js'
 import Point2 from './Point2.js'
 
@@ -37,17 +36,20 @@ export default class Geo {
   crossProduct (a, b) {
     return a.x * b.y - b.x * a.y
   }
+
   isPointOnLine (aa, ab, b) {
     var aTmp = new Point2(ab.x - aa.x, ab.y - aa.y)
     var bTmp = new Point2(b.x - aa.x, b.y - aa.y)
     return Math.abs(this.crossProduct(aTmp, bTmp)) < Number.EPSILON
   }
+
   isPointRightOfLine (aa, ab, b) {
     // Move the image, so that a.first is on (0|0)
     var aTmp = new Point2(ab.x - aa.x, ab.y - aa.y)
     var bTmp = new Point2(b.x - aa.x, b.y - aa.y)
     return this.crossProduct(aTmp, bTmp) < 0
   }
+
   segmentTouchesOrCrosses (aa, ab, ba, bb) {
     return this.isPointOnLine(aa, ab, ba) ||
     this.isPointOnLine(aa, ab, bb) || (
@@ -55,9 +57,11 @@ export default class Geo {
     this.isPointRightOfLine(aa, ab, bb)
     )
   }
+
   getSegmentBB (a, b) {
     return [new Point2(Math.min(a.x, b.x), Math.min(a.y, b.y)), new Point2(Math.max(a.x, b.x), Math.max(a.y, b.y))]
   }
+
   segmentsBBIntersect (aa, ab, ba, bb) {
     var firstbb = this.getSegmentBB(aa, ab)
     var secondbb = this.getSegmentBB(ba, bb)
@@ -66,11 +70,13 @@ export default class Geo {
     firstbb[0].y <= secondbb[1].y &&
     firstbb[1].y >= secondbb[0].y
   }
+
   segmentsIntersect (aa, ab, ba, bb) {
     return this.segmentsBBIntersect(aa, ab, ba, bb) &&
     this.segmentTouchesOrCrosses(aa, ab, ba, bb) &&
     this.segmentTouchesOrCrosses(ba, bb, aa, ab)
   }
+
   pointsAtPos (points, pos) {
     var i
     var atPos = []
@@ -79,6 +85,7 @@ export default class Geo {
     }
     return atPos
   }
+
   intersectsWith (ogeo) {
     var i
     var oi

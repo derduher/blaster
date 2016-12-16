@@ -2,9 +2,9 @@
 
 // import Projectile from './Projectile.js'
 var debug = {
-  on: false,
+  on: true,
   fps: 50,
-  text: 0,
+  text: '',
   numUpdates: 0,
   itemL: 0,
   drawRate: 250
@@ -61,9 +61,10 @@ export default class Game {
 
     this.ctx = this.stage.canvas.getContext('2d')
     this.updateCanvasBoundaries()
+    this.ctx.fillStyle = 'rgb(255,255,255)'
     this.showInstructions()
 
-    this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientWidth / 2), this.stage)
+    this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
     this.stage.spatialManager.registerObject(this.npc)
     this.stage.items.push(this.npc)
   }
@@ -163,9 +164,12 @@ export default class Game {
 
   draw (tFrame) {
     this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
+    this.ctx.strokeStyle = 'rgb(255,255,255)'
+    this.ctx.fillStyle = 'rgb(255,255,255)'
+    this.ctx.save()
     var fs = 70
     for (var i = 0; i < this.stage.items.length; i++) {
-      this.stage.items[i].draw(this.ctx)
+      this.stage.items[i].draw(this.ctx, this.debug.on)
     }
 
     if (this.debug.on) {
@@ -209,19 +213,17 @@ export default class Game {
     return cull
   }
 
+  // o other object
   testIntersect (item, i, o, cullQ) {
     if (item.geo.intersectsWith(o.geo)) {
-      item.health -= 200
-      if (item.health < 9) {
-        cullQ.push(i)
-      }
+      item.intersects(o, i, cullQ)
     }
   }
 
   update (tickTime) {
     var cullQ = []
     if (Math.random() > 0.99) {
-      this.stage.items.push(new Roid(this.stage.canvas.width))
+      this.stage.items.push(new Roid(new Point2(0, 0), this.stage))
     }
     this.stage.spatialManager.clearBuckets()
     for (let i = 0; i < this.stage.items.length; i++) {
@@ -232,6 +234,10 @@ export default class Game {
 
     this.hitboxes = new Set()
     var i, item
+
+    /**
+     * for every item on stage, look for items nearby and test whether they intersect
+     */
     for (i = 0; i < this.stage.items.length; i++) {
       item = this.stage.items[i]
       let nearby = this.stage.spatialManager.getNearby(item.geo.pos.x | 0, item.geo.pos.y | 0, item.width | 0).values()
