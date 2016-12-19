@@ -1,4 +1,3 @@
-'use strict'
 /* jshint bitwise: false*/
 export default class SpatialManager {
   constructor (scenewidth, sceneheight, cellsize) {
@@ -21,6 +20,7 @@ export default class SpatialManager {
 
     this.clearBuckets()
   }
+
   clearBuckets () {
     this.buckets.clear()
     var i
@@ -28,8 +28,9 @@ export default class SpatialManager {
       this.buckets.set(i, new Set())
     }
   }
+
   registerObject (obj) {
-    var cells = this.getIdForObject(obj.geo.pos.x | 0, obj.geo.pos.y | 0, obj.width | 0)
+    var cells = this.getIdForObject(obj.geo)
     var cell
     for (var i = 0; i < cells.length; i++) {
       cell = this.buckets.get(cells[i])
@@ -38,21 +39,23 @@ export default class SpatialManager {
       }
     }
   }
-  getIdForObject (x, y, radius) {
+
+  getIdForObject (geo) {
     var bucketsObjIsIn = []
-    var maxX = x + radius
-    var maxY = y + radius
+    var maxX = geo.pos.x + geo.aabb.max.x
+    var maxY = geo.pos.y + geo.aabb.max.y
     var cf = this.cf
     var cols = this.cols
 
-    for (let i = x; i <= maxX; i += this.cellsize) {
-      for (let j = y; j <= maxY; j += this.cellsize) {
+    for (let i = geo.pos.x; i <= maxX; i += this.cellsize) {
+      for (let j = geo.pos.y; j <= maxY; j += this.cellsize) {
         this.addBucket(i, j, cf, cols, bucketsObjIsIn)
       }
     }
 
     return bucketsObjIsIn
   }
+
   addBucket (x, y, cf, cols, set) {
     // ignore collisions offscreen
     var id = (x * cf | 0) + (y * cf | 0) * cols | 0
@@ -60,9 +63,10 @@ export default class SpatialManager {
       set.push(id)
     }
   }
-  getNearby (x, y, radius) {
+
+  getNearby (geo) {
     var nearby = new Set()
-    var ids = this.getIdForObject(x, y, radius)
+    var ids = this.getIdForObject(geo)
 
     var i
     for (i = 0; i < ids.length; i++) {

@@ -21,10 +21,10 @@ function getMag (max) {
 const s = 3
 const numPoints = 12
 export default class Roid extends Obj {
-  constructor (pos, stage) {
-    super(pos, stage)
-    const cw = stage.canvas.width
-    this.color = 'black'
+  constructor (geo, stage) {
+    super(geo.pos, stage)
+    this.geo.pos = geo.pos
+    this.geo.v = geo.v
     // scalar
     var mrad = 4 + 28 * Math.random() // max radius
 
@@ -79,10 +79,6 @@ export default class Roid extends Obj {
     this.path.lineTo(startX, startY)
     this.width = this.geo.aabb.max.x - this.geo.aabb.min.x
     this.health = this.initialHealth = (0.5 + Math.random()) * this.width * this.width | 0
-    this.geo.pos.x = cw * Math.random()
-    this.geo.pos.y = 0 - this.geo.aabb.max.y
-    this.geo.v.x = 0.2 * (-0.5 + Math.random())
-    this.geo.v.y = Math.random()
   }
 
   draw (ctx, debug = false) {
@@ -93,7 +89,7 @@ export default class Roid extends Obj {
 
     if (debug) {
       ctx.font = '24px roboto'
-      ctx.fillText(this.health, 10, 0)
+      ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
     }
 
     ctx.stroke(this.path)

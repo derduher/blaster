@@ -25,11 +25,15 @@ export default class Projectile extends Obj {
     this.boundToCanvas = false
   }
 
-  draw (ctx) {
+  draw (ctx, debug = false) {
     ctx.save()
     ctx.translate(this.geo.pos.x, this.geo.pos.y)
     ctx.fillStyle = 'rgb(255,255,255)'
     ctx.fillRect(0, 0, this.width, this.width)
+    if (debug) {
+      ctx.font = '18px roboto'
+      ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
+    }
     ctx.restore()
   }
 }

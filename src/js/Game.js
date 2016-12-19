@@ -1,8 +1,5 @@
-'use strict'
-
-// import Projectile from './Projectile.js'
 var debug = {
-  on: true,
+  on: false,
   fps: 50,
   text: '',
   numUpdates: 0,
@@ -20,6 +17,7 @@ import NPC from './NPC.js'
 import Point2 from './Point2.js'
 import { toggleFullScreen, fullScreenElementProp } from './fullScreen'
 import Controls from './Controls.js'
+import roidPosFactory from './roidPosFactory.js'
 
 export default class Game {
   constructor (canvas) {
@@ -67,6 +65,21 @@ export default class Game {
     this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
     this.stage.spatialManager.registerObject(this.npc)
     this.stage.items.push(this.npc)
+
+    // let roid = new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage)
+    // window.roid = roid
+    // this.stage.items.push(roid)
+    // this.stage.spatialManager.registerObject(roid)
+
+    // let p = new Projectile({geo: {
+      // pos: {x: (this.stage.canvas.width / 2) + roid.width / 2, y: (this.stage.canvas.height / 2) + roid.width / 2},
+      // v: {x: 0, y: 0}
+    // },
+      // width: 20
+    // }, {x: 0, y: 0})
+    // window.p = p
+    // this.stage.items.push(p)
+    // this.stage.spatialManager.registerObject(p)
   }
 
   main (tFrame) {
@@ -223,8 +236,9 @@ export default class Game {
   update (tickTime) {
     var cullQ = []
     if (Math.random() > 0.99) {
-      this.stage.items.push(new Roid(new Point2(0, 0), this.stage))
+      this.stage.items.push(new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage))
     }
+
     this.stage.spatialManager.clearBuckets()
     for (let i = 0; i < this.stage.items.length; i++) {
       if (this.boundNTick(this.stage.items[i], tickTime)) {
@@ -233,20 +247,24 @@ export default class Game {
     }
 
     this.hitboxes = new Set()
-    var i, item
+    var i
 
     /**
      * for every item on stage, look for items nearby and test whether they intersect
      */
     for (i = 0; i < this.stage.items.length; i++) {
-      item = this.stage.items[i]
-      let nearby = this.stage.spatialManager.getNearby(item.geo.pos.x | 0, item.geo.pos.y | 0, item.width | 0).values()
+      // for (let j = 0; j < this.stage.items.length; j++) {
+        // if (i !== j) {
+          // this.testIntersect(this.stage.items[i], i, this.stage.items[j], cullQ)
+        // }
+      // }
+      let nearby = this.stage.spatialManager.getNearby(this.stage.items[i].geo).values()
       while (1) {
         let o = nearby.next()
         if (o.done) {
           break
         }
-        this.testIntersect(item, i, o.value, cullQ)
+        this.testIntersect(this.stage.items[i], i, o.value, cullQ)
       }
     }
 

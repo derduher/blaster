@@ -21,16 +21,19 @@ export default class Geo {
   }
   // This can probably be simplified.
   aabbIntersects (b) {
-    let aminx = this.pos.x + this.aabb.min.x
-    let bminx = b.pos.x + b.aabb.min.x
-    let aminy = this.pos.y + this.aabb.min.y
-    let bminy = b.pos.y + b.aabb.min.y
-    // foo
-    return ((aminx < bminx && this.pos.x + this.aabb.max.x > bminx) ||
-    (bminx < aminx && b.pos.x + b.aabb.max.x > aminx)) &&
-    ((aminy < bminy && this.pos.y + this.aabb.max.y > bminy) ||
-    (bminy < aminy && b.pos.y + b.aabb.max.y > aminy))
-  // return this.x > b.x && this.x < b.x + b.width && this.y > b.y && this.y < b.y + b.width
+    // let aminx = this.pos.x + this.aabb.min.x | 0
+    // let bminx = b.pos.x + b.aabb.min.x | 0
+    // let aminy = this.pos.y + this.aabb.min.y | 0
+    // let bminy = b.pos.y + b.aabb.min.y | 0
+    // // foo
+    // return ((aminx < bminx && this.pos.x + this.aabb.max.x > bminx) ||
+    // (bminx < aminx && b.pos.x + b.aabb.max.x > aminx)) &&
+    // ((aminy < bminy && this.pos.y + this.aabb.max.y > bminy) ||
+    // (bminy < aminy && b.pos.y + b.aabb.max.y > aminy))
+    //
+    // console.log(this.pos.x, this.pos.y, b.pos.x, b.pos.y, b.aabb.max.x, b.aabb.max.y)
+    // TODO FIX, slightly off
+    return this.pos.x + this.aabb.min.x > b.pos.x && this.pos.x + this.aabb.min.x < b.pos.x + b.aabb.max.x - b.aabb.min.x && this.pos.y + this.aabb.min.y > b.pos.y && this.pos.y + this.aabb.min.y < b.pos.y + b.aabb.max.y - b.aabb.min.y
   }
   // http://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
   crossProduct (a, b) {
