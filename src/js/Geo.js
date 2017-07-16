@@ -103,6 +103,8 @@ export default class Geo {
     if (!this.aabbIntersects(ogeo)) {
       return false
     } else if (this.treatAsPoint || ogeo.treatAsPoint) {
+      // o.highlight('green')
+      // game._pause()
       if (this.treatAsPoint) {
         point = this
         polyPos = ogeo.pos

@@ -175,8 +175,21 @@ export default class Game {
     }
   }
 
+  drawBuckets () {
+    let numPixels = this.stage.canvas.width * this.stage.canvas.height
+    for (let i = 0; i < numPixels; i++) {
+      let x = i % this.stage.canvas.width
+      let y = (i / this.stage.canvas.width) | 0
+      let pct = 100 * this.stage.spatialManager.idForPoint(x, y) / this.stage.spatialManager.numbuckets
+      this.ctx.fillStyle = `hsl(270, 10%, ${pct}%)`
+      this.ctx.fillRect(x, y, 1, 1)
+    }
+  }
+
   draw (tFrame) {
-    this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
+    if (!window.hold) {
+      this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
+    }
     this.ctx.strokeStyle = 'rgb(255,255,255)'
     this.ctx.fillStyle = 'rgb(255,255,255)'
     this.ctx.save()
@@ -334,10 +347,13 @@ export default class Game {
       this.resume()
     }
   }
-
-  pause () {
+  _pause () {
     window.cancelAnimationFrame(this.stopMain)
     this.stopMain = null
+  }
+
+  pause () {
+    this._pause()
     this.showPause()
   }
 

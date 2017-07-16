@@ -29,11 +29,22 @@ export default class Projectile extends Obj {
     ctx.save()
     ctx.translate(this.geo.pos.x, this.geo.pos.y)
     ctx.fillStyle = 'rgb(255,255,255)'
+    if (this.isHighlighted) {
+      ctx.fillStyle = this.highlightColor
+    }
     ctx.fillRect(0, 0, this.width, this.width)
     if (debug) {
       ctx.font = '18px roboto'
       ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
     }
+    // if (this.isDisplayCell) {
+    // ctx.font = '24px roboto'
+    // ctx.fillText(window.spatial.getIdForObject(this.geo).join(', '), 10, 0)
+    // }
     ctx.restore()
+  }
+
+  displayCell () {
+    this.isDisplayCell = true
   }
 }

@@ -47,19 +47,27 @@ export default class SpatialManager {
     var cf = this.cf
     var cols = this.cols
 
-    for (let i = geo.pos.x; i <= maxX; i += this.cellsize) {
-      for (let j = geo.pos.y; j <= maxY; j += this.cellsize) {
-        this.addBucket(i, j, cf, cols, bucketsObjIsIn)
-      }
-    }
+    this.addBucket(geo.pos.x, geo.pos.y, cf, cols, bucketsObjIsIn)
+    this.addBucket(maxX, geo.pos.y, cf, cols, bucketsObjIsIn)
+    this.addBucket(geo.pos.x, maxY, cf, cols, bucketsObjIsIn)
+    this.addBucket(maxX, maxY, cf, cols, bucketsObjIsIn)
+    // for (let i = geo.pos.x; i <= maxX; i += this.cellsize) {
+      // for (let j = geo.pos.y; j <= maxY; j += this.cellsize) {
+        // this.addBucket(i, j, cf, cols, bucketsObjIsIn)
+      // }
+    // }
 
     return bucketsObjIsIn
+  }
+
+  idForPoint (x, y) {
+    return (x * this.cf | 0) + (y * this.cf | 0) * this.cols | 0
   }
 
   addBucket (x, y, cf, cols, set) {
     // ignore collisions offscreen
     var id = (x * cf | 0) + (y * cf | 0) * cols | 0
-    if (id >= 0 && id < this.numbuckets && set.indexOf(id) === -1) {
+    if (id >= 0 && id < this.numbuckets && set.indexOf(id) === -1) { // don't re-add the same item
       set.push(id)
     }
   }
