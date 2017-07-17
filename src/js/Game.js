@@ -1,10 +1,7 @@
-'use strict'
-
-// import Projectile from './Projectile.js'
 var debug = {
   on: false,
   fps: 50,
-  text: 0,
+  text: '',
   numUpdates: 0,
   itemL: 0,
   drawRate: 250
@@ -16,8 +13,11 @@ import Stage from './Stage.js'
 import SpatialManager from './SpatialManager.js'
 import Roid from './Roid.js'
 import Craft from './Craft.js'
+// import NPC from './NPC.js'
+// import Point2 from './Point2.js'
 import { toggleFullScreen, fullScreenElementProp } from './fullScreen'
 import Controls from './Controls.js'
+import roidPosFactory from './roidPosFactory.js'
 
 export default class Game {
   constructor (canvas) {
@@ -55,10 +55,31 @@ export default class Game {
     this.craft = new Craft(this.stage, this.ctrl)
     this.stage.spatialManager.registerObject(this.craft)
     this.stage.items.push(this.craft)
+    this.stage.craft = this.craft
 
     this.ctx = this.stage.canvas.getContext('2d')
     this.updateCanvasBoundaries()
+    this.ctx.fillStyle = 'rgb(255,255,255)'
     this.showInstructions()
+
+    // this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
+    // this.stage.spatialManager.registerObject(this.npc)
+    // this.stage.items.push(this.npc)
+
+    // let roid = new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage)
+    // window.roid = roid
+    // this.stage.items.push(roid)
+    // this.stage.spatialManager.registerObject(roid)
+
+    // let p = new Projectile({geo: {
+      // pos: {x: (this.stage.canvas.width / 2) + roid.width / 2, y: (this.stage.canvas.height / 2) + roid.width / 2},
+      // v: {x: 0, y: 0}
+    // },
+      // width: 20
+    // }, {x: 0, y: 0})
+    // window.p = p
+    // this.stage.items.push(p)
+    // this.stage.spatialManager.registerObject(p)
   }
 
   main (tFrame) {
@@ -154,11 +175,27 @@ export default class Game {
     }
   }
 
+  drawBuckets () {
+    let numPixels = this.stage.canvas.width * this.stage.canvas.height
+    for (let i = 0; i < numPixels; i++) {
+      let x = i % this.stage.canvas.width
+      let y = (i / this.stage.canvas.width) | 0
+      let pct = 100 * this.stage.spatialManager.idForPoint(x, y) / this.stage.spatialManager.numbuckets
+      this.ctx.fillStyle = `hsl(270, 10%, ${pct}%)`
+      this.ctx.fillRect(x, y, 1, 1)
+    }
+  }
+
   draw (tFrame) {
-    this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
+    if (!window.hold) {
+      this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
+    }
+    this.ctx.strokeStyle = 'rgb(255,255,255)'
+    this.ctx.fillStyle = 'rgb(255,255,255)'
+    this.ctx.save()
     var fs = 70
     for (var i = 0; i < this.stage.items.length; i++) {
-      this.stage.items[i].draw(this.ctx)
+      this.stage.items[i].draw(this.ctx, this.debug.on)
     }
 
     if (this.debug.on) {
@@ -202,20 +239,19 @@ export default class Game {
     return cull
   }
 
+  // o other object
   testIntersect (item, i, o, cullQ) {
     if (item.geo.intersectsWith(o.geo)) {
-      item.health -= 200
-      if (item.health < 9) {
-        cullQ.push(i)
-      }
+      item.intersects(o, i, cullQ)
     }
   }
 
   update (tickTime) {
     var cullQ = []
     if (Math.random() > 0.99) {
-      this.stage.items.push(new Roid(this.stage.canvas.width))
+      this.stage.items.push(new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage))
     }
+
     this.stage.spatialManager.clearBuckets()
     for (let i = 0; i < this.stage.items.length; i++) {
       if (this.boundNTick(this.stage.items[i], tickTime)) {
@@ -224,16 +260,24 @@ export default class Game {
     }
 
     this.hitboxes = new Set()
-    var i, item
+    var i
+
+    /**
+     * for every item on stage, look for items nearby and test whether they intersect
+     */
     for (i = 0; i < this.stage.items.length; i++) {
-      item = this.stage.items[i]
-      let nearby = this.stage.spatialManager.getNearby(item.geo.pos.x | 0, item.geo.pos.y | 0, item.width | 0).values()
+      // for (let j = 0; j < this.stage.items.length; j++) {
+        // if (i !== j) {
+          // this.testIntersect(this.stage.items[i], i, this.stage.items[j], cullQ)
+        // }
+      // }
+      let nearby = this.stage.spatialManager.getNearby(this.stage.items[i].geo).values()
       while (1) {
         let o = nearby.next()
         if (o.done) {
           break
         }
-        this.testIntersect(item, i, o.value, cullQ)
+        this.testIntersect(this.stage.items[i], i, o.value, cullQ)
       }
     }
 
@@ -303,10 +347,13 @@ export default class Game {
       this.resume()
     }
   }
-
-  pause () {
+  _pause () {
     window.cancelAnimationFrame(this.stopMain)
     this.stopMain = null
+  }
+
+  pause () {
+    this._pause()
     this.showPause()
   }
 

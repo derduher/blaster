@@ -1,4 +1,3 @@
-'use strict'
 import Vector2 from './Vector2.js'
 import Point2 from './Point2.js'
 
@@ -11,34 +10,49 @@ export default class Geo {
     this.aabb = {min: new Point2(), max: new Point2()}
     this.treatAsPoint = false
   }
+
+  // A^2 + B^2 = C^2
+  distanceTo (pos) {
+    return Math.sqrt(Math.pow(pos.x - this.pos.x, 2) + Math.pow(pos.y - this.pos.y, 2))
+  }
+
+  distanceToObj (obj) {
+    return this.distanceTo(obj.geo.pos)
+  }
   // This can probably be simplified.
   aabbIntersects (b) {
-    let aminx = this.pos.x + this.aabb.min.x
-    let bminx = b.pos.x + b.aabb.min.x
-    let aminy = this.pos.y + this.aabb.min.y
-    let bminy = b.pos.y + b.aabb.min.y
-    // foo
-    return ((aminx < bminx && this.pos.x + this.aabb.max.x > bminx) ||
-    (bminx < aminx && b.pos.x + b.aabb.max.x > aminx)) &&
-    ((aminy < bminy && this.pos.y + this.aabb.max.y > bminy) ||
-    (bminy < aminy && b.pos.y + b.aabb.max.y > aminy))
-  // return this.x > b.x && this.x < b.x + b.width && this.y > b.y && this.y < b.y + b.width
+    // let aminx = this.pos.x + this.aabb.min.x | 0
+    // let bminx = b.pos.x + b.aabb.min.x | 0
+    // let aminy = this.pos.y + this.aabb.min.y | 0
+    // let bminy = b.pos.y + b.aabb.min.y | 0
+    // // foo
+    // return ((aminx < bminx && this.pos.x + this.aabb.max.x > bminx) ||
+    // (bminx < aminx && b.pos.x + b.aabb.max.x > aminx)) &&
+    // ((aminy < bminy && this.pos.y + this.aabb.max.y > bminy) ||
+    // (bminy < aminy && b.pos.y + b.aabb.max.y > aminy))
+    //
+    // console.log(this.pos.x, this.pos.y, b.pos.x, b.pos.y, b.aabb.max.x, b.aabb.max.y)
+    // TODO FIX, slightly off
+    return this.pos.x + this.aabb.min.x > b.pos.x && this.pos.x + this.aabb.min.x < b.pos.x + b.aabb.max.x - b.aabb.min.x && this.pos.y + this.aabb.min.y > b.pos.y && this.pos.y + this.aabb.min.y < b.pos.y + b.aabb.max.y - b.aabb.min.y
   }
   // http://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
   crossProduct (a, b) {
     return a.x * b.y - b.x * a.y
   }
+
   isPointOnLine (aa, ab, b) {
     var aTmp = new Point2(ab.x - aa.x, ab.y - aa.y)
     var bTmp = new Point2(b.x - aa.x, b.y - aa.y)
     return Math.abs(this.crossProduct(aTmp, bTmp)) < Number.EPSILON
   }
+
   isPointRightOfLine (aa, ab, b) {
     // Move the image, so that a.first is on (0|0)
     var aTmp = new Point2(ab.x - aa.x, ab.y - aa.y)
     var bTmp = new Point2(b.x - aa.x, b.y - aa.y)
     return this.crossProduct(aTmp, bTmp) < 0
   }
+
   segmentTouchesOrCrosses (aa, ab, ba, bb) {
     return this.isPointOnLine(aa, ab, ba) ||
     this.isPointOnLine(aa, ab, bb) || (
@@ -46,9 +60,11 @@ export default class Geo {
     this.isPointRightOfLine(aa, ab, bb)
     )
   }
+
   getSegmentBB (a, b) {
     return [new Point2(Math.min(a.x, b.x), Math.min(a.y, b.y)), new Point2(Math.max(a.x, b.x), Math.max(a.y, b.y))]
   }
+
   segmentsBBIntersect (aa, ab, ba, bb) {
     var firstbb = this.getSegmentBB(aa, ab)
     var secondbb = this.getSegmentBB(ba, bb)
@@ -57,11 +73,13 @@ export default class Geo {
     firstbb[0].y <= secondbb[1].y &&
     firstbb[1].y >= secondbb[0].y
   }
+
   segmentsIntersect (aa, ab, ba, bb) {
     return this.segmentsBBIntersect(aa, ab, ba, bb) &&
     this.segmentTouchesOrCrosses(aa, ab, ba, bb) &&
     this.segmentTouchesOrCrosses(ba, bb, aa, ab)
   }
+
   pointsAtPos (points, pos) {
     var i
     var atPos = []
@@ -70,6 +88,7 @@ export default class Geo {
     }
     return atPos
   }
+
   intersectsWith (ogeo) {
     var i
     var oi
@@ -84,6 +103,8 @@ export default class Geo {
     if (!this.aabbIntersects(ogeo)) {
       return false
     } else if (this.treatAsPoint || ogeo.treatAsPoint) {
+      // o.highlight('green')
+      // game._pause()
       if (this.treatAsPoint) {
         point = this
         polyPos = ogeo.pos
@@ -119,5 +140,3 @@ export default class Geo {
     return collision
   }
 }
-
-// line segments

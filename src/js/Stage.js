@@ -4,5 +4,6 @@ export default class Stage {
     this.spatialManager = null
     this.canvas = canvas
     this.padding = 3
+    this.craft = null
   }
 }
