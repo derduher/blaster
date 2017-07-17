@@ -13,8 +13,8 @@ import Stage from './Stage.js'
 import SpatialManager from './SpatialManager.js'
 import Roid from './Roid.js'
 import Craft from './Craft.js'
-import NPC from './NPC.js'
-import Point2 from './Point2.js'
+// import NPC from './NPC.js'
+// import Point2 from './Point2.js'
 import { toggleFullScreen, fullScreenElementProp } from './fullScreen'
 import Controls from './Controls.js'
 import roidPosFactory from './roidPosFactory.js'
@@ -62,9 +62,9 @@ export default class Game {
     this.ctx.fillStyle = 'rgb(255,255,255)'
     this.showInstructions()
 
-    this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
-    this.stage.spatialManager.registerObject(this.npc)
-    this.stage.items.push(this.npc)
+    // this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
+    // this.stage.spatialManager.registerObject(this.npc)
+    // this.stage.items.push(this.npc)
 
     // let roid = new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage)
     // window.roid = roid
