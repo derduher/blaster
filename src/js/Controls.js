@@ -3,6 +3,7 @@ const a = 65
 const d = 68
 const w = 87
 const s = 83
+const q = 81
 const space = 32
 const left = 37
 const right = 39
@@ -20,6 +21,7 @@ export default class Controls {
     this.cfg[w] = this.cfg[up] = 'u'
     this.cfg[s] = this.cfg[down] = 'd'
     this.cfg[space] = 'f'
+    this.cfg[q] = 'p'
     this.cfg[esc] = 'toggleFS'
   }
   kd (e) {

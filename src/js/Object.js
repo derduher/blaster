@@ -31,7 +31,7 @@ export default class Obj {
     ctx.stroke(this.path)
     if (debug) {
       ctx.font = '24px roboto'
-      ctx.fillText(this.health, 10, 0)
+      ctx.fillText(this.health, 10, 35)
     }
     // if (this.isDisplayCell) {
     // ctx.font = '24px roboto'
@@ -55,7 +55,7 @@ export default class Obj {
 
   intersects (o, i, cullQ) {
     this.health -= 10
-    if (this.health < 9) {
+    if (this.health <= 0 && this.immortal !== true) {
       cullQ.push(i)
     }
     this.highlight()

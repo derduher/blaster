@@ -18,6 +18,7 @@ export default class Craft extends Obj {
     this.boundToCanvas = true
     this.width = width
     this.health = 1000
+    this.immortal = true
 
     this.path.moveTo(0, this.width)
     this.geo.points.push(new Point2(0, this.width))

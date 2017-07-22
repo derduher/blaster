@@ -21,7 +21,7 @@ export default class Projectile extends Obj {
     this.geo.aabb.max.x = this.width
     this.geo.aabb.max.y = this.width
     this.geo.treatAsPoint = true
-    this.health = 5
+    this.health = 10
     this.boundToCanvas = false
   }
 
@@ -33,10 +33,10 @@ export default class Projectile extends Obj {
       ctx.fillStyle = this.highlightColor
     }
     ctx.fillRect(0, 0, this.width, this.width)
-    if (debug) {
-      ctx.font = '18px roboto'
-      ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
-    }
+    // if (debug) {
+      // ctx.font = '18px roboto'
+      // ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
+    // }
     // if (this.isDisplayCell) {
     // ctx.font = '24px roboto'
     // ctx.fillText(window.spatial.getIdForObject(this.geo).join(', '), 10, 0)

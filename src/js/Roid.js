@@ -80,19 +80,4 @@ export default class Roid extends Obj {
     this.width = this.geo.aabb.max.x - this.geo.aabb.min.x
     this.health = this.initialHealth = (0.5 + Math.random()) * this.width * this.width | 0
   }
-
-  draw (ctx, debug = false) {
-    ctx.save()
-    ctx.strokeStyle = 'rgb(' + (148 + 107 * (1 - this.health / this.initialHealth) | 0) + ',0,234)'
-    // ctx.fillStyle = this.color
-    ctx.translate(this.geo.pos.x, this.geo.pos.y)
-
-    if (debug) {
-      ctx.font = '24px roboto'
-      ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
-    }
-
-    ctx.stroke(this.path)
-    ctx.restore()
-  }
 }

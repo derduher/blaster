@@ -47,15 +47,18 @@ export default class SpatialManager {
     var cf = this.cf
     var cols = this.cols
 
-    this.addBucket(geo.pos.x, geo.pos.y, cf, cols, bucketsObjIsIn)
-    this.addBucket(maxX, geo.pos.y, cf, cols, bucketsObjIsIn)
-    this.addBucket(geo.pos.x, maxY, cf, cols, bucketsObjIsIn)
-    this.addBucket(maxX, maxY, cf, cols, bucketsObjIsIn)
-    // for (let i = geo.pos.x; i <= maxX; i += this.cellsize) {
-      // for (let j = geo.pos.y; j <= maxY; j += this.cellsize) {
-        // this.addBucket(i, j, cf, cols, bucketsObjIsIn)
-      // }
-    // }
+    // this.addBucket(geo.pos.x, geo.pos.y, cf, cols, bucketsObjIsIn)
+    // this.addBucket(maxX, geo.pos.y, cf, cols, bucketsObjIsIn)
+    // this.addBucket(geo.pos.x, maxY, cf, cols, bucketsObjIsIn)
+    // this.addBucket(maxX, maxY, cf, cols, bucketsObjIsIn)
+    const minX = (geo.pos.x / this.cellsize | 0) * this.cellsize
+    const minY = (geo.pos.y / this.cellsize | 0) * this.cellsize
+    for (let i = (maxX / this.cellsize | 0) * this.cellsize; i >= minX; i -= this.cellsize) {
+      for (let j = (maxY / this.cellsize | 0) * this.cellsize; j >= minY; j -= this.cellsize) {
+        // debugger
+        this.addBucket(i, j, cf, cols, bucketsObjIsIn)
+      }
+    }
 
     return bucketsObjIsIn
   }

@@ -21,20 +21,30 @@ export default class Geo {
   }
   // This can probably be simplified.
   aabbIntersects (b) {
-    // let aminx = this.pos.x + this.aabb.min.x | 0
-    // let bminx = b.pos.x + b.aabb.min.x | 0
-    // let aminy = this.pos.y + this.aabb.min.y | 0
-    // let bminy = b.pos.y + b.aabb.min.y | 0
-    // // foo
-    // return ((aminx < bminx && this.pos.x + this.aabb.max.x > bminx) ||
-    // (bminx < aminx && b.pos.x + b.aabb.max.x > aminx)) &&
-    // ((aminy < bminy && this.pos.y + this.aabb.max.y > bminy) ||
-    // (bminy < aminy && b.pos.y + b.aabb.max.y > aminy))
-    //
-    // console.log(this.pos.x, this.pos.y, b.pos.x, b.pos.y, b.aabb.max.x, b.aabb.max.y)
-    // TODO FIX, slightly off
-    return this.pos.x + this.aabb.min.x > b.pos.x && this.pos.x + this.aabb.min.x < b.pos.x + b.aabb.max.x - b.aabb.min.x && this.pos.y + this.aabb.min.y > b.pos.y && this.pos.y + this.aabb.min.y < b.pos.y + b.aabb.max.y - b.aabb.min.y
+    let left // the object that is the most to the left
+    let right
+    let top
+    let bottom
+    if (this.pos.x + this.aabb.min.x < b.pos.x + b.aabb.min.x) {
+      left = this
+      right = b
+    } else {
+      left = b
+      right = this
+    }
+
+    if (this.pos.y + this.aabb.min.y < b.pos.y + b.aabb.min.y) {
+      top = this
+      bottom = b
+    } else {
+      top = b
+      bottom = this
+    }
+
+    return right.aabb.min.x < left.aabb.max.x &&
+      bottom.aabb.min.y < top.aabb.max.y
   }
+
   // http://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
   crossProduct (a, b) {
     return a.x * b.y - b.x * a.y

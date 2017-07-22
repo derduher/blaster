@@ -8,13 +8,14 @@ var debug = {
 }
 
 const fpsFilter = 75
+const cellSize = 256
 
 import Stage from './Stage.js'
 import SpatialManager from './SpatialManager.js'
 import Roid from './Roid.js'
 import Craft from './Craft.js'
 // import NPC from './NPC.js'
-// import Point2 from './Point2.js'
+import Point2 from './Point2.js'
 import { toggleFullScreen, fullScreenElementProp } from './fullScreen'
 import Controls from './Controls.js'
 import roidPosFactory from './roidPosFactory.js'
@@ -50,7 +51,7 @@ export default class Game {
     document.addEventListener('touchend', this.pausedOnTap.bind(this))
     window.onresize = () => this.updateCanvasBoundaries()
 
-    this.stage.spatialManager = new SpatialManager(document.documentElement.clientWidth, document.documentElement.clientHeight, 109)
+    window.spatial = this.stage.spatialManager = new SpatialManager(document.documentElement.clientWidth, document.documentElement.clientHeight, cellSize)
 
     this.craft = new Craft(this.stage, this.ctrl)
     this.stage.spatialManager.registerObject(this.craft)
@@ -61,6 +62,7 @@ export default class Game {
     this.updateCanvasBoundaries()
     this.ctx.fillStyle = 'rgb(255,255,255)'
     this.showInstructions()
+    window.game = this
 
     // this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
     // this.stage.spatialManager.registerObject(this.npc)
@@ -147,7 +149,7 @@ export default class Game {
     this.stage.ymax = this.stage.canvas.height - this.stage.padding
 
     this.hatches = new Path2D()
-    let w = 109
+    let w = cellSize
     let max = this.stage.canvas.width / w
     if (this.stage.canvas.height / w > max) {
       max = this.stage.canvas.height / w
@@ -159,7 +161,7 @@ export default class Game {
     // this.stage.items.push(new Roid(this.stage.canvas.width, i*90, j*90))
     // }
     // }
-    this.stage.spatialManager = new SpatialManager(this.stage.canvas.width, this.stage.canvas.height, 109)
+    this.stage.spatialManager = new SpatialManager(this.stage.canvas.width, this.stage.canvas.height, cellSize)
     this.stage.items.forEach(this.stage.spatialManager.registerObject, this.stage.spatialManager)
     if (this.started && !this.stopMain) {
       this.draw()
@@ -209,7 +211,7 @@ export default class Game {
       this.ctx.save()
       this.ctx.strokeStyle = 'green'
       this.ctx.lineWidth = 3
-      this.hitboxes.forEach(xy => this.ctx.strokeRect(xy.x, xy.y, 109, 109))
+      this.hitboxes.forEach(xy => this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize))
       this.ctx.restore()
     }
   }
@@ -241,12 +243,15 @@ export default class Game {
 
   // o other object
   testIntersect (item, i, o, cullQ) {
-    if (item.geo.intersectsWith(o.geo)) {
+    if (item !== o && item.geo.intersectsWith(o.geo)) {
       item.intersects(o, i, cullQ)
     }
   }
 
   update (tickTime) {
+    if (this.ctrl.p) {
+      this.togglePause()
+    }
     var cullQ = []
     if (Math.random() > 0.99) {
       this.stage.items.push(new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage))
@@ -259,7 +264,14 @@ export default class Game {
       }
     }
 
-    this.hitboxes = new Set()
+    if (this.debug.on) {
+      this.hitboxes = new Set()
+      for (let i = 0; i < this.stage.canvas.width; i += cellSize) {
+        for (let j = 0; j < this.stage.canvas.height; j += cellSize) {
+          this.hitboxes.add(new Point2(i, j))
+        }
+      }
+    }
     var i
 
     /**
@@ -350,6 +362,14 @@ export default class Game {
   _pause () {
     window.cancelAnimationFrame(this.stopMain)
     this.stopMain = null
+  }
+
+  togglePause () {
+    if (this.stopMain) {
+      this._pause()
+    } else {
+      this.resume()
+    }
   }
 
   pause () {
