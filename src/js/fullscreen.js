@@ -1,4 +1,3 @@
-'use strict'
 var de = document.documentElement
 var fullScreenElementProp
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 import Geo from './Geo.js'
 
 export default class Obj {

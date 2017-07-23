@@ -1,14 +1,13 @@
-'use strict'
-/* jshint bitwise: false*/
+/* jshint bitwise: false */
+import Point2 from './Point2.js'
+import Obj from './Object.js'
+import Projectile from './Projectile.js'
+
 var pSpeed = 50
 
 const speed = 5
 var posDir = speed
 var negDir = speed * -1
-import Point2 from './Point2.js'
-import Obj from './Object.js'
-
-import Projectile from './Projectile.js'
 export default class Craft extends Obj {
   constructor (stage, ctrl) {
     const width = 50

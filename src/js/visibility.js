@@ -1,4 +1,3 @@
-'use strict'
 var visProp = (function getHiddenProp () {
   var prefixes = ['webkit', 'moz', 'ms', 'o']
 
