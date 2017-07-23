@@ -1,3 +1,13 @@
+import Stage from './Stage.js'
+import SpatialManager from './SpatialManager.js'
+import Roid from './Roid.js'
+import Craft from './Craft.js'
+// import NPC from './NPC.js'
+import Point2 from './Point2.js'
+import { toggleFullScreen, fullScreenElementProp } from './fullScreen'
+import Controls from './Controls.js'
+import roidPosFactory from './roidPosFactory.js'
+
 var debug = {
   on: false,
   fps: 50,
@@ -9,16 +19,6 @@ var debug = {
 
 const fpsFilter = 75
 const cellSize = 256
-
-import Stage from './Stage.js'
-import SpatialManager from './SpatialManager.js'
-import Roid from './Roid.js'
-import Craft from './Craft.js'
-// import NPC from './NPC.js'
-import Point2 from './Point2.js'
-import { toggleFullScreen, fullScreenElementProp } from './fullScreen'
-import Controls from './Controls.js'
-import roidPosFactory from './roidPosFactory.js'
 
 export default class Game {
   constructor (canvas) {
@@ -216,6 +216,8 @@ export default class Game {
     }
   }
 
+  /* eslint-disable no-mixed-operators */
+  // I don't remember what the intended order of ops is on this
   boundNTick (i, tickTime) {
     i.tick(tickTime)
     var x = i.geo.pos.x + i.geo.v.x
@@ -240,6 +242,7 @@ export default class Game {
     }
     return cull
   }
+  /* eslint-enable no-mixed-operators */
 
   // o other object
   testIntersect (item, i, o, cullQ) {

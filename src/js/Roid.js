@@ -1,4 +1,4 @@
-/* jshint bitwise: false*/
+/* jshint bitwise: false */
 import Point2 from './Point2.js'
 import Obj from './Object.js'
 

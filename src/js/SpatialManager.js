@@ -1,4 +1,4 @@
-/* jshint bitwise: false*/
+/* jshint bitwise: false */
 export default class SpatialManager {
   constructor (scenewidth, sceneheight, cellsize) {
     this.SceneWidth = scenewidth
