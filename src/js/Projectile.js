@@ -16,7 +16,6 @@ export default class Projectile extends Obj {
   }
 
   draw (ctx, debug = false) {
-    ctx.save()
     ctx.translate(this.geo.pos.x, this.geo.pos.y)
     ctx.fillStyle = 'rgb(255,255,255)'
     if (this.isHighlighted) {
@@ -34,7 +33,6 @@ export default class Projectile extends Obj {
     // ctx.font = '24px roboto'
     // ctx.fillText(window.spatial.getIdForObject(this.geo).join(', '), 10, 0)
     // }
-    ctx.restore()
   }
 
   displayCell () {
