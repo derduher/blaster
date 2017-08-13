@@ -11,7 +11,8 @@ var posDir = speed
 var negDir = speed * -1
 export default class Craft extends Obj {
   constructor (stage, ctrl) {
-    const width = 50
+    const width = 48
+    const height = 76
     const pos = new Point2(document.documentElement.clientWidth / 2 - width / 2, document.documentElement.clientHeight - width - stage.padding)
     super(pos, stage)
     this.mass = 8 // Gg
@@ -22,17 +23,47 @@ export default class Craft extends Obj {
     this.immortal = true
     this.projectileSize = Math.random() * 20 | 0
 
-    this.path.moveTo(0, this.width)
-    this.geo.points.push(new Point2(0, this.width))
-    this.path.lineTo(this.width, this.width)
-    this.geo.points.push(new Point2(this.width, this.width))
-    this.path.lineTo(this.width / 2, 0)
-    this.geo.points.push(new Point2(this.width / 2, 0))
+    this.geo.points.push(new Point2(9, 38.45))
+    this.geo.points.push(new Point2(9, 10))
+    this.geo.points.push(new Point2(5, 10))
+    this.geo.points.push(new Point2(5, 54.95))
+
+    this.geo.points.push(new Point2(39, 38.45))
+    this.geo.points.push(new Point2(39, 10))
+    this.geo.points.push(new Point2(43, 10))
+    this.geo.points.push(new Point2(43, 54.95))
+
+    this.geo.points.push(new Point2(18, 0))
+    this.geo.points.push(new Point2(30, 0))
+    this.geo.points.push(new Point2(48, 76))
+    this.geo.points.push(new Point2(0, 76))
+
+    let points = [...this.geo.points]
+    let first = points.shift()
+    this.path.moveTo(first.x, first.y)
+    for (let i = 0; i < 3; i++) {
+      let pt = points.shift()
+      this.path.lineTo(pt.x, pt.y)
+    }
+
+    first = points.shift()
+    this.path.moveTo(first.x, first.y)
+    for (let i = 0; i < 3; i++) {
+      let pt = points.shift()
+      this.path.lineTo(pt.x, pt.y)
+    }
+
+    first = points.shift()
+    this.path.moveTo(first.x, first.y)
+    for (let i = 0; points.length; i++) {
+      let pt = points.shift()
+      this.path.lineTo(pt.x, pt.y)
+    }
 
     this.path.closePath()
 
-    this.geo.aabb.max.x = this.width
-    this.geo.aabb.max.y = this.width
+    this.geo.aabb.max.x = width
+    this.geo.aabb.max.y = height
 
     this.ctrl = ctrl
   }

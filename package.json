@@ -7,7 +7,7 @@
     "clean": "rm -rf build/*",
     "run": "http-server build/ -s",
     "start": "npm-run-all -p watch:pug watch:js watch:less run",
-    "build": "cp -R src/* build/ & npm run build:pug & npm run build:js & npm run build:less & wait",
+    "build": "cp -R src/* build/ & npm-run-all -p build:pug build:js build:less & wait",
     "build:js": "browserify src/js/main.js -t [ babelify ] --outfile build/js/main.js",
     "build:pug": "pug src/*.pug -o build/",
     "build:less": "lessc --source-map-map-inline src/css/main.less > build/css/main.css",
@@ -15,7 +15,7 @@
     "watch:pug": "nodemon --watch src -e pug --exec 'npm run build:pug'",
     "watch:less": "nodemon --watch src/css -e less --exec 'npm run build:less'",
     "watch:js": "nodemon --watch src -e js --exec 'npm run build:js'",
-    "watch": "npm run watch:pug & npm run watch:js & npm run watch:less",
+    "watch": "npm-run-all -p watch:pug watch:js watch:less",
     "test": "standard --fix"
   },
   "repository": {
