@@ -25,6 +25,8 @@ export default class Roid extends Obj {
     super(geo.pos, stage)
     this.geo.pos = geo.pos
     this.geo.v = geo.v
+    // https://en.wikipedia.org/wiki/101955_Bennu
+    this.mass = 6e4 * Math.random() // Gg
     // scalar
     var mrad = 4 + 28 * Math.random() // max radius
 

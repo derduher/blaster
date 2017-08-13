@@ -3,6 +3,7 @@ import Geo from './Geo.js'
 
 export default class Obj {
   constructor (pos, stage) {
+    this.mass = 1
     this.stage = stage
     this.geo = new Geo()
 
@@ -55,6 +56,9 @@ export default class Obj {
   }
 
   intersects (o, i, cullQ) {
+    // f = ma
+    // let fx = (this.geo.v.x / 16.7) * this.mass
+    // let fy = (this.geo.v.y / 16.7) * this.mass
     this.health -= 10
     if (this.health <= 0 && this.immortal !== true) {
       cullQ.push(i)
