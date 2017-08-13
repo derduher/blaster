@@ -19,6 +19,8 @@ var debug = {
 
 const fpsFilter = 75
 const cellSize = 256
+const nativeWidth = 1920
+const nativeHeight = 1080
 
 export default class Game {
   constructor (canvas) {
@@ -61,7 +63,11 @@ export default class Game {
     this.ctx = this.stage.canvas.getContext('2d')
     this.updateCanvasBoundaries()
     this.ctx.fillStyle = 'rgb(255,255,255)'
+    this.ctx.strokeStyle = 'rgb(255,255,255)'
+    this.ctx.save()
+    this.ctx.save()
     this.showInstructions()
+    this.count = 0
     window.game = this
 
     // this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
@@ -140,13 +146,17 @@ export default class Game {
       this.stage.canvas.width = window.screen.width
       this.stage.canvas.height = window.screen.height
     } else {
-      this.stage.canvas.width = document.documentElement.clientWidth
-      this.stage.canvas.height = document.documentElement.clientHeight
+      this.stage.canvas.width = window.innerWidth
+      this.stage.canvas.height = window.innerHeight
     }
-    this.stage.xmax = this.stage.canvas.width - this.stage.padding
+
+    this.stage.canvas.style.width = this.stage.canvas.width + 'px'
+    this.stage.canvas.style.height = this.stage.canvas.height + 'px'
+
+    this.stage.xmax = nativeWidth - this.stage.padding
     this.stage.xmin = this.stage.padding
     this.stage.ymin = this.stage.padding
-    this.stage.ymax = this.stage.canvas.height - this.stage.padding
+    this.stage.ymax = nativeHeight - this.stage.padding
 
     this.hatches = new Path2D()
     let w = cellSize
@@ -192,13 +202,30 @@ export default class Game {
     if (!window.hold) {
       this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
     }
-    this.ctx.strokeStyle = 'rgb(255,255,255)'
-    this.ctx.fillStyle = 'rgb(255,255,255)'
     this.ctx.save()
+    const deviceWidth = this.stage.canvas.width
+    const deviceHeight = this.stage.canvas.height
+    const scaleFitNative = Math.min(deviceWidth / nativeWidth, deviceHeight / nativeHeight)
+    // const scaleFillNative = Math.max(deviceWidth / nativeWidth, deviceHeight / nativeHeight)
+    const scale = scaleFitNative
+
+    this.ctx.setTransform(
+      scale, 0, // or use scaleFillNative
+      0, scale,
+      deviceWidth / 2 | 0,
+      deviceHeight / 2 | 0
+    )
+    let offsetDeviceTop = -(deviceHeight / scale) / 2
+    let offsetDeviceLeft = -(deviceWidth / scale) / 2
+    this.ctx.translate(offsetDeviceLeft, offsetDeviceTop)
+    console.log(scale, deviceWidth, deviceHeight, this.stage.xmax, this.stage.ymax)
     var fs = 70
     for (var i = 0; i < this.stage.items.length; i++) {
+      this.ctx.save()
       this.stage.items[i].draw(this.ctx, this.debug.on)
+      this.ctx.restore()
     }
+    this.ctx.restore()
 
     if (this.debug.on) {
       this.ctx.font = '64px roboto'
@@ -208,7 +235,6 @@ export default class Game {
       this.ctx.fillText(this.debug.text, this.stage.canvas.width / 2, this.stage.canvas.height / 2)
 
       this.ctx.stroke(this.hatches)
-      this.ctx.save()
       this.ctx.strokeStyle = 'green'
       this.ctx.lineWidth = 3
       this.hitboxes.forEach(xy => this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize))
@@ -318,16 +344,13 @@ export default class Game {
     let x = this.stage.canvas.width / 2
     let y = this.stage.canvas.height / 2
     this.ctx.textAlign = 'center'
-    this.ctx.save()
     this.ctx.font = '64px roboto'
     this.ctx.fillText(msg[0], x, y)
-    this.ctx.restore()
     if (msg.length > 1) {
-      this.ctx.save()
       this.ctx.font = '48px roboto'
       this.ctx.fillText(msg[1], x, y + 72)
-      this.ctx.restore()
     }
+    this.ctx.restore()
   }
 
   showInstructions () {

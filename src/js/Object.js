@@ -25,7 +25,7 @@ export default class Obj {
   }
 
   draw (ctx, debug = false) {
-    ctx.save()
+    ctx.strokeStyle = 'rgb(255,255,255)'
     if (this.isHighlighted) {
       ctx.strokeStyle = this.highlightColor
     }
@@ -39,14 +39,13 @@ export default class Obj {
     // ctx.font = '24px roboto'
     // ctx.fillText(window.spatial.getIdForObject(this.geo).join(', '), 10, 0)
     // }
-    ctx.restore()
   }
 
   displayCell () {
     this.isDisplayCell = true
   }
 
-  highlight (highlightColor = 'blue') {
+  highlight (highlightColor = 'yellow') {
     this.isHighlighted = true
     this.highlightColor = highlightColor
     window.setTimeout(() => this.isHighlighted = false, 5000)
