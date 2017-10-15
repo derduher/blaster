@@ -1,3 +1,14 @@
 {
-  "plugins": ["transform-es2015-modules-commonjs"]
+  "presets": [["env", {
+    "targets": {
+      "browsers": ["chrome >= 60"]
+    },
+    "useBuiltIns": true,
+    "debug": true
+  }], "minify"],
+  "env": {
+    "production": {
+      "presets": ["minify"]
+    }
+  }
 }
