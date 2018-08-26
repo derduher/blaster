@@ -4,11 +4,15 @@ import Obj from './Object.js'
 import Projectile from './Projectile.js'
 import Geo from './Geo.js'
 
-var pSpeed = 50
+var rateOfFire = 50
 
 const speed = 0.1 // m/s
 var posDir = speed
 var negDir = speed * -1
+
+const force = 25
+const barrelLength = 10
+
 export default class Craft extends Obj {
   constructor (stage, ctrl) {
     const width = 48
@@ -21,22 +25,23 @@ export default class Craft extends Obj {
     this.width = width
     this.health = 1000
     this.immortal = true
-    this.projectileSize = Math.random() * 20 | 0
+    this.configurations = [Math.random() * 20 | 0, Math.random() * 20 | 0, Math.random() * 20 | 0, Math.random() * 20 | 0]
+    this.currentConfiguration = 0
 
-    this.geo.points.push(new Point2(9, 38.45))
+    this.geo.points.push(new Point2(9, 28.45))
     this.geo.points.push(new Point2(9, 10))
     this.geo.points.push(new Point2(5, 10))
-    this.geo.points.push(new Point2(5, 54.95))
+    this.geo.points.push(new Point2(5, 34.95))
 
-    this.geo.points.push(new Point2(39, 38.45))
+    this.geo.points.push(new Point2(39, 28.45))
     this.geo.points.push(new Point2(39, 10))
     this.geo.points.push(new Point2(43, 10))
-    this.geo.points.push(new Point2(43, 54.95))
+    this.geo.points.push(new Point2(43, 34.95))
 
     this.geo.points.push(new Point2(18, 0))
     this.geo.points.push(new Point2(30, 0))
-    this.geo.points.push(new Point2(48, 76))
-    this.geo.points.push(new Point2(0, 76))
+    this.geo.points.push(new Point2(48, 56))
+    this.geo.points.push(new Point2(0, 56))
 
     let points = [...this.geo.points]
     let first = points.shift()
@@ -93,25 +98,48 @@ export default class Craft extends Obj {
       this.geo.pos.y = this.ctrl.touchY
     }
 
-    if (this.ctrl.f && pdt > pSpeed) {
-      const pos = new Point2(
-        this.geo.pos.x + this.width / 2 + this.geo.v.x - this.projectileSize / 2,
-        this.geo.pos.y - this.projectileSize - 5
-      )
-      let p = new Projectile(
-        new Geo(
-          pos.x,
-          pos.y,
-          0,
-          -5
-        ),
-        this.stage,
-        this.projectileSize
-      )
-
-      this.stage.items.push(p)
-      this.stage.spatialManager.registerObject(p)
-      this.lastFire = now
+    if (this.ctrl.f && pdt > rateOfFire) {
+      this.fire(now)
     }
+
+    if (this.ctrl.weaponNext) {
+      this.nextConfiguration()
+    }
+
+    if (this.ctrl.weaponPrev) {
+      this.nextConfiguration()
+    }
+  }
+
+  nextConfiguration () {
+    this.currentConfiguration = (this.currentConfiguration + 1) % this.configurations.length
+  }
+
+  prevConfiguration () {
+    this.currentConfiguration = Math.abs(this.currentConfiguration - 1 % this.configurations.length)
+  }
+
+  fire (now) {
+    const size = this.configurations[this.currentConfiguration]
+    const pos = new Point2(
+      this.geo.pos.x + this.width / 2 + this.geo.v.x - size / 2,
+      this.geo.pos.y - size - 5
+    )
+
+    const velY = Math.sqrt(2 * barrelLength * force / size)
+    const p = new Projectile(
+      new Geo(
+        pos.x,
+        pos.y,
+        0,
+        -velY
+      ),
+      this.stage,
+      size
+    )
+
+    this.stage.items.push(p)
+    this.stage.spatialManager.registerObject(p)
+    this.lastFire = now
   }
 }

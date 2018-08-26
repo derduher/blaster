@@ -11,6 +11,9 @@ const right = 39
 const up = 38
 const down = 40
 const esc = 27
+const f = 70
+// const r = 82
+const e = 69
 
 export default class Controls {
   constructor () {
@@ -20,8 +23,10 @@ export default class Controls {
     this.cfg[w] = this.cfg[up] = 'u'
     this.cfg[s] = this.cfg[down] = 'd'
     this.cfg[space] = 'f'
-    this.cfg[q] = 'p'
+    this.cfg[q] = 'weaponPrev'
+    this.cfg[e] = 'weaponNext'
     this.cfg[esc] = 'toggleFS'
+    this.cfg[f] = 'p'
   }
   kd (e) {
     this[this.cfg[e.keyCode]] = true

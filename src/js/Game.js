@@ -123,9 +123,6 @@ export default class Game {
     if (tFrame > nextTick) {
       timeSinceTick = tFrame - this.lastTick
       numTicks = (timeSinceTick / this.tickLength) | 0
-      // if (numTicks !== 1) {
-      // console.log(numTicks)
-      // }
       if (numTicks > 4) {
         numTicks = 4
       }
@@ -218,7 +215,7 @@ export default class Game {
     let offsetDeviceTop = -(deviceHeight / scale) / 2
     let offsetDeviceLeft = -(deviceWidth / scale) / 2
     this.ctx.translate(offsetDeviceLeft, offsetDeviceTop)
-    console.log(scale, deviceWidth, deviceHeight, this.stage.xmax, this.stage.ymax)
+    // console.log(scale, deviceWidth, deviceHeight, this.stage.xmax, this.stage.ymax)
     var fs = 70
     for (var i = 0; i < this.stage.items.length; i++) {
       this.ctx.save()

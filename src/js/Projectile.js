@@ -38,4 +38,9 @@ export default class Projectile extends Obj {
   displayCell () {
     this.isDisplayCell = true
   }
+
+  intersects (o, i, cullQ) {
+    o.health -= 10
+    super.intersects(o, i, cullQ)
+  }
 }
