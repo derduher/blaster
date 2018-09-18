@@ -14,7 +14,7 @@ export default class SpatialManager {
 
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
-        this.reverse[x + y * this.cols | 0] = {x: x * cellsize, y: y * cellsize}
+        this.reverse[x + y * this.cols | 0] = { x: x * cellsize, y: y * cellsize }
       }
     }
 

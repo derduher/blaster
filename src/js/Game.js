@@ -80,10 +80,10 @@ export default class Game {
     // this.stage.spatialManager.registerObject(roid)
 
     // let p = new Projectile({geo: {
-      // pos: {x: (this.stage.canvas.width / 2) + roid.width / 2, y: (this.stage.canvas.height / 2) + roid.width / 2},
-      // v: {x: 0, y: 0}
+    // pos: {x: (this.stage.canvas.width / 2) + roid.width / 2, y: (this.stage.canvas.height / 2) + roid.width / 2},
+    // v: {x: 0, y: 0}
     // },
-      // width: 20
+    // width: 20
     // }, {x: 0, y: 0})
     // window.p = p
     // this.stage.items.push(p)
@@ -313,9 +313,9 @@ export default class Game {
      */
     for (i = 0; i < this.stage.items.length; i++) {
       // for (let j = 0; j < this.stage.items.length; j++) {
-        // if (i !== j) {
-          // this.testIntersect(this.stage.items[i], i, this.stage.items[j], cullQ)
-        // }
+      // if (i !== j) {
+      // this.testIntersect(this.stage.items[i], i, this.stage.items[j], cullQ)
+      // }
       // }
       let nearby = this.stage.spatialManager.getNearby(this.stage.items[i].geo).values()
       while (1) {

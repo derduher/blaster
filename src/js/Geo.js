@@ -7,7 +7,7 @@ export default class Geo {
     this.v = new Vector2(dx, dy)
     this.acc = new Vector2(ax, ay)
     this.points = []
-    this.aabb = {min: new Point2(), max: new Point2()}
+    this.aabb = { min: new Point2(), max: new Point2() }
     this.treatAsPoint = false
   }
 
@@ -66,7 +66,7 @@ export default class Geo {
   segmentTouchesOrCrosses (aa, ab, ba, bb) {
     return this.isPointOnLine(aa, ab, ba) ||
     this.isPointOnLine(aa, ab, bb) || (
-    this.isPointRightOfLine(aa, ab, ba) ^
+      this.isPointRightOfLine(aa, ab, ba) ^
     this.isPointRightOfLine(aa, ab, bb)
     )
   }

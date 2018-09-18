@@ -26,8 +26,8 @@ export default class Projectile extends Obj {
     ctx.fill()
     ctx.stroke()
     // if (debug) {
-      // ctx.font = '18px roboto'
-      // ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
+    // ctx.font = '18px roboto'
+    // ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
     // }
     // if (this.isDisplayCell) {
     // ctx.font = '24px roboto'
