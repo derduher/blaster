@@ -1,4 +1,3 @@
-/* jshint bitwise: false */
 import Point2 from './Point2.js'
 import Obj from './Object.js'
 import Projectile from './Projectile.js'

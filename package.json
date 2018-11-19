@@ -38,16 +38,65 @@
     "source-map": "~0.7.3",
     "standard": "^12.0.1",
     "style-loader": "^0.23.1",
-    "webpack": "^4.25.1",
+    "webpack": "^4.26.0",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10",
     "webpack-merge": "^4.1.4"
   },
   "standard": {
     "globals": [
-      "Path2D"
+      "Path2D",
+      "describe",
+      "xdescribe",
+      "it",
+      "xit",
+      "beforeAll",
+      "afterAll",
+      "beforeEach",
+      "afterEach",
+      "expect",
+      "fetch",
+      "Event",
+      "browser",
+      "FocusEvent",
+      "FormData",
+      "URL",
+      "jest",
+      "browser"
     ],
+    "ignore": [],
     "parser": "babel-eslint"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
+    "plugins": [
+      "react"
+    ],
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "env": {
+      "browser": true,
+      "es6": true,
+      "jasmine": true,
+      "jest": true,
+      "mocha": true,
+      "node": true
+    },
+    "rules": {
+      "no-case-declarations": 0,
+      "no-console": 0,
+      "no-unused-vars": 0,
+      "react/prop-types": 0
+    }
+  }
 }

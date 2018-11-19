@@ -28,6 +28,7 @@ export default class Controls {
     this.cfg[esc] = 'toggleFS'
     this.cfg[f] = 'p'
   }
+
   kd (e) {
     this[this.cfg[e.keyCode]] = true
   }
