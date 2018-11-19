@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "target": "ESNext",
+    "module": "ESNext",
+    "checkJs": true,
+    "jsx": "react",
+    "moduleResolution": "node",
+    "lib": [
+      "ES2015",
+      "ES2016",
+      "ES2017",
+      "ESNext",
+      "dom"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*"
+  ],
+  "include": [
+    "src/**/*"
+  ]
+}
