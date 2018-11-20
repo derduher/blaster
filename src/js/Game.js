@@ -4,7 +4,7 @@ import Roid from './Roid.js'
 import Craft from './Craft.js'
 // import NPC from './NPC.js'
 import Point2 from './Point2.js'
-import { toggleFullScreen, fullScreenElementProp } from './fullScreen'
+import { toggleFullScreen, fullScreenElementProp } from './fullscreen'
 import Controls from './Controls.js'
 import roidPosFactory from './roidPosFactory.js'
 

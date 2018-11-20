@@ -4,7 +4,7 @@
   "description": "game",
   "main": "index.js",
   "scripts": {
-    "upload": "aws s3 sync --profile derduher build/ s3://aws-website-blaster-2d3g4",
+    "upload": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --delete --profile derduher --cache-control 'public, max-age=31540000'",
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "watch": "webpack --progress --watch --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",

@@ -3,19 +3,22 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 module.exports = {
-  stats: 'detailed',
+  cache: true,
+  stats: 'normal',
   entry: './src/js/main.js',
   plugins: [
-    new CleanWebpackPlugin(['build']),
+    // new CleanWebpackPlugin(['build']),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
     })
   ],
+  recordsOutputPath: path.join(__dirname, 'build', 'records.json'),
   optimization: {
     splitChunks: {
       chunks: 'all',
       maxInitialRequests: Infinity,
-      minSize: 0,
+      minSize: 10000,
+      maxSize: 20000,
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
@@ -48,8 +51,7 @@ module.exports = {
                 'targets': {
                   'browsers': ['chrome >= 67']
                 },
-                'useBuiltIns': 'usage',
-                'debug': true
+                'useBuiltIns': 'usage'
               }]
             ]
           }

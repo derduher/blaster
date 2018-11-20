@@ -1,4 +1,4 @@
-import { fullScreenElementProp } from './fullScreen'
+import { fullScreenElementProp } from './fullscreen'
 
 const a = 65
 const d = 68
