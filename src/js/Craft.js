@@ -23,7 +23,10 @@ var negDir = speed * -1
 
 export default class Craft extends Obj {
   constructor (stage, ctrl) {
-    const pos = new Point2(document.documentElement.clientWidth / 2 - width / 2, document.documentElement.clientHeight - width - stage.padding)
+    const pos = new Point2(
+      document.documentElement.clientWidth / 2 - width / 2,
+      document.documentElement.clientHeight - width - stage.padding
+    )
     super(pos, stage)
     this.mass = mass // Gg
     this.lastFire = 0
@@ -74,6 +77,15 @@ export default class Craft extends Obj {
       this.geo.acc.x = negDir
     } else if (this.ctrl.r && !this.ctrl.l) {
       this.geo.acc.x = posDir
+    } else if (this.ctrl.autoBreak && (
+      this.geo.v.x > 0.05 ||
+      this.geo.v.x < -0.05
+    )) {
+      if (this.geo.v.x > Number.EPSILON) {
+        this.geo.acc.x = negDir
+      } else if (this.geo.v.x < -Number.EPSILON) {
+        this.geo.acc.x = posDir
+      }
     } else {
       this.geo.acc.x = 0
     }
@@ -83,6 +95,15 @@ export default class Craft extends Obj {
       this.geo.acc.y = posDir
     } else if (this.ctrl.u && !this.ctrl.d) {
       this.geo.acc.y = negDir
+    } else if (this.ctrl.autoBreak && (
+      this.geo.v.y > Number.EPSILON ||
+      this.geo.v.y < -Number.EPSILON
+    )) {
+      if (this.geo.v.y > Number.EPSILON) {
+        this.geo.acc.y = negDir
+      } else if (this.geo.v.y < -Number.EPSILON) {
+        this.geo.acc.y = posDir
+      }
     } else {
       this.geo.acc.y = 0
     }
