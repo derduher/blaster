@@ -1,0 +1,9 @@
+{
+  "short_name": "blaster",
+  "name": "blaster",
+  "start_url": "/",
+  "background_color": "#101010",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#101010"
+}
