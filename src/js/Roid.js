@@ -1,6 +1,14 @@
 /* jshint bitwise: false */
 import Point2 from './Point2.js'
 import Obj from './Object.js'
+import { roid } from './config.js'
+
+const {
+  numPoints,
+  mass,
+  maxRadius,
+  minRadius
+} = roid
 
 function getX (ang, mag) {
   return mag * Math.cos(ang)
@@ -19,16 +27,15 @@ function getMag (max) {
 }
 
 const s = 3
-const numPoints = 12
 export default class Roid extends Obj {
   constructor (geo, stage) {
     super(geo.pos, stage)
     this.geo.pos = geo.pos
     this.geo.v = geo.v
     // https://en.wikipedia.org/wiki/101955_Bennu
-    this.mass = 6e4 * Math.random() // Gg
+    this.mass = mass * Math.random() // Gg
     // scalar
-    var mrad = 4 + 28 * Math.random() // max radius
+    var mrad = minRadius + maxRadius * Math.random() // max radius
 
     // starting point
     var m = getMag(mrad) // magnitude

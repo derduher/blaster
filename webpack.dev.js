@@ -11,7 +11,6 @@ module.exports = merge(common, {
   devServer: {
     contentBase: './build',
     hot: true,
-    compress: true,
-    https: true
+    compress: true
   }
 })

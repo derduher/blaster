@@ -2,45 +2,39 @@ import Point2 from './Point2.js'
 import Obj from './Object.js'
 import Projectile from './Projectile.js'
 import Geo from './Geo.js'
+import {
+  craft
+} from './config'
+const {
+  rateOfFire,
+  speed,
+  force,
+  barrelLength,
+  width,
+  height,
+  mass,
+  health,
+  immortal,
+  geo
+} = craft
 
-var rateOfFire = 50
-
-const speed = 0.1 // m/s
 var posDir = speed
 var negDir = speed * -1
 
-const force = 25
-const barrelLength = 10
-
 export default class Craft extends Obj {
   constructor (stage, ctrl) {
-    const width = 48
-    const height = 76
     const pos = new Point2(document.documentElement.clientWidth / 2 - width / 2, document.documentElement.clientHeight - width - stage.padding)
     super(pos, stage)
-    this.mass = 8 // Gg
+    this.mass = mass // Gg
     this.lastFire = 0
     this.boundToCanvas = true
     this.width = width
-    this.health = 1000
-    this.immortal = true
+    this.health = health
+    this.immortal = immortal
     this.configurations = [Math.random() * 20 | 0, Math.random() * 20 | 0, Math.random() * 20 | 0, Math.random() * 20 | 0]
     this.currentConfiguration = 0
 
-    this.geo.points.push(new Point2(9, 28.45))
-    this.geo.points.push(new Point2(9, 10))
-    this.geo.points.push(new Point2(5, 10))
-    this.geo.points.push(new Point2(5, 34.95))
-
-    this.geo.points.push(new Point2(39, 28.45))
-    this.geo.points.push(new Point2(39, 10))
-    this.geo.points.push(new Point2(43, 10))
-    this.geo.points.push(new Point2(43, 34.95))
-
-    this.geo.points.push(new Point2(18, 0))
-    this.geo.points.push(new Point2(30, 0))
-    this.geo.points.push(new Point2(48, 56))
-    this.geo.points.push(new Point2(0, 56))
+    geo.forEach(point => this.geo.points.push(point))
 
     let points = [...this.geo.points]
     let first = points.shift()

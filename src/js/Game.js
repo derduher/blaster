@@ -7,6 +7,13 @@ import Point2 from './Point2.js'
 import { toggleFullScreen, fullScreenElementProp } from './fullscreen'
 import Controls from './Controls.js'
 import roidPosFactory from './roidPosFactory.js'
+import {
+  fpsFilter,
+  cellSize,
+  nativeWidth,
+  nativeHeight,
+  tickLength
+} from './config'
 
 var debug = {
   on: false,
@@ -17,17 +24,13 @@ var debug = {
   drawRate: 250
 }
 
-const fpsFilter = 75
-const cellSize = 256
-const nativeWidth = 1920
-const nativeHeight = 1080
-
 export default class Game {
   constructor (canvas) {
+    this.updateIsReady = false
     this.hitboxes = new Set()
     this.debug = debug
     this.lastRender = window.performance.now()
-    this.tickLength = 16.7
+    this.tickLength = tickLength
     this.ctrl = new Controls()
     this.lastTick = this.lastRender
     this.debug.lastRender = this.lastRender
@@ -88,6 +91,10 @@ export default class Game {
     // window.p = p
     // this.stage.items.push(p)
     // this.stage.spatialManager.registerObject(p)
+  }
+
+  updateReady () {
+    this.updateIsReady = true
   }
 
   main (tFrame) {

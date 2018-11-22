@@ -1,17 +1,25 @@
 // import Vector2 from './Vector2.js'
 import Obj from './Object.js'
 // import Point2 from './Point2.js'
+import {
+  projectile
+} from './config.js'
+const {
+  mass,
+  width: defaultWidth,
+  health
+} = projectile
 
 export default class Projectile extends Obj {
-  constructor (geo, stage, width = 6) {
+  constructor (geo, stage, width = defaultWidth) {
     super(geo.pos, stage)
     this.geo = geo
-    this.mass = 0.1 // Gg
+    this.mass = mass // Gg
     this.width = width
     this.geo.aabb.max.x = this.width
     this.geo.aabb.max.y = this.width
     this.geo.treatAsPoint = true
-    this.health = 10
+    this.health = health
     this.boundToCanvas = false
   }
 

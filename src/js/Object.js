@@ -1,9 +1,11 @@
 /* eslint-disable no-return-assign */
 import Geo from './Geo.js'
+import { defaultObjMass } from './config.js'
 
 export default class Obj {
   constructor (pos, stage) {
-    this.mass = 1
+    this.mass = defaultObjMass
+    this.immortal = false
     this.stage = stage
     this.geo = new Geo()
 

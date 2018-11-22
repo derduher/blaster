@@ -1,16 +1,24 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   cache: true,
   stats: 'normal',
   entry: './src/js/main.js',
   plugins: [
-    // new CleanWebpackPlugin(['build']),
+    new CleanWebpackPlugin(['build']),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
-    })
+    }),
+    new ServiceWorkerWebpackPlugin({
+      entry: './src/js/sw.js'
+    }),
+    new CopyWebpackPlugin([
+      { from: 'static' }
+    ])
   ],
   recordsOutputPath: path.join(__dirname, 'build', 'records.json'),
   optimization: {
