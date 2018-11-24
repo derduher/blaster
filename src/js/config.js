@@ -17,21 +17,49 @@ export const craft = {
   rateOfFire: 50,
   immortal: true,
   geo: [
-    new Point2(9, 28.45),
-    new Point2(9, 10),
-    new Point2(5, 10),
-    new Point2(5, 34.95),
-
-    new Point2(39, 28.45),
-    new Point2(39, 10),
-    new Point2(43, 10),
-    new Point2(43, 34.95),
-
-    new Point2(18, 0),
-    new Point2(30, 0),
-    new Point2(48, 56),
-    new Point2(0, 56)
-  ]
+    [
+      new Point2(19, 38.45),
+      new Point2(19, 20),
+      new Point2(15, 20),
+      new Point2(15, 44.95)
+    ], [
+      new Point2(49, 28.45),
+      new Point2(49, 20),
+      new Point2(53, 20),
+      new Point2(53, 44.95)
+    ], [
+      new Point2(28, 10),
+      new Point2(40, 10),
+      new Point2(58, 66),
+      new Point2(10, 66)
+    ]
+  ],
+  thruster: {
+    up: [
+      new Point2(32, 0),
+      new Point2(37, 0),
+      new Point2(37, 10),
+      new Point2(32, 10)
+    ],
+    left: [
+      new Point2(5, 45),
+      new Point2(15, 45),
+      new Point2(15, 50),
+      new Point2(5, 50)
+    ],
+    right: [
+      new Point2(52, 45),
+      new Point2(62, 45),
+      new Point2(62, 50),
+      new Point2(52, 50)
+    ],
+    down: [
+      new Point2(32, 68),
+      new Point2(37, 68),
+      new Point2(37, 78),
+      new Point2(32, 78)
+    ]
+  }
 }
 
 export const defaultObjMass = 1

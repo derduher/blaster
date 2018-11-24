@@ -15,7 +15,8 @@ const {
   mass,
   health,
   immortal,
-  geo
+  geo,
+  thruster
 } = craft
 
 var posDir = speed
@@ -34,34 +35,28 @@ export default class Craft extends Obj {
     this.width = width
     this.health = health
     this.immortal = immortal
-    this.configurations = [Math.random() * 20 | 0, Math.random() * 20 | 0, Math.random() * 20 | 0, Math.random() * 20 | 0]
-    this.currentConfiguration = 0
+    this.weaponConfigurations = [
+      Math.random() * 20 | 0,
+      Math.random() * 20 | 0,
+      Math.random() * 20 | 0,
+      Math.random() * 20 | 0
+    ]
+    this.currentWeapon = 0
 
-    geo.forEach(point => this.geo.points.push(point))
+    geo.forEach(segment => segment.forEach(point => this.geo.points.push(point)))
 
-    let points = [...this.geo.points]
-    let first = points.shift()
-    this.path.moveTo(first.x, first.y)
-    for (let i = 0; i < 3; i++) {
-      let pt = points.shift()
-      this.path.lineTo(pt.x, pt.y)
-    }
-
-    first = points.shift()
-    this.path.moveTo(first.x, first.y)
-    for (let i = 0; i < 3; i++) {
-      let pt = points.shift()
-      this.path.lineTo(pt.x, pt.y)
-    }
-
-    first = points.shift()
-    this.path.moveTo(first.x, first.y)
-    for (let i = 0; points.length; i++) {
-      let pt = points.shift()
-      this.path.lineTo(pt.x, pt.y)
-    }
+    let segments = [...geo]
+    segments.forEach(segment => {
+      let points = [...segment]
+      let first = points.shift()
+      this.path.moveTo(first.x, first.y)
+      points.forEach(pt => {
+        this.path.lineTo(pt.x, pt.y)
+      })
+    })
 
     this.path.closePath()
+    this.originalPath = this.path
 
     this.geo.aabb.max.x = width
     this.geo.aabb.max.y = height
@@ -70,7 +65,7 @@ export default class Craft extends Obj {
   }
 
   tick (now) {
-    var pdt = now - this.lastFire
+    var lastFireDelta = now - this.lastFire
 
     // set ctrl dir
     if (this.ctrl.l && !this.ctrl.r) {
@@ -78,12 +73,12 @@ export default class Craft extends Obj {
     } else if (this.ctrl.r && !this.ctrl.l) {
       this.geo.acc.x = posDir
     } else if (this.ctrl.autoBreak && (
-      this.geo.v.x > 0.05 ||
-      this.geo.v.x < -0.05
+      this.geo.v.x > speed ||
+      this.geo.v.x < -speed
     )) {
-      if (this.geo.v.x > Number.EPSILON) {
+      if (this.geo.v.x > speed) {
         this.geo.acc.x = negDir
-      } else if (this.geo.v.x < -Number.EPSILON) {
+      } else if (this.geo.v.x < -speed) {
         this.geo.acc.x = posDir
       }
     } else {
@@ -96,23 +91,24 @@ export default class Craft extends Obj {
     } else if (this.ctrl.u && !this.ctrl.d) {
       this.geo.acc.y = negDir
     } else if (this.ctrl.autoBreak && (
-      this.geo.v.y > Number.EPSILON ||
-      this.geo.v.y < -Number.EPSILON
+      this.geo.v.y > speed ||
+      this.geo.v.y < -speed
     )) {
-      if (this.geo.v.y > Number.EPSILON) {
+      if (this.geo.v.y > speed) {
         this.geo.acc.y = negDir
-      } else if (this.geo.v.y < -Number.EPSILON) {
+      } else if (this.geo.v.y < -speed) {
         this.geo.acc.y = posDir
       }
     } else {
       this.geo.acc.y = 0
     }
+
     if (this.ctrl.touch) {
       this.geo.pos.x = this.ctrl.touchX
       this.geo.pos.y = this.ctrl.touchY
     }
 
-    if (this.ctrl.f && pdt > rateOfFire) {
+    if (this.ctrl.f && lastFireDelta > rateOfFire) {
       this.fire(now)
     }
 
@@ -123,21 +119,55 @@ export default class Craft extends Obj {
     if (this.ctrl.weaponPrev) {
       this.nextConfiguration()
     }
+
+    this.path = new Path2D(this.originalPath)
+    let thrusterPath = new Path2D()
+    if (this.geo.acc.x > 0) {
+      thrusterPath.moveTo(thruster.left[0].x, thruster.left[0].y)
+      thrusterPath.lineTo(thruster.left[1].x, thruster.left[1].y)
+      thrusterPath.lineTo(thruster.left[2].x, thruster.left[2].y)
+      thrusterPath.lineTo(thruster.left[3].x, thruster.left[3].y)
+      thrusterPath.closePath()
+      this.path.addPath(thrusterPath)
+    } else if (this.geo.acc.x < 0) {
+      thrusterPath.moveTo(thruster.right[0].x, thruster.right[0].y)
+      thrusterPath.lineTo(thruster.right[1].x, thruster.right[1].y)
+      thrusterPath.lineTo(thruster.right[2].x, thruster.right[2].y)
+      thrusterPath.lineTo(thruster.right[3].x, thruster.right[3].y)
+      thrusterPath.closePath()
+      this.path.addPath(thrusterPath)
+    }
+
+    if (this.geo.acc.y > 0) {
+      thrusterPath.moveTo(thruster.up[0].x, thruster.up[0].y)
+      thrusterPath.lineTo(thruster.up[1].x, thruster.up[1].y)
+      thrusterPath.lineTo(thruster.up[2].x, thruster.up[2].y)
+      thrusterPath.lineTo(thruster.up[3].x, thruster.up[3].y)
+      thrusterPath.closePath()
+      this.path.addPath(thrusterPath)
+    } else if (this.geo.acc.y < 0) {
+      thrusterPath.moveTo(thruster.down[0].x, thruster.down[0].y)
+      thrusterPath.lineTo(thruster.down[1].x, thruster.down[1].y)
+      thrusterPath.lineTo(thruster.down[2].x, thruster.down[2].y)
+      thrusterPath.lineTo(thruster.down[3].x, thruster.down[3].y)
+      thrusterPath.closePath()
+      this.path.addPath(thrusterPath)
+    }
   }
 
   nextConfiguration () {
-    this.currentConfiguration = (this.currentConfiguration + 1) % this.configurations.length
+    this.currentWeapon = (this.currentWeapon + 1) % this.weaponConfigurations.length
   }
 
   prevConfiguration () {
-    this.currentConfiguration = Math.abs(this.currentConfiguration - 1 % this.configurations.length)
+    this.currentWeapon = Math.abs(this.currentWeapon - 1 % this.weaponConfigurations.length)
   }
 
   fire (now) {
-    const size = this.configurations[this.currentConfiguration]
+    const size = this.weaponConfigurations[this.currentWeapon]
     const pos = new Point2(
-      this.geo.pos.x + this.width / 2 + this.geo.v.x - size / 2,
-      this.geo.pos.y - size - 5
+      this.geo.pos.x + this.width / 2 + this.geo.v.x + 10 - size / 2,
+      this.geo.pos.y - size + 5
     )
 
     const velY = Math.sqrt(2 * barrelLength * force / size)

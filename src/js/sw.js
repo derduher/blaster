@@ -1,4 +1,4 @@
-var CACHE_NAME = 'blaster-0'
+var CACHE_NAME = 'blaster-1'
 const { assets } = global.serviceWorkerOption
 let assetsToCache = [...assets, './']
 console.log(assetsToCache)
