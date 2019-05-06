@@ -1,7 +1,9 @@
 /* jshint bitwise: false */
-import Point2 from './Point2.js'
-import Obj from './Object.js'
+import Point2 from './Point2'
+import Obj from './Object'
 import { roid } from './config.js'
+import { GenPos } from './roidPosFactory'
+import Stage from './Stage'
 
 const {
   numPoints,
@@ -10,15 +12,15 @@ const {
   minRadius
 } = roid
 
-function getX (ang, mag) {
+function getX (ang: number, mag: number) {
   return mag * Math.cos(ang)
 }
 
-function getY (ang, mag) {
+function getY (ang: number, mag: number) {
   return mag * Math.sin(ang)
 }
 
-function getMag (max) {
+function getMag (max: number) {
   var extra = 0
   if (Math.random() > 0.8) {
     extra = (-0.8 + Math.random()) * max * 0.25
@@ -28,7 +30,8 @@ function getMag (max) {
 
 const s = 3
 export default class Roid extends Obj {
-  constructor (geo, stage) {
+  initialHealth: number
+  constructor (geo: GenPos, stage: Stage) {
     super(geo.pos, stage)
     this.geo.pos = geo.pos
     this.geo.v = geo.v

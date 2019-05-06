@@ -1,4 +1,13 @@
+// @ts-ignore: No idea how to handle dynamic props on document
 import { fullScreenElementProp } from './fullscreen'
+
+interface keyBindings {
+  [index: number]: string
+}
+
+interface document {
+  [index: string]: any
+}
 
 const a = 65
 const d = 68
@@ -18,6 +27,24 @@ const f = 70
 const e = 69
 
 export default class Controls {
+  l: boolean
+  r: boolean
+  u: boolean
+  d: boolean
+  f: boolean
+  weaponNext: boolean
+  weaponPrev: boolean
+  toggleFS: boolean
+  p: boolean
+  autoBreak: boolean
+  touch: boolean
+  touchX: number
+  touchY: number
+  toggle: Set<string>
+  pressActivated: Set<string>
+  cfg: keyBindings
+  [index: string]: any
+
   constructor () {
     this.l = false
     this.r = false
@@ -46,14 +73,14 @@ export default class Controls {
     this.toggle = new Set(['autoBreak', 'toggleFS'])
   }
 
-  kd (e) {
+  kd (e : KeyboardEvent) {
     const action = this.cfg[e.keyCode]
     if (this.pressActivated.has(action)) {
       this[action] = true
     }
   }
 
-  ku (e) {
+  ku (e : KeyboardEvent) {
     const action = this.cfg[e.keyCode]
     if (this.pressActivated.has(action)) {
       this[action] = false
@@ -64,14 +91,16 @@ export default class Controls {
     }
   }
 
-  ts (e) {
+  ts (e : TouchEvent) {
+    // @ts-ignore: No idea how to handle dynamic props on document
     if (document[fullScreenElementProp]) {
       this.touch = true
       e.preventDefault()
     }
   }
 
-  tm (e) {
+  tm (e : TouchEvent) {
+    // @ts-ignore: No idea how to handle dynamic props on document
     if (document[fullScreenElementProp]) {
       var t = e.changedTouches[0]
       this.touchX = t.pageX
@@ -81,9 +110,10 @@ export default class Controls {
     }
   }
 
-  te (e) {
+  te (e : TouchEvent) {
     this.touch = false
     this.f = false
+    // @ts-ignore: No idea how to handle dynamic props on document
     if (document[fullScreenElementProp]) {
       e.preventDefault()
     }

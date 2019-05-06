@@ -1,7 +1,7 @@
-import Point2 from './Point2.js'
-import Vector2 from './Vector2.js'
-import Projectile from './Projectile.js'
-import Obj from './Object.js'
+import Point2 from './Point2'
+import Vector2 from './Vector2'
+import Projectile from './Projectile'
+import Obj from './Object'
 const pSpeed = 100
 
 export default class NPC extends Obj {

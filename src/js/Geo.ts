@@ -1,7 +1,16 @@
-import Vector2 from './Vector2.js'
-import Point2 from './Point2.js'
+import Vector2 from './Vector2'
+import Point2 from './Point2'
+import { BoundingBox, PointLike } from './types'
+import Obj from './Object'
+import { GenPos } from './roidPosFactory'
 
-export default class Geo {
+export default class Geo implements GenPos {
+  pos: Point2
+  v: Vector2
+  acc: Vector2
+  points: Point2[]
+  treatAsPoint: boolean
+  aabb: BoundingBox
   constructor (x = 0, y = 0, dx = 0, dy = 0, ax = 0, ay = 0) {
     this.pos = new Point2(x, y)
     this.v = new Vector2(dx, dy)
@@ -12,15 +21,15 @@ export default class Geo {
   }
 
   // A^2 + B^2 = C^2
-  distanceTo (pos) {
+  distanceTo (pos: Point2): number {
     return Math.sqrt(Math.pow(pos.x - this.pos.x, 2) + Math.pow(pos.y - this.pos.y, 2))
   }
 
-  distanceToObj (obj) {
+  distanceToObj (obj: Obj): number {
     return this.distanceTo(obj.geo.pos)
   }
   // This can probably be simplified.
-  aabbIntersects (b) {
+  aabbIntersects (b: Geo):boolean {
     let left // the object that is the most to the left
     let right
     let top
@@ -46,36 +55,36 @@ export default class Geo {
   }
 
   // http://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-  crossProduct (a, b) {
+  crossProduct (a: Vector2|Point2, b: Vector2|Point2) {
     return a.x * b.y - b.x * a.y
   }
 
-  isPointOnLine (aa, ab, b) {
-    var aTmp = new Point2(ab.x - aa.x, ab.y - aa.y)
-    var bTmp = new Point2(b.x - aa.x, b.y - aa.y)
+  isPointOnLine (aa: Point2, ab: Point2, b: Point2): boolean {
+    const aTmp:Point2 = new Point2(ab.x - aa.x, ab.y - aa.y)
+    const bTmp:Point2 = new Point2(b.x - aa.x, b.y - aa.y)
     return Math.abs(this.crossProduct(aTmp, bTmp)) < Number.EPSILON
   }
 
-  isPointRightOfLine (aa, ab, b) {
+  isPointRightOfLine (aa: Point2, ab: Point2, b: Point2) : boolean {
     // Move the image, so that a.first is on (0|0)
-    var aTmp = new Point2(ab.x - aa.x, ab.y - aa.y)
-    var bTmp = new Point2(b.x - aa.x, b.y - aa.y)
+    const aTmp:Point2 = new Point2(ab.x - aa.x, ab.y - aa.y)
+    const bTmp:Point2 = new Point2(b.x - aa.x, b.y - aa.y)
     return this.crossProduct(aTmp, bTmp) < 0
   }
 
-  segmentTouchesOrCrosses (aa, ab, ba, bb) {
+  segmentTouchesOrCrosses (aa: Point2, ab: Point2, ba: Point2, bb: Point2) : boolean {
     return this.isPointOnLine(aa, ab, ba) ||
     this.isPointOnLine(aa, ab, bb) || (
-      this.isPointRightOfLine(aa, ab, ba) ^
+      this.isPointRightOfLine(aa, ab, ba) !==
     this.isPointRightOfLine(aa, ab, bb)
     )
   }
 
-  getSegmentBB (a, b) {
+  getSegmentBB (a: Point2, b: Point2) {
     return [new Point2(Math.min(a.x, b.x), Math.min(a.y, b.y)), new Point2(Math.max(a.x, b.x), Math.max(a.y, b.y))]
   }
 
-  segmentsBBIntersect (aa, ab, ba, bb) {
+  segmentsBBIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
     var firstbb = this.getSegmentBB(aa, ab)
     var secondbb = this.getSegmentBB(ba, bb)
     return firstbb[0].x <= secondbb[1].x &&
@@ -84,13 +93,13 @@ export default class Geo {
     firstbb[1].y >= secondbb[0].y
   }
 
-  segmentsIntersect (aa, ab, ba, bb) {
+  segmentsIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
     return this.segmentsBBIntersect(aa, ab, ba, bb) &&
     this.segmentTouchesOrCrosses(aa, ab, ba, bb) &&
     this.segmentTouchesOrCrosses(ba, bb, aa, ab)
   }
 
-  pointsAtPos (points, pos) {
+  pointsAtPos (points: Point2[], pos: Point2) {
     var i
     var atPos = []
     for (i = 0; i < points.length; i++) {
@@ -99,7 +108,7 @@ export default class Geo {
     return atPos
   }
 
-  intersectsWith (ogeo) {
+  intersectsWith (ogeo: Geo): boolean {
     var i
     var oi
     var collision = false

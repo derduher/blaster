@@ -1,9 +1,24 @@
 /* eslint-disable no-return-assign */
-import Geo from './Geo.js'
+import Geo from './Geo'
 import { defaultObjMass } from './config.js'
+import { BoundingBox } from './types'
+import Stage from './Stage'
+import Point2 from './Point2'
 
 export default class Obj {
-  constructor (pos, stage) {
+  mass: number
+  immortal: boolean
+  geo: Geo
+  path: Path2D
+  width: number
+  health: number
+  isHighlighted: boolean
+  isDisplayCell: boolean
+  highlightColor: string
+  stage: Stage
+  boundToCanvas: boolean
+
+  constructor (pos: Point2, stage: Stage) {
     this.mass = defaultObjMass
     this.immortal = false
     this.stage = stage
@@ -26,7 +41,7 @@ export default class Obj {
     this.geo.pos = pos
   }
 
-  draw (ctx, debug = false) {
+  draw (ctx: CanvasRenderingContext2D, debug = false) {
     ctx.strokeStyle = 'rgb(255,255,255)'
     if (this.isHighlighted) {
       ctx.strokeStyle = this.highlightColor
@@ -35,7 +50,7 @@ export default class Obj {
     ctx.stroke(this.path)
     if (debug) {
       ctx.font = '24px roboto'
-      ctx.fillText(this.health, 10, 35)
+      ctx.fillText(this.health + '', 10, 35)
     }
     // if (this.isDisplayCell) {
     // ctx.font = '24px roboto'
@@ -53,10 +68,10 @@ export default class Obj {
     window.setTimeout(() => this.isHighlighted = false, 5000)
   }
 
-  tick () {
+  tick (now?: number) : void {
   }
 
-  intersects (o, i, cullQ) {
+  intersects (o: Obj, i: number, cullQ: number[]) {
     // f = ma
     // let fx = (this.geo.v.x / 16.7) * this.mass
     // let fy = (this.geo.v.y / 16.7) * this.mass

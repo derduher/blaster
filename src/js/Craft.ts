@@ -1,7 +1,9 @@
-import Point2 from './Point2.js'
-import Obj from './Object.js'
-import Projectile from './Projectile.js'
-import Geo from './Geo.js'
+import Point2 from './Point2'
+import Obj from './Object'
+import Projectile from './Projectile'
+import Geo from './Geo'
+import Stage from './Stage'
+import Controls from './Controls'
 import {
   craft
 } from './config'
@@ -23,7 +25,14 @@ var posDir = speed
 var negDir = speed * -1
 
 export default class Craft extends Obj {
-  constructor (stage, ctrl) {
+  lastFire: number
+  boundToCanvas: boolean
+  currentWeapon: number
+  weaponConfigurations: number[]
+  ctrl: Controls
+  path: Path2D
+  originalPath: Path2D
+  constructor (stage: Stage, ctrl: Controls) {
     const pos = new Point2(
       document.documentElement.clientWidth / 2 - width / 2,
       document.documentElement.clientHeight - width - stage.padding
@@ -47,12 +56,14 @@ export default class Craft extends Obj {
 
     let segments = [...geo]
     segments.forEach(segment => {
-      let points = [...segment]
-      let first = points.shift()
-      this.path.moveTo(first.x, first.y)
-      points.forEach(pt => {
-        this.path.lineTo(pt.x, pt.y)
-      })
+      const points = [...segment]
+      const first = points.shift()
+      if (first) {
+        this.path.moveTo(first.x, first.y)
+        points.forEach(pt => {
+          this.path.lineTo(pt.x, pt.y)
+        })
+      }
     })
 
     this.path.closePath()
@@ -64,7 +75,7 @@ export default class Craft extends Obj {
     this.ctrl = ctrl
   }
 
-  tick (now) {
+  tick (now: number): void {
     var lastFireDelta = now - this.lastFire
 
     // set ctrl dir
@@ -163,7 +174,7 @@ export default class Craft extends Obj {
     this.currentWeapon = Math.abs(this.currentWeapon - 1 % this.weaponConfigurations.length)
   }
 
-  fire (now) {
+  fire (now : number) {
     const size = this.weaponConfigurations[this.currentWeapon]
     const pos = new Point2(
       this.geo.pos.x + this.width / 2 + this.geo.v.x + 10 - size / 2,

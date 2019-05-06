@@ -1,6 +1,19 @@
 /* jshint bitwise: false */
+import { PointLike } from './types'
+import Obj from './Object'
+import Geo from './Geo'
+interface Reverse { [index: number]: PointLike}
 export default class SpatialManager {
-  constructor (scenewidth, sceneheight, cellsize) {
+  SceneWidth: number
+  SceneHeight: number
+  cellsize: number
+  cf: number
+  cols: number
+  rows: number
+  numbuckets: number
+  reverse: Reverse
+  buckets: Map<number,Set<Obj>>
+  constructor (scenewidth:number, sceneheight:number, cellsize:number) {
     this.SceneWidth = scenewidth
     this.SceneHeight = sceneheight
     this.cellsize = cellsize
@@ -29,7 +42,7 @@ export default class SpatialManager {
     }
   }
 
-  registerObject (obj) {
+  registerObject (obj: Obj) {
     var cells = this.getIdForObject(obj.geo)
     var cell
     for (var i = 0; i < cells.length; i++) {
@@ -40,8 +53,8 @@ export default class SpatialManager {
     }
   }
 
-  getIdForObject (geo) {
-    var bucketsObjIsIn = []
+  getIdForObject (geo: Geo) {
+    let bucketsObjIsIn:number[] = []
     var maxX = geo.pos.x + geo.aabb.max.x
     var maxY = geo.pos.y + geo.aabb.max.y
     var cf = this.cf
@@ -63,11 +76,11 @@ export default class SpatialManager {
     return bucketsObjIsIn
   }
 
-  idForPoint (x, y) {
+  idForPoint (x: number, y: number) {
     return (x * this.cf | 0) + (y * this.cf | 0) * this.cols | 0
   }
 
-  addBucket (x, y, cf, cols, set) {
+  addBucket (x: number, y: number, cf: number, cols: number, set: number[]) {
     // ignore collisions offscreen
     var id = (x * cf | 0) + (y * cf | 0) * cols | 0
     if (id >= 0 && id < this.numbuckets && set.indexOf(id) === -1) { // don't re-add the same item
@@ -75,15 +88,22 @@ export default class SpatialManager {
     }
   }
 
-  getNearby (geo) {
+  getNearby (geo: Geo) {
     var nearby = new Set()
     var ids = this.getIdForObject(geo)
 
     var i
     for (i = 0; i < ids.length; i++) {
-      let bucket = this.buckets.get(ids[i]).values()
+      let bucketI = this.buckets.get(ids[i])
+      let bucket
+      if (bucketI) {
+        bucket = bucketI.values()
+      }
       var b
       while (1) {
+        if (!bucket) {
+          break
+        }
         b = bucket.next()
         if (b.done) {
           break

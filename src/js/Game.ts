@@ -1,12 +1,14 @@
-import Stage from './Stage.js'
-import SpatialManager from './SpatialManager.js'
-import Roid from './Roid.js'
-import Craft from './Craft.js'
+import Stage from './Stage'
+import SpatialManager from './SpatialManager'
+import Roid from './Roid'
+import Craft from './Craft'
 // import NPC from './NPC.js'
-import Point2 from './Point2.js'
+import Point2 from './Point2'
+import Obj from './Object'
+// @ts-ignore
 import { toggleFullScreen, fullScreenElementProp } from './fullscreen'
-import Controls from './Controls.js'
-import roidPosFactory from './roidPosFactory.js'
+import Controls from './Controls'
+import roidPosFactory from './roidPosFactory'
 import {
   fpsFilter,
   cellSize,
@@ -15,17 +17,43 @@ import {
   tickLength
 } from './config'
 
-var debug = {
+interface Debug {
+  on: boolean,
+  fps: number,
+  text: string,
+  numUpdates: number,
+  itemL: number,
+  drawRate: number,
+  lastRender: number
+}
+
+const debug : Debug = {
   on: false,
   fps: 50,
   text: '',
   numUpdates: 0,
   itemL: 0,
-  drawRate: 250
+  drawRate: 250,
+  lastRender: Number.POSITIVE_INFINITY
 }
 
 export default class Game {
-  constructor (canvas) {
+  updateIsReady: boolean
+  hitboxes: Set<Point2>
+  lastRender: number
+  ctrl: Controls
+  started: boolean
+  stage: Stage
+  ctx: CanvasRenderingContext2D | null
+  count: number
+  lastTick: number
+  isTouchInterface: boolean
+  craft: Craft
+  tickLength: number
+  stopMain: number
+  debug: Debug
+  hatches: Path2D
+  constructor (canvas : HTMLCanvasElement) {
     this.updateIsReady = false
     this.hitboxes = new Set()
     this.debug = debug
@@ -56,6 +84,7 @@ export default class Game {
     document.addEventListener('touchend', this.pausedOnTap.bind(this))
     window.onresize = () => this.updateCanvasBoundaries()
 
+    // @ts-ignore
     window.spatial = this.stage.spatialManager = new SpatialManager(document.documentElement.clientWidth, document.documentElement.clientHeight, cellSize)
 
     this.craft = new Craft(this.stage, this.ctrl)
@@ -65,12 +94,15 @@ export default class Game {
 
     this.ctx = this.stage.canvas.getContext('2d')
     this.updateCanvasBoundaries()
-    this.ctx.fillStyle = 'rgb(255,255,255)'
-    this.ctx.strokeStyle = 'rgb(255,255,255)'
-    this.ctx.save()
-    this.ctx.save()
+    if (this.ctx) {
+      this.ctx.fillStyle = 'rgb(255,255,255)'
+      this.ctx.strokeStyle = 'rgb(255,255,255)'
+      this.ctx.save()
+      this.ctx.save()
+    }
     this.showInstructions()
     this.count = 0
+    // @ts-ignore
     window.game = this
 
     // this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
@@ -93,16 +125,16 @@ export default class Game {
     // this.stage.spatialManager.registerObject(p)
   }
 
-  updateReady () {
+  updateReady () : void {
     this.updateIsReady = true
   }
 
-  main (tFrame) {
+  main (tFrame: number) {
     this.started = true
     var timeSinceTick
     var nextTick = this.lastTick + this.tickLength
     var numTicks = 0
-    var ud = 0
+    let ud = false
     var thisFrameFPS = 60.1
 
     this.stopMain = window.requestAnimationFrame(this.main.bind(this))
@@ -141,11 +173,12 @@ export default class Game {
       this.debug.numUpdates = numTicks
     }
 
-    this.draw(tFrame)
+    this.draw()
     this.lastRender = tFrame
   }
 
   updateCanvasBoundaries () {
+    // @ts-ignore
     if (document[fullScreenElementProp]) {
       this.stage.canvas.width = window.screen.width
       this.stage.canvas.height = window.screen.height
@@ -183,7 +216,7 @@ export default class Game {
     }
   }
 
-  updates (numTicks) {
+  updates (numTicks: number) {
     var i
     for (i = 0; i < numTicks; i++) {
       this.lastTick += this.tickLength
@@ -197,58 +230,65 @@ export default class Game {
       let x = i % this.stage.canvas.width
       let y = (i / this.stage.canvas.width) | 0
       let pct = 100 * this.stage.spatialManager.idForPoint(x, y) / this.stage.spatialManager.numbuckets
-      this.ctx.fillStyle = `hsl(270, 10%, ${pct}%)`
-      this.ctx.fillRect(x, y, 1, 1)
+      if (this.ctx) {
+        this.ctx.fillStyle = `hsl(270, 10%, ${pct}%)`
+        this.ctx.fillRect(x, y, 1, 1)
+      }
     }
   }
 
-  draw (tFrame) {
-    if (!window.hold) {
+  draw () {
+    // @ts-ignore
+    if (!window.hold && this.ctx) {
       this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
     }
-    this.ctx.save()
+    if (this.ctx) {
+      this.ctx.save()
+    }
     const deviceWidth = this.stage.canvas.width
     const deviceHeight = this.stage.canvas.height
     const scaleFitNative = Math.min(deviceWidth / nativeWidth, deviceHeight / nativeHeight)
     // const scaleFillNative = Math.max(deviceWidth / nativeWidth, deviceHeight / nativeHeight)
     const scale = scaleFitNative
 
-    this.ctx.setTransform(
-      scale, 0, // or use scaleFillNative
-      0, scale,
-      deviceWidth / 2 | 0,
-      deviceHeight / 2 | 0
-    )
-    let offsetDeviceTop = -(deviceHeight / scale) / 2
-    let offsetDeviceLeft = -(deviceWidth / scale) / 2
-    this.ctx.translate(offsetDeviceLeft, offsetDeviceTop)
-    // console.log(scale, deviceWidth, deviceHeight, this.stage.xmax, this.stage.ymax)
-    var fs = 70
-    for (var i = 0; i < this.stage.items.length; i++) {
-      this.ctx.save()
-      this.stage.items[i].draw(this.ctx, this.debug.on)
+    if (this.ctx) {
+      this.ctx.setTransform(
+        scale, 0, // or use scaleFillNative
+        0, scale,
+        deviceWidth / 2 | 0,
+        deviceHeight / 2 | 0
+      )
+      let offsetDeviceTop = -(deviceHeight / scale) / 2
+      let offsetDeviceLeft = -(deviceWidth / scale) / 2
+      this.ctx.translate(offsetDeviceLeft, offsetDeviceTop)
+      // console.log(scale, deviceWidth, deviceHeight, this.stage.xmax, this.stage.ymax)
+      var fs = 70
+      for (var i = 0; i < this.stage.items.length; i++) {
+        this.ctx.save()
+        this.stage.items[i].draw(this.ctx, this.debug.on)
+        this.ctx.restore()
+      }
       this.ctx.restore()
-    }
-    this.ctx.restore()
 
-    if (this.debug.on) {
-      this.ctx.font = '64px roboto'
-      this.ctx.fillText(this.debug.fps.toFixed(1), 0, fs)
-      this.ctx.fillText(this.debug.itemL, 0, fs * 2)
-      this.ctx.fillText(this.debug.numUpdates, 0, fs * 3)
-      this.ctx.fillText(this.debug.text, this.stage.canvas.width / 2, this.stage.canvas.height / 2)
+      if (this.debug.on) {
+        this.ctx.font = '64px roboto'
+        this.ctx.fillText(this.debug.fps.toFixed(1), 0, fs)
+        this.ctx.fillText(this.debug.itemL + '', 0, fs * 2)
+        this.ctx.fillText(this.debug.numUpdates + '', 0, fs * 3)
+        this.ctx.fillText(this.debug.text, this.stage.canvas.width / 2, this.stage.canvas.height / 2)
 
-      this.ctx.stroke(this.hatches)
-      this.ctx.strokeStyle = 'green'
-      this.ctx.lineWidth = 3
-      this.hitboxes.forEach(xy => this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize))
-      this.ctx.restore()
+        this.ctx.stroke(this.hatches)
+        this.ctx.strokeStyle = 'green'
+        this.ctx.lineWidth = 3
+        this.hitboxes.forEach((xy:Point2) => this.ctx && this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize))
+        this.ctx.restore()
+      }
     }
   }
 
   /* eslint-disable no-mixed-operators */
   // I don't remember what the intended order of ops is on this
-  boundNTick (i, tickTime) {
+  boundNTick (i:Obj, tickTime:number) {
     i.tick(tickTime)
     var x = i.geo.pos.x + i.geo.v.x
     var y = i.geo.pos.y + i.geo.v.y
@@ -283,13 +323,13 @@ export default class Game {
   /* eslint-enable no-mixed-operators */
 
   // o other object
-  testIntersect (item, i, o, cullQ) {
+  testIntersect (item: Obj, i:number, o: Obj, cullQ: number[]) {
     if (item !== o && item.geo.intersectsWith(o.geo)) {
       item.intersects(o, i, cullQ)
     }
   }
 
-  update (tickTime) {
+  update (tickTime:number) {
     if (this.ctrl.p) {
       this.togglePause()
     }
@@ -344,17 +384,19 @@ export default class Game {
     cullQ.forEach(v => this.stage.items.splice(v - culled++, 1))
   }
 
-  messageModal (msg) {
-    let x = this.stage.canvas.width / 2
-    let y = this.stage.canvas.height / 2
-    this.ctx.textAlign = 'center'
-    this.ctx.font = '64px roboto'
-    this.ctx.fillText(msg[0], x, y)
-    if (msg.length > 1) {
-      this.ctx.font = '48px roboto'
-      this.ctx.fillText(msg[1], x, y + 72)
+  messageModal (msg:string[]) {
+    if (this.ctx) {
+      let x = this.stage.canvas.width / 2
+      let y = this.stage.canvas.height / 2
+      this.ctx.textAlign = 'center'
+      this.ctx.font = '64px roboto'
+      this.ctx.fillText(msg[0], x, y)
+      if (msg.length > 1) {
+        this.ctx.font = '48px roboto'
+        this.ctx.fillText(msg[1], x, y + 72)
+      }
+      this.ctx.restore()
     }
-    this.ctx.restore()
   }
 
   showInstructions () {
@@ -386,20 +428,20 @@ export default class Game {
     this.messageModal(msg)
   }
 
-  pausedOnKeyUp (e) {
+  pausedOnKeyUp (e:KeyboardEvent) {
     if (!this.stopMain && e.keyCode === 32) {
       this.resume()
     }
   }
 
-  pausedOnTap (e) {
+  pausedOnTap (e: TouchEvent) {
     if (!this.stopMain) {
       this.resume()
     }
   }
   _pause () {
     window.cancelAnimationFrame(this.stopMain)
-    this.stopMain = null
+    this.stopMain = 0
   }
 
   togglePause () {

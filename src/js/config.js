@@ -1,4 +1,4 @@
-import Point2 from './Point2.js'
+import Point2 from './Point2'
 
 export const fpsFilter = 75
 export const cellSize = 256

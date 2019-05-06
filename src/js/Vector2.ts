@@ -1,14 +1,16 @@
 export default class Vector2 {
-  constructor (x = 0, y = 0) {
+  x: number
+  y: number
+  constructor (x = 0 , y = 0) {
     this.x = x
     this.y = y
   }
 
-  dot (b) {
+  dot (b: Vector2) {
     return this.x * b.x + this.y * b.y
   }
 
-  cross (b) {
+  cross (b: Vector2) {
     return this.x * b.y - this.y * b.x
   }
 }

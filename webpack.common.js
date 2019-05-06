@@ -9,7 +9,7 @@ module.exports = {
   stats: 'normal',
   entry: './src/js/main.js',
   plugins: [
-    new CleanWebpackPlugin(['build']),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
     }),
@@ -48,6 +48,11 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
+      },
       {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
@@ -88,5 +93,8 @@ module.exports = {
         }]
       }
     ]
+  },
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
   }
 }

@@ -1,9 +1,11 @@
 // import Vector2 from './Vector2.js'
-import Obj from './Object.js'
+import Obj from './Object'
 // import Point2 from './Point2.js'
 import {
   projectile
 } from './config.js'
+import Geo from './Geo'
+import Stage from './Stage'
 const {
   mass,
   width: defaultWidth,
@@ -11,7 +13,8 @@ const {
 } = projectile
 
 export default class Projectile extends Obj {
-  constructor (geo, stage, width = defaultWidth) {
+  boundToCanvas: boolean
+  constructor (geo: Geo, stage: Stage, width = defaultWidth) {
     super(geo.pos, stage)
     this.geo = geo
     this.mass = mass // Gg
@@ -23,7 +26,7 @@ export default class Projectile extends Obj {
     this.boundToCanvas = false
   }
 
-  draw (ctx, debug = false) {
+  draw (ctx: CanvasRenderingContext2D, debug = false) {
     ctx.translate(this.geo.pos.x, this.geo.pos.y)
     ctx.fillStyle = 'rgb(255,255,255)'
     if (this.isHighlighted) {
@@ -47,7 +50,7 @@ export default class Projectile extends Obj {
     this.isDisplayCell = true
   }
 
-  intersects (o, i, cullQ) {
+  intersects (o: Obj, i: number, cullQ:number[]) {
     o.health -= 10
     super.intersects(o, i, cullQ)
   }
