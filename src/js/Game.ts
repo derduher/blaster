@@ -129,7 +129,7 @@ export default class Game {
     this.updateIsReady = true
   }
 
-  main (tFrame: number) {
+  main (tFrame: number) : void {
     this.started = true
     var timeSinceTick
     var nextTick = this.lastTick + this.tickLength
@@ -177,7 +177,7 @@ export default class Game {
     this.lastRender = tFrame
   }
 
-  updateCanvasBoundaries () {
+  updateCanvasBoundaries () : void {
     // @ts-ignore
     if (document[fullScreenElementProp]) {
       this.stage.canvas.width = window.screen.width
@@ -216,7 +216,7 @@ export default class Game {
     }
   }
 
-  updates (numTicks: number) {
+  updates (numTicks: number) : void {
     var i
     for (i = 0; i < numTicks; i++) {
       this.lastTick += this.tickLength
@@ -224,7 +224,7 @@ export default class Game {
     }
   }
 
-  drawBuckets () {
+  drawBuckets () : void {
     let numPixels = this.stage.canvas.width * this.stage.canvas.height
     for (let i = 0; i < numPixels; i++) {
       let x = i % this.stage.canvas.width
@@ -237,7 +237,7 @@ export default class Game {
     }
   }
 
-  draw () {
+  draw () : void {
     // @ts-ignore
     if (!window.hold && this.ctx) {
       this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
@@ -288,7 +288,7 @@ export default class Game {
 
   /* eslint-disable no-mixed-operators */
   // I don't remember what the intended order of ops is on this
-  boundNTick (i:Obj, tickTime:number) {
+  boundNTick (i:Obj, tickTime:number) : boolean {
     i.tick(tickTime)
     var x = i.geo.pos.x + i.geo.v.x
     var y = i.geo.pos.y + i.geo.v.y
@@ -323,13 +323,13 @@ export default class Game {
   /* eslint-enable no-mixed-operators */
 
   // o other object
-  testIntersect (item: Obj, i:number, o: Obj, cullQ: number[]) {
+  testIntersect (item: Obj, i:number, o: Obj, cullQ: number[]) : void {
     if (item !== o && item.geo.intersectsWith(o.geo)) {
       item.intersects(o, i, cullQ)
     }
   }
 
-  update (tickTime:number) {
+  update (tickTime:number) : void {
     if (this.ctrl.p) {
       this.togglePause()
     }
@@ -384,7 +384,7 @@ export default class Game {
     cullQ.forEach(v => this.stage.items.splice(v - culled++, 1))
   }
 
-  messageModal (msg:string[]) {
+  messageModal (msg:string[]) : void {
     if (this.ctx) {
       let x = this.stage.canvas.width / 2
       let y = this.stage.canvas.height / 2
@@ -399,7 +399,7 @@ export default class Game {
     }
   }
 
-  showInstructions () {
+  showInstructions () : void {
     let msg = []
     if (this.isTouchInterface) {
       msg[0] = 'Tap to start'
@@ -416,7 +416,7 @@ export default class Game {
     this.messageModal(msg)
   }
 
-  showPause () {
+  showPause () : void {
     let msg = []
 
     if (this.isTouchInterface) {
@@ -428,23 +428,23 @@ export default class Game {
     this.messageModal(msg)
   }
 
-  pausedOnKeyUp (e:KeyboardEvent) {
+  pausedOnKeyUp (e:KeyboardEvent) : void {
     if (!this.stopMain && e.keyCode === 32) {
       this.resume()
     }
   }
 
-  pausedOnTap (e: TouchEvent) {
+  pausedOnTap (e: TouchEvent) : void {
     if (!this.stopMain) {
       this.resume()
     }
   }
-  _pause () {
+  _pause () : void {
     window.cancelAnimationFrame(this.stopMain)
     this.stopMain = 0
   }
 
-  togglePause () {
+  togglePause () : void {
     if (this.stopMain) {
       this._pause()
     } else {
@@ -452,12 +452,12 @@ export default class Game {
     }
   }
 
-  pause () {
+  pause () : void {
     this._pause()
     this.showPause()
   }
 
-  resume () {
+  resume () : void {
     // prevents the engine from trying to catch up from all the lost cycles
     // before pause
     this.lastTick = window.performance.now()

@@ -34,7 +34,7 @@ export default class SpatialManager {
     this.clearBuckets()
   }
 
-  clearBuckets () {
+  clearBuckets () : void {
     this.buckets.clear()
     var i
     for (i = 0; i < this.numbuckets; i++) {
@@ -42,7 +42,7 @@ export default class SpatialManager {
     }
   }
 
-  registerObject (obj: Obj) {
+  registerObject (obj: Obj) : void {
     var cells = this.getIdForObject(obj.geo)
     var cell
     for (var i = 0; i < cells.length; i++) {
@@ -53,7 +53,7 @@ export default class SpatialManager {
     }
   }
 
-  getIdForObject (geo: Geo) {
+  getIdForObject (geo: Geo) : number[] {
     let bucketsObjIsIn:number[] = []
     var maxX = geo.pos.x + geo.aabb.max.x
     var maxY = geo.pos.y + geo.aabb.max.y
@@ -76,11 +76,11 @@ export default class SpatialManager {
     return bucketsObjIsIn
   }
 
-  idForPoint (x: number, y: number) {
+  idForPoint (x: number, y: number) : number {
     return (x * this.cf | 0) + (y * this.cf | 0) * this.cols | 0
   }
 
-  addBucket (x: number, y: number, cf: number, cols: number, set: number[]) {
+  addBucket (x: number, y: number, cf: number, cols: number, set: number[]) : void {
     // ignore collisions offscreen
     var id = (x * cf | 0) + (y * cf | 0) * cols | 0
     if (id >= 0 && id < this.numbuckets && set.indexOf(id) === -1) { // don't re-add the same item
@@ -88,7 +88,7 @@ export default class SpatialManager {
     }
   }
 
-  getNearby (geo: Geo) {
+  getNearby (geo: Geo) : Set<Obj> {
     var nearby = new Set()
     var ids = this.getIdForObject(geo)
 

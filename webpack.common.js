@@ -49,25 +49,10 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.js$/,
+        test: /\.[tj]sx?$/,
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: [
-              ['@babel/preset-env', {
-                'targets': {
-                  'browsers': ['chrome >= 67']
-                },
-                'useBuiltIns': 'usage'
-              }]
-            ]
-          }
         }
       },
       {

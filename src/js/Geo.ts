@@ -55,7 +55,7 @@ export default class Geo implements GenPos {
   }
 
   // http://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-  crossProduct (a: Vector2|Point2, b: Vector2|Point2) {
+  crossProduct (a: Vector2|Point2, b: Vector2|Point2) : number {
     return a.x * b.y - b.x * a.y
   }
 
@@ -99,7 +99,7 @@ export default class Geo implements GenPos {
     this.segmentTouchesOrCrosses(ba, bb, aa, ab)
   }
 
-  pointsAtPos (points: Point2[], pos: Point2) {
+  pointsAtPos (points: Point2[], pos: Point2): Point2[] {
     var i
     var atPos = []
     for (i = 0; i < points.length; i++) {

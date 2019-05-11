@@ -6,11 +6,11 @@ export default class Vector2 {
     this.y = y
   }
 
-  dot (b: Vector2) {
+  dot (b: Vector2) : number {
     return this.x * b.x + this.y * b.y
   }
 
-  cross (b: Vector2) {
+  cross (b: Vector2) : number {
     return this.x * b.y - this.y * b.x
   }
 }

@@ -41,7 +41,7 @@ export default class Obj {
     this.geo.pos = pos
   }
 
-  draw (ctx: CanvasRenderingContext2D, debug = false) {
+  draw (ctx: CanvasRenderingContext2D, debug = false) : void {
     ctx.strokeStyle = 'rgb(255,255,255)'
     if (this.isHighlighted) {
       ctx.strokeStyle = this.highlightColor
@@ -58,11 +58,11 @@ export default class Obj {
     // }
   }
 
-  displayCell () {
+  displayCell () : void {
     this.isDisplayCell = true
   }
 
-  highlight (highlightColor = 'yellow') {
+  highlight (highlightColor = 'yellow') : void {
     this.isHighlighted = true
     this.highlightColor = highlightColor
     window.setTimeout(() => this.isHighlighted = false, 5000)
@@ -71,7 +71,7 @@ export default class Obj {
   tick (now?: number) : void {
   }
 
-  intersects (o: Obj, i: number, cullQ: number[]) {
+  intersects (o: Obj, i: number, cullQ: number[]) : void {
     // f = ma
     // let fx = (this.geo.v.x / 16.7) * this.mass
     // let fy = (this.geo.v.y / 16.7) * this.mass

@@ -2,12 +2,15 @@
   "compilerOptions": {
     "sourceMap": true,
     "outDir": "./dist/",
+    "noEmit": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
+    "strict": true,
     "module": "commonjs",
     "target": "ES2018",
     "jsx": "react",
+		"isolatedModules": true,
     "esModuleInterop": true,
     "allowJs": true,
     "lib": ["dom", "esnext"]
