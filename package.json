@@ -36,6 +36,7 @@
     "html-webpack-template": "^6.2.0",
     "jasmine": "^3.4.0",
     "jest": "^24.8.0",
+    "jest-canvas-mock": "^2.0.0",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "serviceworker-webpack-plugin": "^1.0.1",
@@ -106,5 +107,9 @@
       "no-unused-vars": 0,
       "react/prop-types": 0
     }
+  },
+  "jest": {
+    "collectCoverage": true,
+    "setupFiles": ["jest-canvas-mock"]
   }
 }

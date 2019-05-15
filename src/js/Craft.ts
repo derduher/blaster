@@ -30,7 +30,6 @@ export default class Craft extends Obj {
   currentWeapon: number
   weaponConfigurations: number[]
   ctrl: Controls
-  path: Path2D
   originalPath: Path2D
   constructor (stage: Stage, ctrl: Controls) {
     const pos = new Point2(
