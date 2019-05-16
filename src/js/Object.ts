@@ -19,6 +19,10 @@ export default class Obj {
   boundToCanvas: boolean
 
   constructor (pos: Point2, stage: Stage) {
+    this.boundToCanvas = false
+    this.isHighlighted = false
+    this.isDisplayCell = false
+    this.highlightColor = ''
     this.mass = defaultObjMass
     this.immortal = false
     this.stage = stage
@@ -41,6 +45,7 @@ export default class Obj {
     this.geo.pos = pos
   }
 
+  /* istanbul ignore next */
   draw (ctx: CanvasRenderingContext2D, debug = false) : void {
     ctx.strokeStyle = 'rgb(255,255,255)'
     if (this.isHighlighted) {
@@ -58,16 +63,19 @@ export default class Obj {
     // }
   }
 
+  /* istanbul ignore next */
   displayCell () : void {
     this.isDisplayCell = true
   }
 
+  /* istanbul ignore next */
   highlight (highlightColor = 'yellow') : void {
     this.isHighlighted = true
     this.highlightColor = highlightColor
     window.setTimeout(() => this.isHighlighted = false, 5000)
   }
 
+  /* istanbul ignore next */
   tick (now?: number) : void {
   }
 

@@ -25,7 +25,7 @@ export default class Projectile extends Obj {
     this.health = health
     this.boundToCanvas = false
   }
-
+  /* istanbul ignore next */
   draw (ctx: CanvasRenderingContext2D, debug = false) {
     ctx.translate(this.geo.pos.x, this.geo.pos.y)
     ctx.fillStyle = 'rgb(255,255,255)'
@@ -46,6 +46,7 @@ export default class Projectile extends Obj {
     // }
   }
 
+  /* istanbul ignore next */
   displayCell () {
     this.isDisplayCell = true
   }

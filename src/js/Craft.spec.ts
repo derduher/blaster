@@ -11,8 +11,7 @@ describe('Craft', () => {
   let controls:Controls
   let craft:Craft
   beforeEach(() => {
-    stage = new Stage(document.createElement('canvas'))
-    stage.spatialManager = new SpatialManager(1000, 1000, 10)
+    stage = new Stage(document.createElement('canvas'), new SpatialManager(1000, 1000, 10))
     controls = new Controls()
     craft = new Craft(stage, controls)
   })

@@ -54,6 +54,8 @@ export default class Game {
   debug: Debug
   hatches: Path2D
   constructor (canvas : HTMLCanvasElement) {
+    this.hatches = new Path2D()
+    this.stopMain = 0
     this.updateIsReady = false
     this.hitboxes = new Set()
     this.debug = debug
@@ -62,7 +64,10 @@ export default class Game {
     this.ctrl = new Controls()
     this.lastTick = this.lastRender
     this.debug.lastRender = this.lastRender
-    this.stage = new Stage(canvas)
+
+    // @ts-ignore
+    const spatialManager = new SpatialManager(document.documentElement.clientWidth, document.documentElement.clientHeight, cellSize)
+    this.stage = new Stage(canvas, spatialManager)
     this.started = false
 
     this.isTouchInterface = 'ontouchend' in document.documentElement
@@ -83,9 +88,6 @@ export default class Game {
     document.addEventListener('touchend', this.ctrl.te.bind(this.ctrl))
     document.addEventListener('touchend', this.pausedOnTap.bind(this))
     window.onresize = () => this.updateCanvasBoundaries()
-
-    // @ts-ignore
-    window.spatial = this.stage.spatialManager = new SpatialManager(document.documentElement.clientWidth, document.documentElement.clientHeight, cellSize)
 
     this.craft = new Craft(this.stage, this.ctrl)
     this.stage.spatialManager.registerObject(this.craft)

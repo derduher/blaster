@@ -14,5 +14,7 @@
     "esModuleInterop": true,
     "allowJs": true,
     "lib": ["dom", "esnext"]
-  }
+  },
+  "include": ["src/js/**/*"],
+  "exclude": ["node_modules", "src/js/sw.js", "**/*.spec.*"]
 }

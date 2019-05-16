@@ -46,6 +46,9 @@ export default class Controls {
   [index: string]: any
 
   constructor () {
+    this.touch = false
+    this.touchX = 0
+    this.touchY = 0
     this.l = false
     this.r = false
     this.u = false
@@ -73,6 +76,7 @@ export default class Controls {
     this.toggle = new Set(['autoBreak', 'toggleFS'])
   }
 
+  /* istanbul ignore next */
   kd (e : KeyboardEvent) {
     const action = this.cfg[e.keyCode]
     if (this.pressActivated.has(action)) {
@@ -80,6 +84,7 @@ export default class Controls {
     }
   }
 
+  /* istanbul ignore next */
   ku (e : KeyboardEvent) {
     const action = this.cfg[e.keyCode]
     if (this.pressActivated.has(action)) {
@@ -91,6 +96,7 @@ export default class Controls {
     }
   }
 
+  /* istanbul ignore next */
   ts (e : TouchEvent) {
     // @ts-ignore: No idea how to handle dynamic props on document
     if (document[fullScreenElementProp]) {
@@ -99,6 +105,7 @@ export default class Controls {
     }
   }
 
+  /* istanbul ignore next */
   tm (e : TouchEvent) {
     // @ts-ignore: No idea how to handle dynamic props on document
     if (document[fullScreenElementProp]) {
@@ -110,6 +117,7 @@ export default class Controls {
     }
   }
 
+  /* istanbul ignore next */
   te (e : TouchEvent) {
     this.touch = false
     this.f = false

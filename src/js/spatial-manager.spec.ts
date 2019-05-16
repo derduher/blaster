@@ -6,14 +6,16 @@ import SpatialManager from './SpatialManager'
 
 describe('SpatialManager', () => {
   let spatial:SpatialManager
+  let stage:Stage
   beforeEach(() => {
     spatial = new SpatialManager(1000, 1000, 10)
+    stage = new Stage(document.createElement('canvas'), spatial)
   })
 
   describe('clearBuckets', () => {
     it('empties all buckets', () => {
       spyOn(spatial, 'getIdForObject').and.returnValue([0, 1])
-      const foo = new Obj(new Point2(), new Stage(document.createElement('canvas')))
+      const foo = new Obj(new Point2(), stage)
       spatial.registerObject(foo)
       expect(spatial.buckets.get(0).has(foo)).toBeTruthy()
       spatial.clearBuckets()
@@ -24,7 +26,7 @@ describe('SpatialManager', () => {
   describe('registerObject', () => {
     it('adds the passed in obj to its matching buckets', () => {
       spyOn(spatial, 'getIdForObject').and.returnValue([0, 1])
-      const foo = new Obj(new Point2(), new Stage(document.createElement('canvas')))
+      const foo = new Obj(new Point2(), stage)
       spatial.registerObject(foo)
       expect(spatial.buckets.get(0).has(foo)).toBeTruthy()
       expect(spatial.buckets.get(1).has(foo)).toBeTruthy()
@@ -69,9 +71,9 @@ describe('SpatialManager', () => {
   describe('getNearby', () => {
     it('returns a set of object near the passed in obj', () => {
       spyOn(spatial, 'getIdForObject').and.returnValue([0, 1])
-      const foo = new Obj(new Point2(), new Stage(document.createElement('canvas')))
-      const bar = new Obj(new Point2(), new Stage(document.createElement('canvas')))
-      const baz = new Obj(new Point2(), new Stage(document.createElement('canvas')))
+      const foo = new Obj(new Point2(), stage)
+      const bar = new Obj(new Point2(), stage)
+      const baz = new Obj(new Point2(), stage)
       spatial.registerObject(foo)
       spatial.registerObject(bar)
       const nearby = spatial.getNearby(baz.geo)

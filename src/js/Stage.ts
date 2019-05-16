@@ -7,12 +7,12 @@ export default class Stage {
   spatialManager: SpatialManager
   canvas: HTMLCanvasElement
   padding: number
-  craft: Craft
+  craft?: Craft
   xmax: number
   xmin: number
   ymin: number
   ymax: number
-  constructor (canvas: HTMLCanvasElement) {
+  constructor (canvas: HTMLCanvasElement, spatialManager: SpatialManager) {
     this.items = []
     this.canvas = canvas
     this.padding = stagePadding
@@ -20,5 +20,6 @@ export default class Stage {
     this.xmin = 0
     this.ymin = 0
     this.ymax = 1080
+    this.spatialManager = spatialManager
   }
 }

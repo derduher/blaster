@@ -47,6 +47,7 @@ export default class SpatialManager {
     var cell
     for (var i = 0; i < cells.length; i++) {
       cell = this.buckets.get(cells[i])
+      /* istanbul ignore else */
       if (cell) {
         cell.add(obj)
       }
@@ -96,11 +97,13 @@ export default class SpatialManager {
     for (i = 0; i < ids.length; i++) {
       let bucketI = this.buckets.get(ids[i])
       let bucket
+      /* istanbul ignore else */
       if (bucketI) {
         bucket = bucketI.values()
       }
       var b
       while (1) {
+        /* istanbul ignore if */
         if (!bucket) {
           break
         }

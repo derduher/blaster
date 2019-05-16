@@ -3,11 +3,13 @@ import Projectile from './Projectile'
 import Geo from './Geo'
 import Point2 from './Point2'
 import Obj from './Object'
+import SpatialManager from './SpatialManager'
+
 describe('Projectile', () => {
   let projectile:Projectile
   let stage:Stage
   beforeEach(() => {
-    stage = new Stage(document.createElement('canvas'))
+    stage = new Stage(document.createElement('canvas'), new SpatialManager(1000, 1000, 10))
     projectile = new Projectile(new Geo(), stage)
   })
   it('decrements health on intersection', () => {
