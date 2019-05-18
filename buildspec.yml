@@ -12,11 +12,11 @@ phases:
       - echo Build started on `date`
       - npm ci
       - npm run build
-      # - zip -r build.zip build/
   post_build:
     commands:
       - echo Build completed on `date`
 artifacts:
   files:
-    - build/*
+    - '**/*'
+  base-directory: build
   name: blaster-$(date +%Y-%m-%d)
