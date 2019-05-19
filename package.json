@@ -76,7 +76,9 @@
       "typescript"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.4.4"
+  },
   "eslintConfig": {
     "extends": [
       "eslint:recommended",
@@ -110,7 +112,9 @@
   },
   "jest": {
     "collectCoverage": true,
-    "setupFiles": ["jest-canvas-mock"],
+    "setupFiles": [
+      "jest-canvas-mock"
+    ],
     "collectCoverageFrom": [
       "src/js/**/*.{ts,tsx}",
       "!node_modules/",

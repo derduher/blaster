@@ -36,16 +36,15 @@ export default class SpatialManager {
 
   clearBuckets () : void {
     this.buckets.clear()
-    var i
-    for (i = 0; i < this.numbuckets; i++) {
+    for (let i = 0; i < this.numbuckets; i++) {
       this.buckets.set(i, new Set())
     }
   }
 
   registerObject (obj: Obj) : void {
-    var cells = this.getIdForObject(obj.geo)
-    var cell
-    for (var i = 0; i < cells.length; i++) {
+    const cells = this.getIdForObject(obj.geo)
+    let cell
+    for (let i = 0; i < cells.length; i++) {
       cell = this.buckets.get(cells[i])
       /* istanbul ignore else */
       if (cell) {
@@ -56,10 +55,10 @@ export default class SpatialManager {
 
   getIdForObject (geo: Geo) : number[] {
     let bucketsObjIsIn:number[] = []
-    var maxX = geo.pos.x + geo.aabb.max.x
-    var maxY = geo.pos.y + geo.aabb.max.y
-    var cf = this.cf
-    var cols = this.cols
+    const maxX = geo.pos.x + geo.aabb.max.x
+    const maxY = geo.pos.y + geo.aabb.max.y
+    const cf = this.cf
+    const cols = this.cols
 
     // this.addBucket(geo.pos.x, geo.pos.y, cf, cols, bucketsObjIsIn)
     // this.addBucket(maxX, geo.pos.y, cf, cols, bucketsObjIsIn)
@@ -83,31 +82,29 @@ export default class SpatialManager {
 
   addBucket (x: number, y: number, cf: number, cols: number, set: number[]) : void {
     // ignore collisions offscreen
-    var id = (x * cf | 0) + (y * cf | 0) * cols | 0
+    const id = (x * cf | 0) + (y * cf | 0) * cols | 0
     if (id >= 0 && id < this.numbuckets && set.indexOf(id) === -1) { // don't re-add the same item
       set.push(id)
     }
   }
 
   getNearby (geo: Geo) : Set<Obj> {
-    var nearby = new Set()
-    var ids = this.getIdForObject(geo)
+    const nearby = new Set()
+    const ids = this.getIdForObject(geo)
 
-    var i
-    for (i = 0; i < ids.length; i++) {
+    for (let i = 0; i < ids.length; i++) {
       let bucketI = this.buckets.get(ids[i])
       let bucket
       /* istanbul ignore else */
       if (bucketI) {
         bucket = bucketI.values()
       }
-      var b
       while (1) {
         /* istanbul ignore if */
         if (!bucket) {
           break
         }
-        b = bucket.next()
+        const b = bucket.next()
         if (b.done) {
           break
         }

@@ -55,51 +55,51 @@ export default class Geo implements GenPos {
   }
 
   // http://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-  crossProduct (a: Vector2|Point2, b: Vector2|Point2) : number {
+  static crossProduct (a: Vector2|Point2, b: Vector2|Point2) : number {
     return a.x * b.y - b.x * a.y
   }
 
-  isPointOnLine (aa: Point2, ab: Point2, b: Point2): boolean {
+  static isPointOnLine (aa: Point2, ab: Point2, b: Point2): boolean {
     const aTmp:Point2 = new Point2(ab.x - aa.x, ab.y - aa.y)
     const bTmp:Point2 = new Point2(b.x - aa.x, b.y - aa.y)
-    return Math.abs(this.crossProduct(aTmp, bTmp)) < Number.EPSILON
+    return Math.abs(Geo.crossProduct(aTmp, bTmp)) < Number.EPSILON
   }
 
-  isPointRightOfLine (aa: Point2, ab: Point2, b: Point2) : boolean {
+  static isPointRightOfLine (aa: Point2, ab: Point2, b: Point2) : boolean {
     // Move the image, so that a.first is on (0|0)
     const aTmp:Point2 = new Point2(ab.x - aa.x, ab.y - aa.y)
     const bTmp:Point2 = new Point2(b.x - aa.x, b.y - aa.y)
-    return this.crossProduct(aTmp, bTmp) < 0
+    return Geo.crossProduct(aTmp, bTmp) < 0
   }
 
-  segmentTouchesOrCrosses (aa: Point2, ab: Point2, ba: Point2, bb: Point2) : boolean {
-    return this.isPointOnLine(aa, ab, ba) ||
-    this.isPointOnLine(aa, ab, bb) || (
-      this.isPointRightOfLine(aa, ab, ba) !==
-    this.isPointRightOfLine(aa, ab, bb)
+  static segmentTouchesOrCrosses (aa: Point2, ab: Point2, ba: Point2, bb: Point2) : boolean {
+    return Geo.isPointOnLine(aa, ab, ba) ||
+    Geo.isPointOnLine(aa, ab, bb) || (
+      Geo.isPointRightOfLine(aa, ab, ba) !==
+    Geo.isPointRightOfLine(aa, ab, bb)
     )
   }
 
-  getSegmentBB (a: Point2, b: Point2) {
+  static getSegmentBB (a: Point2, b: Point2) {
     return [new Point2(Math.min(a.x, b.x), Math.min(a.y, b.y)), new Point2(Math.max(a.x, b.x), Math.max(a.y, b.y))]
   }
 
-  segmentsBBIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
-    var firstbb = this.getSegmentBB(aa, ab)
-    var secondbb = this.getSegmentBB(ba, bb)
+  static segmentsBBIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
+    var firstbb = Geo.getSegmentBB(aa, ab)
+    var secondbb = Geo.getSegmentBB(ba, bb)
     return firstbb[0].x <= secondbb[1].x &&
     firstbb[1].x >= secondbb[0].x &&
     firstbb[0].y <= secondbb[1].y &&
     firstbb[1].y >= secondbb[0].y
   }
 
-  segmentsIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
-    return this.segmentsBBIntersect(aa, ab, ba, bb) &&
-    this.segmentTouchesOrCrosses(aa, ab, ba, bb) &&
-    this.segmentTouchesOrCrosses(ba, bb, aa, ab)
+  static segmentsIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
+    return Geo.segmentsBBIntersect(aa, ab, ba, bb) &&
+    Geo.segmentTouchesOrCrosses(aa, ab, ba, bb) &&
+    Geo.segmentTouchesOrCrosses(ba, bb, aa, ab)
   }
 
-  pointsAtPos (points: Point2[], pos: Point2): Point2[] {
+  static pointsAtPos (points: Point2[], pos: Point2): Point2[] {
     var i
     var atPos = []
     for (i = 0; i < points.length; i++) {
@@ -142,11 +142,11 @@ export default class Geo implements GenPos {
         }
       }
     } else {
-      points = this.pointsAtPos(this.points, this.pos)
-      opoints = ogeo.pointsAtPos(ogeo.points, ogeo.pos)
+      points = Geo.pointsAtPos(this.points, this.pos)
+      opoints = Geo.pointsAtPos(ogeo.points, ogeo.pos)
       for (i = 0, prev = points.length - 1; i < points.length; prev = i++) {
         for (oi = 0, oprev = opoints.length - 1; oi < opoints.length; oprev = oi++) {
-          if (this.segmentsIntersect(points[i], points[prev], opoints[oi], opoints[oprev])) {
+          if (Geo.segmentsIntersect(points[i], points[prev], opoints[oi], opoints[oprev])) {
             collision = true
             break
           }

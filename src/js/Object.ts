@@ -7,30 +7,22 @@ import Point2 from './Point2'
 
 export default class Obj {
   mass: number
-  immortal: boolean
   geo: Geo
   path: Path2D
-  width: number
   health: number
-  isHighlighted: boolean
-  isDisplayCell: boolean
-  highlightColor: string
-  stage: Stage
-  boundToCanvas: boolean
 
-  constructor (pos: Point2, stage: Stage) {
-    this.boundToCanvas = false
-    this.isHighlighted = false
-    this.isDisplayCell = false
-    this.highlightColor = ''
+  boundToCanvas = false
+  isHighlighted = false
+  isDisplayCell = false
+  highlightColor = ''
+  width = 0
+  immortal = false
+  constructor (pos: Point2, public stage: Stage) {
     this.mass = defaultObjMass
-    this.immortal = false
-    this.stage = stage
     this.geo = new Geo()
 
     this.path = new Path2D()
 
-    this.width = 0
     this.geo.aabb.min = {
       x: 0,
       y: 0

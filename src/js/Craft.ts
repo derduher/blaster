@@ -21,8 +21,8 @@ const {
   thruster
 } = craft
 
-var posDir = speed
-var negDir = speed * -1
+const posDir = speed
+const negDir = speed * -1
 
 export default class Craft extends Obj {
   lastFire: number
@@ -75,7 +75,7 @@ export default class Craft extends Obj {
   }
 
   tick (now: number): void {
-    var lastFireDelta = now - this.lastFire
+    const lastFireDelta = now - this.lastFire
 
     // set ctrl dir
     if (this.ctrl.l && !this.ctrl.r) {

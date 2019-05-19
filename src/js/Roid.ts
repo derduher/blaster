@@ -21,7 +21,7 @@ function getY (ang: number, mag: number) {
 }
 
 function getMag (max: number) {
-  var extra = 0
+  let extra = 0
   if (Math.random() > 0.8) {
     extra = (-0.8 + Math.random()) * max * 0.25
   }
@@ -38,12 +38,12 @@ export default class Roid extends Obj {
     // https://en.wikipedia.org/wiki/101955_Bennu
     this.mass = mass * Math.random() // Gg
     // scalar
-    var mrad = minRadius + maxRadius * Math.random() // max radius
+    const mrad = minRadius + maxRadius * Math.random() // max radius
 
     // starting point
-    var m = getMag(mrad) // magnitude
-    var startX = s * (m + mrad)
-    var startY = s * mrad
+    let m = getMag(mrad) // magnitude
+    const startX = s * (m + mrad)
+    const startY = s * mrad
 
     this.geo.aabb.min = {
       x: Number.POSITIVE_INFINITY,
@@ -55,10 +55,11 @@ export default class Roid extends Obj {
       y: Number.NEGATIVE_INFINITY
     }
     this.geo.points.push(new Point2(startX, startY))
-    var i = 1
-    var a = 0
-    var inc = 2 * Math.PI / numPoints
-    var x, y
+    let i = 1
+    let a = 0
+    const inc = 2 * Math.PI / numPoints
+    let x
+    let y
 
     this.path.moveTo(startX, startY)
 
