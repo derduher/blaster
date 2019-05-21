@@ -1,3 +1,4 @@
+import Geo from './Geo'
 export default class Vector2 {
   constructor (public x: number = 0, public y: number = 0) {}
 
@@ -6,6 +7,6 @@ export default class Vector2 {
   }
 
   cross (b: Vector2) : number {
-    return this.x * b.y - this.y * b.x
+    return Geo.crossProduct(this, b)
   }
 }

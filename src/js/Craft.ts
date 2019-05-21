@@ -4,6 +4,7 @@ import Projectile from './Projectile'
 import Geo from './Geo'
 import Stage from './Stage'
 import Controls from './Controls'
+import Vector2 from './Vector2'
 import {
   craft
 } from './config'
@@ -25,33 +26,24 @@ const posDir = speed
 const negDir = speed * -1
 
 export default class Craft extends Obj {
-  lastFire: number
-  boundToCanvas: boolean
-  currentWeapon: number
   weaponConfigurations: number[]
   ctrl: Controls
   originalPath: Path2D
-  constructor (stage: Stage, ctrl: Controls) {
-    const pos = new Point2(
-      document.documentElement.clientWidth / 2 - width / 2,
-      document.documentElement.clientHeight - width - stage.padding
-    )
-    super(pos, stage)
-    this.mass = mass // Gg
-    this.lastFire = 0
-    this.boundToCanvas = true
-    this.width = width
-    this.health = health
-    this.immortal = immortal
+  lastFire = 0
+  boundToCanvas = true
+  immortal = immortal
+  health = health
+  width = width
+  mass = mass // Gg
+  currentWeapon = 0
+  constructor (stage: Stage, ctrl: Controls, pos: Point2) {
+    super(pos, stage, geo.flat())
     this.weaponConfigurations = [
       Math.random() * 20 | 0,
       Math.random() * 20 | 0,
       Math.random() * 20 | 0,
       Math.random() * 20 | 0
     ]
-    this.currentWeapon = 0
-
-    geo.forEach(segment => segment.forEach(point => this.geo.points.push(point)))
 
     let segments = [...geo]
     segments.forEach(segment => {
@@ -67,9 +59,6 @@ export default class Craft extends Obj {
 
     this.path.closePath()
     this.originalPath = this.path
-
-    this.geo.aabb.max.x = width
-    this.geo.aabb.max.y = height
 
     this.ctrl = ctrl
   }
@@ -182,12 +171,8 @@ export default class Craft extends Obj {
 
     const velY = Math.sqrt(2 * barrelLength * force / size)
     const p = new Projectile(
-      new Geo(
-        pos.x,
-        pos.y,
-        0,
-        -velY
-      ),
+      pos,
+      new Vector2(0, -velY),
       this.stage,
       size
     )

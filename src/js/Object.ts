@@ -4,12 +4,12 @@ import { defaultObjMass } from './config.js'
 import { BoundingBox } from './types'
 import Stage from './Stage'
 import Point2 from './Point2'
+import Vector2 from './Vector2'
 
 export default class Obj {
   mass: number
   geo: Geo
   path: Path2D
-  health: number
 
   boundToCanvas = false
   isHighlighted = false
@@ -17,24 +17,12 @@ export default class Obj {
   highlightColor = ''
   width = 0
   immortal = false
-  constructor (pos: Point2, public stage: Stage) {
+  health = 1
+  constructor (pos: Point2, public stage: Stage, points: Point2[], v?: Vector2) {
     this.mass = defaultObjMass
-    this.geo = new Geo()
+    this.geo = new Geo(points, pos, v)
 
     this.path = new Path2D()
-
-    this.geo.aabb.min = {
-      x: 0,
-      y: 0
-    }
-
-    this.geo.aabb.max = {
-      x: this.width,
-      y: this.width
-    }
-
-    this.health = 1
-    this.geo.pos = pos
   }
 
   /* istanbul ignore next */

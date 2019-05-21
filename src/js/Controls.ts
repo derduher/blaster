@@ -27,39 +27,25 @@ const f = 70
 const e = 69
 
 export default class Controls {
-  l: boolean
-  r: boolean
-  u: boolean
-  d: boolean
-  f: boolean
-  weaponNext: boolean
-  weaponPrev: boolean
-  toggleFS: boolean
-  p: boolean
-  autoBreak: boolean
-  touch: boolean
-  touchX: number
-  touchY: number
   toggle: Set<string>
   pressActivated: Set<string>
   cfg: keyBindings
   [index: string]: any
+  touch = false
+  touchX = 0
+  touchY = 0
+  l = false
+  r = false
+  u = false
+  d = false
+  f = false
+  weaponNext = false
+  weaponPrev = false
+  toggleFS = false
+  p = false
+  autoBreak = false
 
   constructor () {
-    this.touch = false
-    this.touchX = 0
-    this.touchY = 0
-    this.l = false
-    this.r = false
-    this.u = false
-    this.d = false
-    this.f = false
-    this.weaponNext = false
-    this.weaponPrev = false
-    this.toggleFS = false
-    this.p = false
-    this.autoBreak = false
-
     this.cfg = {}
     this.cfg[a] = this.cfg[left] = 'l'
     this.cfg[d] = this.cfg[right] = 'r'

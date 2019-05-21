@@ -14,7 +14,8 @@ import {
   cellSize,
   nativeWidth,
   nativeHeight,
-  tickLength
+  tickLength,
+  craft
 } from './config'
 
 interface Debug {
@@ -89,7 +90,10 @@ export default class Game {
     document.addEventListener('touchend', this.pausedOnTap.bind(this))
     window.onresize = () => this.updateCanvasBoundaries()
 
-    this.craft = new Craft(this.stage, this.ctrl)
+    this.craft = new Craft(this.stage, this.ctrl, new Point2(
+      document.documentElement.clientWidth / 2 - craft.width / 2,
+      document.documentElement.clientHeight - craft.width - this.stage.padding
+    ))
     this.stage.spatialManager.registerObject(this.craft)
     this.stage.items.push(this.craft)
     this.stage.craft = this.craft
@@ -231,7 +235,7 @@ export default class Game {
     for (let i = 0; i < numPixels; i++) {
       let x = i % this.stage.canvas.width
       let y = (i / this.stage.canvas.width) | 0
-      let pct = 100 * this.stage.spatialManager.idForPoint(x, y) / this.stage.spatialManager.numbuckets
+      let pct = 100 * this.stage.spatialManager.idForPoint(new Point2(x, y)) / this.stage.spatialManager.numbuckets
       if (this.ctx) {
         this.ctx.fillStyle = `hsl(270, 10%, ${pct}%)`
         this.ctx.fillRect(x, y, 1, 1)
@@ -366,13 +370,8 @@ export default class Game {
       // this.testIntersect(this.stage.items[i], i, this.stage.items[j], cullQ)
       // }
       // }
-      let nearby = this.stage.spatialManager.getNearby(this.stage.items[i].geo).values()
-      while (1) {
-        let o = nearby.next()
-        if (o.done) {
-          break
-        }
-        this.testIntersect(this.stage.items[i], i, o.value, cullQ)
+      for (let o of this.stage.spatialManager.getNearby(this.stage.items[i].geo)) {
+        this.testIntersect(this.stage.items[i], i, o, cullQ)
       }
     }
 

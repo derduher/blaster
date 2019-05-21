@@ -6,6 +6,8 @@ import {
 } from './config.js'
 import Geo from './Geo'
 import Stage from './Stage'
+import Point2 from './Point2'
+import Vector2 from './Vector2'
 const {
   mass,
   width: defaultWidth,
@@ -14,9 +16,9 @@ const {
 
 export default class Projectile extends Obj {
   boundToCanvas: boolean
-  constructor (geo: Geo, stage: Stage, width = defaultWidth) {
-    super(geo.pos, stage)
-    this.geo = geo
+  // why is this being handed a pre crafted geometry?
+  constructor (pos: Point2, v: Vector2, stage: Stage, width = defaultWidth) {
+    super(pos, stage, [new Point2()], v)
     this.mass = mass // Gg
     this.width = width
     this.geo.aabb.max.x = this.width

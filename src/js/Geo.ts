@@ -5,19 +5,41 @@ import Obj from './Object'
 import { GenPos } from './roidPosFactory'
 
 export default class Geo implements GenPos {
-  pos: Point2
-  v: Vector2
-  acc: Vector2
-  points: Point2[]
-  treatAsPoint: boolean
   aabb: BoundingBox
-  constructor (x = 0, y = 0, dx = 0, dy = 0, ax = 0, ay = 0) {
-    this.pos = new Point2(x, y)
-    this.v = new Vector2(dx, dy)
-    this.acc = new Vector2(ax, ay)
-    this.points = []
-    this.aabb = { min: new Point2(), max: new Point2() }
-    this.treatAsPoint = false
+  treatAsPoint = false
+  constructor (
+    public points : Point2[],
+    public pos = new Point2(),
+    public v = new Vector2(),
+    public acc = new Vector2()
+  ) {
+    this.aabb = Geo.getBBForPoints(points)
+  }
+
+  static getBBForPoints (points: Point2[]):BoundingBox {
+    const iv: BoundingBox = { min: new Point2(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY), max: new Point2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY) }
+    return points.reduce(
+      (aabb: BoundingBox, point: Point2) => {
+        if (point.x < aabb.min.x) {
+          aabb.min.x = point.x
+        }
+
+        if (point.y < aabb.min.y) {
+          aabb.min.y = point.y
+        }
+
+        if (point.x > aabb.max.x) {
+          aabb.max.x = point.x
+        }
+
+        if (point.y > aabb.max.y) {
+          aabb.max.y = point.y
+        }
+
+        return aabb
+      },
+      iv
+    )
   }
 
   // A^2 + B^2 = C^2
@@ -109,15 +131,10 @@ export default class Geo implements GenPos {
   }
 
   intersectsWith (ogeo: Geo): boolean {
-    var i
-    var oi
-    var collision = false
-    var points
-    var opoints
-    var point
-    var prev
-    var polyPos
-    var oprev
+    let collision = false
+    let points
+    let point
+    let polyPos
 
     if (!this.aabbIntersects(ogeo)) {
       return false
@@ -135,7 +152,7 @@ export default class Geo implements GenPos {
       }
       point = new Point2(point.pos.x + point.aabb.max.x / 2, point.pos.y + point.aabb.max.y / 2)
       // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-      for (i = 0, prev = points.length - 1; i < points.length; prev = i++) {
+      for (let i = 0, prev = points.length - 1; i < points.length; prev = i++) {
         if (((polyPos.y + points[i].y > point.y) !== (polyPos.y + points[prev].y > point.y)) &&
           (point.x < (points[prev].x - points[i].x) * (point.y - (polyPos.y + points[i].y)) / (points[prev].y - points[i].y) + polyPos.x + points[i].x)) {
           collision = !collision
@@ -143,9 +160,9 @@ export default class Geo implements GenPos {
       }
     } else {
       points = Geo.pointsAtPos(this.points, this.pos)
-      opoints = Geo.pointsAtPos(ogeo.points, ogeo.pos)
-      for (i = 0, prev = points.length - 1; i < points.length; prev = i++) {
-        for (oi = 0, oprev = opoints.length - 1; oi < opoints.length; oprev = oi++) {
+      const opoints = Geo.pointsAtPos(ogeo.points, ogeo.pos)
+      for (let i = 0, prev = points.length - 1; i < points.length; prev = i++) {
+        for (let oi = 0, oprev = opoints.length - 1; oi < opoints.length; oprev = oi++) {
           if (Geo.segmentsIntersect(points[i], points[prev], opoints[oi], opoints[oprev])) {
             collision = true
             break

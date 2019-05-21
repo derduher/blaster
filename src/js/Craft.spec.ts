@@ -13,7 +13,7 @@ describe('Craft', () => {
   beforeEach(() => {
     stage = new Stage(document.createElement('canvas'), new SpatialManager(1000, 1000, 10))
     controls = new Controls()
-    craft = new Craft(stage, controls)
+    craft = new Craft(stage, controls, new Point2())
   })
 
   describe('tick', () => {

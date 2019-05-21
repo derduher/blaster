@@ -49,7 +49,7 @@ describe('Game', () => {
 
   describe('boundNTick', () => {
     it('prevents bound elements from going out of bounds', () => {
-      const o = new Obj(new Point2(), stage)
+      const o = new Obj(new Point2(), stage, [new Point2()])
       o.boundToCanvas = true
       o.geo.v.x = -100
       o.geo.v.y = -100
@@ -59,7 +59,7 @@ describe('Game', () => {
     })
 
     it('culls elements when they go out of bounds', () => {
-      const o = new Obj(new Point2(), stage)
+      const o = new Obj(new Point2(), stage, [new Point2()])
       o.geo.v.x = -100
       o.geo.v.y = -100
       spyOn(game.stage.spatialManager, 'registerObject')
@@ -70,7 +70,7 @@ describe('Game', () => {
     })
 
     it('moves objects according to their velocity', () => {
-      const o = new Obj(new Point2(), stage)
+      const o = new Obj(new Point2(), stage, [new Point2()])
       o.geo.v.x = 100
       o.geo.v.y = 100
       expect(game.boundNTick(o, 1)).toBe(false)
@@ -96,8 +96,8 @@ describe('Game', () => {
 
     it('checks for intersection', () => {
       const nearby = new Set()
-      nearby.add(new Obj(new Point2(), stage))
-      nearby.add(new Obj(new Point2(), stage))
+      nearby.add(new Obj(new Point2(), stage, [new Point2()]))
+      nearby.add(new Obj(new Point2(), stage, [new Point2()]))
       spyOn(game, 'boundNTick')
       spyOn(game, 'testIntersect')
       spyOn(game.stage.spatialManager, 'getNearby').and.returnValue(nearby)
