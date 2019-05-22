@@ -9,7 +9,7 @@
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "watch": "webpack --progress --watch --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "test": "tsc && jest"
+    "test": "tsc && jest && codecov --token=9530801e-4ebe-4249-b3db-28762b62eda1"
   },
   "repository": {
     "type": "git"
@@ -77,7 +77,8 @@
     ]
   },
   "dependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.4.4"
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "codecov": "^3.5.0"
   },
   "eslintConfig": {
     "extends": [
