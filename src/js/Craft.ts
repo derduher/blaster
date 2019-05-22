@@ -14,7 +14,6 @@ const {
   speed,
   force,
   barrelLength,
-  width,
   height,
   mass,
   health,
@@ -39,7 +38,6 @@ export default class Craft extends Obj {
   boundToCanvas = true
   immortal = immortal
   health = health
-  width = width
   mass = mass // Gg
   currentWeapon = 0
   constructor (stage: Stage, ctrl: Controls, pos: Point2) {
@@ -141,7 +139,7 @@ export default class Craft extends Obj {
   fire (now : number) {
     const size = this.weaponConfigurations[this.currentWeapon]
     const pos = new Point2(
-      this.geo.pos.x + this.width / 2 + this.geo.v.x + 10 - size / 2,
+      this.geo.pos.x + this.geo.aabb.max.x / 2 + this.geo.v.x + 10 - size / 2,
       this.geo.pos.y - size + 5
     )
 

@@ -69,7 +69,6 @@ export default class Roid extends Obj {
     super(geo.pos, stage, generatePoints(), geo.v)
 
     this.path = pathFromPoints(this.geo.points, true)
-    this.width = this.geo.aabb.max.x - this.geo.aabb.min.x
-    this.health = this.initialHealth = (0.5 + Math.random()) * this.width * this.width | 0
+    this.health = this.initialHealth = (0.5 + Math.random()) * (this.geo.aabb.max.x - this.geo.aabb.min.x) ** 2 | 0
   }
 }

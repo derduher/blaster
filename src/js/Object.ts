@@ -15,7 +15,6 @@ export default class Obj {
   isHighlighted = false
   isDisplayCell = false
   highlightColor = ''
-  width = 0
   immortal = false
   health = 1
   constructor (pos: Point2, public stage: Stage, points: Point2[], v?: Vector2) {
