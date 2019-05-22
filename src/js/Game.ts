@@ -66,7 +66,7 @@ export default class Game {
     this.debug.lastRender = this.lastRender
 
     // @ts-ignore
-    const spatialManager = new SpatialManager(document.documentElement.clientWidth, document.documentElement.clientHeight, cellSize)
+    const spatialManager = new SpatialManager(nativeWidth, nativeHeight, cellSize)
     this.stage = new Stage(canvas, spatialManager)
     this.started = false
 
@@ -210,7 +210,7 @@ export default class Game {
     // this.stage.items.push(new Roid(this.stage.canvas.width, i*90, j*90))
     // }
     // }
-    this.stage.spatialManager = new SpatialManager(this.stage.canvas.width, this.stage.canvas.height, cellSize)
+    this.stage.spatialManager = new SpatialManager(nativeWidth, nativeHeight, cellSize)
     this.stage.items.forEach(this.stage.spatialManager.registerObject, this.stage.spatialManager)
     if (this.started && !this.stopMain) {
       this.draw()
@@ -315,6 +315,7 @@ export default class Game {
       cull = true
     } else {
       i.geo.v.y = 0
+      console.log('ih', window.innerHeight, 'ymax', this.stage.ymax, 'ymin', this.stage.ymin, 'y', y, 'y+width', y + i.width)
     }
 
     if (!cull) {

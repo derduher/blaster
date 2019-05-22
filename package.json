@@ -110,7 +110,9 @@
   },
   "jest": {
     "collectCoverage": true,
-    "setupFiles": ["jest-canvas-mock"],
+    "setupFiles": [
+      "jest-canvas-mock"
+    ],
     "collectCoverageFrom": [
       "src/js/**/*.{ts,tsx}",
       "!node_modules/",
