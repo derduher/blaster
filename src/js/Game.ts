@@ -298,7 +298,7 @@ export default class Game {
     i.geo.v.y += i.geo.acc.y
     var cull = false
 
-    if (((i.geo.v.x <= 0 || x < this.stage.xmax - i.width) && (i.geo.v.x >= 0 || x > this.stage.xmin)) ||
+    if (((i.geo.v.x <= 0 || x < this.stage.xmax - i.geo.aabb.max.x) && (i.geo.v.x >= 0 || x > this.stage.xmin)) ||
       !i.boundToCanvas && x < this.stage.xmax && x > -100
     ) {
       i.geo.pos.x = x
@@ -308,14 +308,13 @@ export default class Game {
       i.geo.v.x = 0
     }
 
-    if (((i.geo.v.y <= 0 || y < this.stage.ymax - i.width) && (i.geo.v.y >= 0 || y > this.stage.ymin)) ||
+    if (((i.geo.v.y <= 0 || y < this.stage.ymax - i.geo.aabb.max.y) && (i.geo.v.y >= 0 || y > this.stage.ymin)) ||
       !i.boundToCanvas && y < this.stage.ymax && y > -100) {
       i.geo.pos.y = y
     } else if (!i.boundToCanvas) {
       cull = true
     } else {
       i.geo.v.y = 0
-      console.log('ih', window.innerHeight, 'ymax', this.stage.ymax, 'ymin', this.stage.ymin, 'y', y, 'y+width', y + i.width)
     }
 
     if (!cull) {
