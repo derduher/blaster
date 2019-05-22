@@ -4,6 +4,7 @@ import Obj from './Object'
 import { roid } from './config.js'
 import { GenPos } from './roidPosFactory'
 import Stage from './Stage'
+import { pathFromPoints } from './draw'
 
 const {
   numPoints,
@@ -67,15 +68,7 @@ export default class Roid extends Obj {
   constructor (geo: GenPos, stage: Stage) {
     super(geo.pos, stage, generatePoints(), geo.v)
 
-    const firstPoint = this.geo.points[0]
-    this.path.moveTo(firstPoint.x, firstPoint.y)
-    for (let point of this.geo.points) {
-      if (point === firstPoint) {
-        continue
-      }
-      this.path.lineTo(firstPoint.x, firstPoint.y)
-    }
-    this.path.lineTo(firstPoint.x, firstPoint.y)
+    this.path = pathFromPoints(this.geo.points, true)
     this.width = this.geo.aabb.max.x - this.geo.aabb.min.x
     this.health = this.initialHealth = (0.5 + Math.random()) * this.width * this.width | 0
   }

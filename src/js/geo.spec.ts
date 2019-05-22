@@ -1,9 +1,8 @@
 import Geo from './Geo'
 import Point2 from './Point2'
 import Obj from './Object'
-import Stage from './Stage'
-import SpatialManager from './SpatialManager'
 import { BoundingBox } from './types'
+import { generateObj } from './spec-helper'
 describe('Geo', () => {
   let geo:Geo
   let geo2:Geo
@@ -24,8 +23,7 @@ describe('Geo', () => {
 
   describe('distanceToObj', () => {
     it('unwraps passed in obj to its position', () => {
-      const stage = new Stage(document.createElement('canvas'), new SpatialManager(1000, 1000, 10))
-      const obj = new Obj(new Point2, stage, [new Point2])
+      const obj = generateObj()
       spyOn(geo, 'distanceTo')
       geo.distanceToObj(obj)
       expect(geo.distanceTo).toHaveBeenCalledWith(obj.geo.pos)

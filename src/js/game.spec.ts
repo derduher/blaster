@@ -4,14 +4,16 @@ import Stage from './Stage'
 import Point2 from './Point2'
 import SpatialManager from './SpatialManager'
 import Roid from './Roid'
+import { generateObj } from './spec-helper'
+
 describe('Game', () => {
   let game:Game
-  let spatial:SpatialManager
   let stage:Stage
   let when:number
+  let o:Obj
   beforeEach(() => {
-    spatial = new SpatialManager(1000, 1000, 10)
-    stage = new Stage(document.createElement('canvas'), spatial)
+    stage = new Stage(document.createElement('canvas'), new SpatialManager(1000, 1000, 10))
+    o = generateObj(stage)
     game = new Game(document.createElement('canvas'))
     when = performance.now()
   })
@@ -49,7 +51,6 @@ describe('Game', () => {
 
   describe('boundNTick', () => {
     it('prevents bound elements from going out of bounds', () => {
-      const o = new Obj(new Point2(), stage, [new Point2()])
       o.boundToCanvas = true
       o.geo.v.x = -100
       o.geo.v.y = -100
@@ -59,7 +60,6 @@ describe('Game', () => {
     })
 
     it('culls elements when they go out of bounds', () => {
-      const o = new Obj(new Point2(), stage, [new Point2()])
       o.geo.v.x = -100
       o.geo.v.y = -100
       spyOn(game.stage.spatialManager, 'registerObject')
@@ -70,7 +70,6 @@ describe('Game', () => {
     })
 
     it('moves objects according to their velocity', () => {
-      const o = new Obj(new Point2(), stage, [new Point2()])
       o.geo.v.x = 100
       o.geo.v.y = 100
       expect(game.boundNTick(o, 1)).toBe(false)
@@ -96,8 +95,8 @@ describe('Game', () => {
 
     it('checks for intersection', () => {
       const nearby = new Set()
-      nearby.add(new Obj(new Point2(), stage, [new Point2()]))
-      nearby.add(new Obj(new Point2(), stage, [new Point2()]))
+      nearby.add(o)
+      nearby.add(generateObj(stage))
       spyOn(game, 'boundNTick')
       spyOn(game, 'testIntersect')
       spyOn(game.stage.spatialManager, 'getNearby').and.returnValue(nearby)
