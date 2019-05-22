@@ -4,6 +4,8 @@ import Projectile from './Projectile'
 import Geo from './Geo'
 import Stage from './Stage'
 import Controls from './Controls'
+import Vector2 from './Vector2'
+import { pathFromPoints, pathFromSegments } from './draw'
 import {
   craft
 } from './config'
@@ -12,7 +14,6 @@ const {
   speed,
   force,
   barrelLength,
-  width,
   height,
   mass,
   health,
@@ -21,61 +22,40 @@ const {
   thruster
 } = craft
 
-var posDir = speed
-var negDir = speed * -1
+const leftThrusterPath = pathFromPoints(thruster.left)
+const rightThrusterPath = pathFromPoints(thruster.right)
+const upThrusterPath = pathFromPoints(thruster.up)
+const downThrusterPath = pathFromPoints(thruster.down)
+
+const posDir = speed
+const negDir = speed * -1
 
 export default class Craft extends Obj {
-  lastFire: number
-  boundToCanvas: boolean
-  currentWeapon: number
   weaponConfigurations: number[]
   ctrl: Controls
   originalPath: Path2D
-  constructor (stage: Stage, ctrl: Controls) {
-    const pos = new Point2(
-      document.documentElement.clientWidth / 2 - width / 2,
-      document.documentElement.clientHeight - width - stage.padding
-    )
-    super(pos, stage)
-    this.mass = mass // Gg
-    this.lastFire = 0
-    this.boundToCanvas = true
-    this.width = width
-    this.health = health
-    this.immortal = immortal
+  lastFire = 0
+  boundToCanvas = true
+  immortal = immortal
+  health = health
+  mass = mass // Gg
+  currentWeapon = 0
+  constructor (stage: Stage, ctrl: Controls, pos: Point2) {
+    super(pos, stage, geo.flat())
     this.weaponConfigurations = [
       Math.random() * 20 | 0,
       Math.random() * 20 | 0,
       Math.random() * 20 | 0,
       Math.random() * 20 | 0
     ]
-    this.currentWeapon = 0
 
-    geo.forEach(segment => segment.forEach(point => this.geo.points.push(point)))
-
-    let segments = [...geo]
-    segments.forEach(segment => {
-      const points = [...segment]
-      const first = points.shift()
-      if (first) {
-        this.path.moveTo(first.x, first.y)
-        points.forEach(pt => {
-          this.path.lineTo(pt.x, pt.y)
-        })
-      }
-    })
-
-    this.path.closePath()
-    this.originalPath = this.path
-
-    this.geo.aabb.max.x = width
-    this.geo.aabb.max.y = height
+    this.originalPath = this.path = pathFromSegments(geo)
 
     this.ctrl = ctrl
   }
 
   tick (now: number): void {
-    var lastFireDelta = now - this.lastFire
+    const lastFireDelta = now - this.lastFire
 
     // set ctrl dir
     if (this.ctrl.l && !this.ctrl.r) {
@@ -130,38 +110,21 @@ export default class Craft extends Obj {
       this.nextConfiguration()
     }
 
-    this.path = new Path2D(this.originalPath)
-    let thrusterPath = new Path2D()
-    if (this.geo.acc.x > 0) {
-      thrusterPath.moveTo(thruster.left[0].x, thruster.left[0].y)
-      thrusterPath.lineTo(thruster.left[1].x, thruster.left[1].y)
-      thrusterPath.lineTo(thruster.left[2].x, thruster.left[2].y)
-      thrusterPath.lineTo(thruster.left[3].x, thruster.left[3].y)
-      thrusterPath.closePath()
-      this.path.addPath(thrusterPath)
-    } else if (this.geo.acc.x < 0) {
-      thrusterPath.moveTo(thruster.right[0].x, thruster.right[0].y)
-      thrusterPath.lineTo(thruster.right[1].x, thruster.right[1].y)
-      thrusterPath.lineTo(thruster.right[2].x, thruster.right[2].y)
-      thrusterPath.lineTo(thruster.right[3].x, thruster.right[3].y)
-      thrusterPath.closePath()
-      this.path.addPath(thrusterPath)
-    }
+    if (this.geo.acc.x !== 0 || this.geo.acc.y !== 0) {
+      this.path = new Path2D(this.originalPath)
+      if (this.geo.acc.x > 0) {
+        this.path.addPath(leftThrusterPath)
+      } else if (this.geo.acc.x < 0) {
+        this.path.addPath(rightThrusterPath)
+      }
 
-    if (this.geo.acc.y > 0) {
-      thrusterPath.moveTo(thruster.up[0].x, thruster.up[0].y)
-      thrusterPath.lineTo(thruster.up[1].x, thruster.up[1].y)
-      thrusterPath.lineTo(thruster.up[2].x, thruster.up[2].y)
-      thrusterPath.lineTo(thruster.up[3].x, thruster.up[3].y)
-      thrusterPath.closePath()
-      this.path.addPath(thrusterPath)
-    } else if (this.geo.acc.y < 0) {
-      thrusterPath.moveTo(thruster.down[0].x, thruster.down[0].y)
-      thrusterPath.lineTo(thruster.down[1].x, thruster.down[1].y)
-      thrusterPath.lineTo(thruster.down[2].x, thruster.down[2].y)
-      thrusterPath.lineTo(thruster.down[3].x, thruster.down[3].y)
-      thrusterPath.closePath()
-      this.path.addPath(thrusterPath)
+      if (this.geo.acc.y > 0) {
+        this.path.addPath(upThrusterPath)
+      } else if (this.geo.acc.y < 0) {
+        this.path.addPath(downThrusterPath)
+      }
+    } else {
+      this.path = this.originalPath
     }
   }
 
@@ -176,18 +139,14 @@ export default class Craft extends Obj {
   fire (now : number) {
     const size = this.weaponConfigurations[this.currentWeapon]
     const pos = new Point2(
-      this.geo.pos.x + this.width / 2 + this.geo.v.x + 10 - size / 2,
+      this.geo.pos.x + this.geo.aabb.max.x / 2 + this.geo.v.x + 10 - size / 2,
       this.geo.pos.y - size + 5
     )
 
     const velY = Math.sqrt(2 * barrelLength * force / size)
     const p = new Projectile(
-      new Geo(
-        pos.x,
-        pos.y,
-        0,
-        -velY
-      ),
+      pos,
+      new Vector2(0, -velY),
       this.stage,
       size
     )

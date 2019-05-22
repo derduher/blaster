@@ -4,6 +4,7 @@ import Obj from './Object'
 import { roid } from './config.js'
 import { GenPos } from './roidPosFactory'
 import Stage from './Stage'
+import { pathFromPoints } from './draw'
 
 const {
   numPoints,
@@ -21,75 +22,53 @@ function getY (ang: number, mag: number) {
 }
 
 function getMag (max: number) {
-  var extra = 0
+  let extra = 0
   if (Math.random() > 0.8) {
     extra = (-0.8 + Math.random()) * max * 0.25
   }
   return 0.8125 * max + 3 * (-0.5 + Math.random()) + extra
 }
 
+function generatePoints () : Point2[] {
+  // scalar
+  const mrad = minRadius + maxRadius * Math.random() // max radius
+
+  // starting point
+  let m = getMag(mrad) // magnitude
+  const startX = s * (m + mrad)
+  const startY = s * mrad
+
+  const points : Point2[] = []
+  points.push(new Point2(startX, startY))
+  let i = 1
+  let a = 0
+  const inc = 2 * Math.PI / numPoints
+  let x
+  let y
+
+  while (i < numPoints) {
+    a = inc * i
+    m = getMag(mrad)
+    x = getX(a, m)
+    y = getY(a, m)
+    y = mrad - y
+    x += mrad
+    x *= s
+    y *= s
+    points.push(new Point2(x, y))
+    i++
+  }
+  return points
+}
+
 const s = 3
 export default class Roid extends Obj {
   initialHealth: number
+  mass = mass * Math.random() // gigagrams
   constructor (geo: GenPos, stage: Stage) {
-    super(geo.pos, stage)
-    this.geo.pos = geo.pos
-    this.geo.v = geo.v
-    // https://en.wikipedia.org/wiki/101955_Bennu
-    this.mass = mass * Math.random() // Gg
-    // scalar
-    var mrad = minRadius + maxRadius * Math.random() // max radius
+    super(geo.pos, stage, generatePoints(), geo.v)
 
-    // starting point
-    var m = getMag(mrad) // magnitude
-    var startX = s * (m + mrad)
-    var startY = s * mrad
-
-    this.geo.aabb.min = {
-      x: Number.POSITIVE_INFINITY,
-      y: Number.POSITIVE_INFINITY
-    }
-
-    this.geo.aabb.max = {
-      x: s * (m + mrad),
-      y: Number.NEGATIVE_INFINITY
-    }
-    this.geo.points.push(new Point2(startX, startY))
-    var i = 1
-    var a = 0
-    var inc = 2 * Math.PI / numPoints
-    var x, y
-
-    this.path.moveTo(startX, startY)
-
-    while (i < numPoints) {
-      a = inc * i
-      m = getMag(mrad)
-      x = getX(a, m)
-      y = getY(a, m)
-      y = mrad - y
-      x += mrad
-      x *= s
-      y *= s
-      this.geo.points.push(new Point2(x, y))
-      if (x > this.geo.aabb.max.x) {
-        this.geo.aabb.max.x = x
-      } else if (x < this.geo.aabb.min.x) {
-        this.geo.aabb.min.x = x
-      }
-      // reverse order of x because its technically possible for
-      // a completely ascending order of maxes
-      if (y < this.geo.aabb.min.y) {
-        this.geo.aabb.min.y = y
-      } else if (y > this.geo.aabb.max.y) {
-        this.geo.aabb.max.y = y
-      }
-
-      this.path.lineTo(x, y)
-      i++
-    }
-    this.path.lineTo(startX, startY)
-    this.width = this.geo.aabb.max.x - this.geo.aabb.min.x
-    this.health = this.initialHealth = (0.5 + Math.random()) * this.width * this.width | 0
+    this.path = pathFromPoints(this.geo.points, true)
+    this.health = this.initialHealth = (0.5 + Math.random()) * (this.geo.aabb.max.x - this.geo.aabb.min.x) ** 2 | 0
   }
 }

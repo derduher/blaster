@@ -2,25 +2,20 @@
 import { PointLike } from './types'
 import Obj from './Object'
 import Geo from './Geo'
+import Point2 from './Point2'
 interface Reverse { [index: number]: PointLike}
 export default class SpatialManager {
-  SceneWidth: number
-  SceneHeight: number
-  cellsize: number
   cf: number
   cols: number
   rows: number
   numbuckets: number
   reverse: Reverse
   buckets: Map<number,Set<Obj>>
-  constructor (scenewidth:number, sceneheight:number, cellsize:number) {
-    this.SceneWidth = scenewidth
-    this.SceneHeight = sceneheight
-    this.cellsize = cellsize
+  constructor (public SceneWidth:number, public SceneHeight:number, public cellsize:number) {
     this.cf = 1 / cellsize
 
-    this.cols = Math.ceil(scenewidth * this.cf)
-    this.rows = Math.ceil(sceneheight * this.cf)
+    this.cols = Math.ceil(SceneWidth * this.cf)
+    this.rows = Math.ceil(SceneHeight * this.cf)
     this.buckets = new Map()
     this.numbuckets = this.rows * this.cols
     this.reverse = {}
@@ -36,17 +31,14 @@ export default class SpatialManager {
 
   clearBuckets () : void {
     this.buckets.clear()
-    var i
-    for (i = 0; i < this.numbuckets; i++) {
+    for (let i = 0; i < this.numbuckets; i++) {
       this.buckets.set(i, new Set())
     }
   }
 
   registerObject (obj: Obj) : void {
-    var cells = this.getIdForObject(obj.geo)
-    var cell
-    for (var i = 0; i < cells.length; i++) {
-      cell = this.buckets.get(cells[i])
+    for (let id of this.getIdForObject(obj.geo)) {
+      let cell = this.buckets.get(id)
       /* istanbul ignore else */
       if (cell) {
         cell.add(obj)
@@ -54,12 +46,12 @@ export default class SpatialManager {
     }
   }
 
-  getIdForObject (geo: Geo) : number[] {
-    let bucketsObjIsIn:number[] = []
-    var maxX = geo.pos.x + geo.aabb.max.x
-    var maxY = geo.pos.y + geo.aabb.max.y
-    var cf = this.cf
-    var cols = this.cols
+  getIdForObject (geo: Geo) : Set<number> {
+    const bucketsObjIsIn:Set<number> = new Set()
+    const maxX = geo.pos.x + geo.aabb.max.x
+    const maxY = geo.pos.y + geo.aabb.max.y
+    const cf = this.cf
+    const cols = this.cols
 
     // this.addBucket(geo.pos.x, geo.pos.y, cf, cols, bucketsObjIsIn)
     // this.addBucket(maxX, geo.pos.y, cf, cols, bucketsObjIsIn)
@@ -70,48 +62,41 @@ export default class SpatialManager {
     for (let i = (maxX / this.cellsize | 0) * this.cellsize; i >= minX; i -= this.cellsize) {
       for (let j = (maxY / this.cellsize | 0) * this.cellsize; j >= minY; j -= this.cellsize) {
         // debugger
-        this.addBucket(i, j, cf, cols, bucketsObjIsIn)
+        SpatialManager.addBucket(i, j, cf, cols, bucketsObjIsIn, this.numbuckets)
       }
     }
 
     return bucketsObjIsIn
   }
 
-  idForPoint (x: number, y: number) : number {
-    return (x * this.cf | 0) + (y * this.cf | 0) * this.cols | 0
+  static idForPoint (point: Point2, cf: number, cols: number) {
+    return (point.x * cf | 0) + (point.y * cf | 0) * cols | 0
   }
 
-  addBucket (x: number, y: number, cf: number, cols: number, set: number[]) : void {
+  idForPoint (point: Point2) : number {
+    return SpatialManager.idForPoint(point, this.cf, this.cols)
+  }
+
+  static addBucket (x: number, y: number, cf: number, cols: number, set: Set<number>, numbuckets: number) : void {
     // ignore collisions offscreen
-    var id = (x * cf | 0) + (y * cf | 0) * cols | 0
-    if (id >= 0 && id < this.numbuckets && set.indexOf(id) === -1) { // don't re-add the same item
-      set.push(id)
+    const id = SpatialManager.idForPoint(new Point2(x, y), cf, cols)
+    if (id >= 0 && id < numbuckets) {
+      set.add(id)
     }
   }
 
   getNearby (geo: Geo) : Set<Obj> {
-    var nearby = new Set()
-    var ids = this.getIdForObject(geo)
+    const nearby = new Set()
+    const ids = this.getIdForObject(geo)
 
-    var i
-    for (i = 0; i < ids.length; i++) {
-      let bucketI = this.buckets.get(ids[i])
-      let bucket
+    for (let id of ids) {
+      let bucketI = this.buckets.get(id)
       /* istanbul ignore else */
       if (bucketI) {
-        bucket = bucketI.values()
-      }
-      var b
-      while (1) {
-        /* istanbul ignore if */
-        if (!bucket) {
-          break
+        const bucket = bucketI.values()
+        for (let b of bucket) {
+          nearby.add(b)
         }
-        b = bucket.next()
-        if (b.done) {
-          break
-        }
-        nearby.add(b.value)
       }
     }
     return nearby

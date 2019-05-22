@@ -6,6 +6,8 @@ import {
 } from './config.js'
 import Geo from './Geo'
 import Stage from './Stage'
+import Point2 from './Point2'
+import Vector2 from './Vector2'
 const {
   mass,
   width: defaultWidth,
@@ -13,17 +15,17 @@ const {
 } = projectile
 
 export default class Projectile extends Obj {
-  boundToCanvas: boolean
-  constructor (geo: Geo, stage: Stage, width = defaultWidth) {
-    super(geo.pos, stage)
-    this.geo = geo
-    this.mass = mass // Gg
-    this.width = width
-    this.geo.aabb.max.x = this.width
-    this.geo.aabb.max.y = this.width
+  boundToCanvas = false
+  diameter: number
+  mass = mass // Gg
+  health = health
+  // why is this being handed a pre crafted geometry?
+  constructor (pos: Point2, v: Vector2, stage: Stage, diameter = defaultWidth) {
+    super(pos, stage, [new Point2()], v)
+    this.diameter = diameter
+    this.geo.aabb.max.x = this.diameter
+    this.geo.aabb.max.y = this.diameter
     this.geo.treatAsPoint = true
-    this.health = health
-    this.boundToCanvas = false
   }
   /* istanbul ignore next */
   draw (ctx: CanvasRenderingContext2D, debug = false) {
@@ -33,7 +35,7 @@ export default class Projectile extends Obj {
       ctx.fillStyle = this.highlightColor
     }
     ctx.beginPath()
-    ctx.arc(this.width / 2, this.width / 2, this.width / 2, 0, 2 * Math.PI)
+    ctx.arc(this.diameter / 2, this.diameter / 2, this.diameter / 2, 0, 2 * Math.PI)
     ctx.fill()
     ctx.stroke()
     // if (debug) {

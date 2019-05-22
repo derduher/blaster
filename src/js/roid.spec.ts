@@ -1,13 +1,13 @@
 import Roid from './Roid'
 import genPos from './roidPosFactory'
 import Stage from './Stage'
-import SpatialManager from './SpatialManager'
+import { generateStage } from './spec-helper'
 
 describe('Roid', () => {
   let roid: Roid
   let stage: Stage
   beforeEach(() => {
-    stage = new Stage(document.createElement('canvas'), new SpatialManager(1000, 1000, 10))
+    stage = generateStage()
     roid = new Roid(genPos(1000, 1000), stage)
   })
 
