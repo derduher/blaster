@@ -15,12 +15,12 @@ const {
 } = projectile
 
 export default class Projectile extends Obj {
-  boundToCanvas = false
-  diameter: number
-  mass = mass // Gg
-  health = health
+  public boundToCanvas = false
+  private diameter: number
+  public mass = mass // Gg
+  public health = health
   // why is this being handed a pre crafted geometry?
-  constructor (pos: Point2, v: Vector2, stage: Stage, diameter = defaultWidth) {
+  public constructor (pos: Point2, v: Vector2, stage: Stage, diameter = defaultWidth) {
     super(pos, stage, [new Point2()], v)
     this.diameter = diameter
     this.geo.aabb.max.x = this.diameter
@@ -28,7 +28,7 @@ export default class Projectile extends Obj {
     this.geo.treatAsPoint = true
   }
   /* istanbul ignore next */
-  draw (ctx: CanvasRenderingContext2D, debug = false) {
+  public draw (ctx: CanvasRenderingContext2D/*, debug = false */): void {
     ctx.translate(this.geo.pos.x, this.geo.pos.y)
     ctx.fillStyle = 'rgb(255,255,255)'
     if (this.isHighlighted) {
@@ -49,11 +49,11 @@ export default class Projectile extends Obj {
   }
 
   /* istanbul ignore next */
-  displayCell () {
+  public displayCell (): void {
     this.isDisplayCell = true
   }
 
-  intersects (o: Obj, i: number, cullQ:number[]) {
+  public intersects (o: Obj, i: number, cullQ: number[]): void {
     o.health -= 10
     super.intersects(o, i, cullQ)
   }

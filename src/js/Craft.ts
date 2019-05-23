@@ -14,7 +14,6 @@ const {
   speed,
   force,
   barrelLength,
-  height,
   mass,
   health,
   immortal,
@@ -31,16 +30,16 @@ const posDir = speed
 const negDir = speed * -1
 
 export default class Craft extends Obj {
-  weaponConfigurations: number[]
-  ctrl: Controls
-  originalPath: Path2D
-  lastFire = 0
-  boundToCanvas = true
-  immortal = immortal
-  health = health
-  mass = mass // Gg
-  currentWeapon = 0
-  constructor (stage: Stage, ctrl: Controls, pos: Point2) {
+  private weaponConfigurations: number[]
+  public ctrl: Controls
+  private originalPath: Path2D
+  private lastFire = 0
+  public boundToCanvas = true
+  public immortal = immortal
+  public health = health
+  public mass = mass // Gg
+  private currentWeapon = 0
+  public constructor (stage: Stage, ctrl: Controls, pos: Point2) {
     super(pos, stage, geo.flat())
     this.weaponConfigurations = [
       Math.random() * 20 | 0,
@@ -54,7 +53,7 @@ export default class Craft extends Obj {
     this.ctrl = ctrl
   }
 
-  tick (now: number): void {
+  public tick (now: number): void {
     const lastFireDelta = now - this.lastFire
 
     // set ctrl dir
@@ -128,15 +127,15 @@ export default class Craft extends Obj {
     }
   }
 
-  nextConfiguration () {
+  public nextConfiguration (): void {
     this.currentWeapon = (this.currentWeapon + 1) % this.weaponConfigurations.length
   }
 
-  prevConfiguration () {
+  public prevConfiguration (): void {
     this.currentWeapon = Math.abs(this.currentWeapon - 1 % this.weaponConfigurations.length)
   }
 
-  fire (now : number) {
+  public fire (now: number): void {
     const size = this.weaponConfigurations[this.currentWeapon]
     const pos = new Point2(
       this.geo.pos.x + this.geo.aabb.max.x / 2 + this.geo.v.x + 10 - size / 2,

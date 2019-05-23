@@ -2,8 +2,8 @@ import Vector2 from './Vector2'
 import Point2 from './Point2'
 
 export interface GenPos {
-  pos: Point2,
-  v: Vector2
+  pos: Point2;
+  v: Vector2;
 }
 
 export default function genPos (width: number, height: number): GenPos {

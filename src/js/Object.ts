@@ -1,23 +1,22 @@
 /* eslint-disable no-return-assign */
 import Geo from './Geo'
 import { defaultObjMass } from './config.js'
-import { BoundingBox } from './types'
 import Stage from './Stage'
 import Point2 from './Point2'
 import Vector2 from './Vector2'
 
 export default class Obj {
-  mass: number
-  geo: Geo
-  path: Path2D
+  public mass: number
+  public geo: Geo
+  public path: Path2D
 
-  boundToCanvas = false
-  isHighlighted = false
-  isDisplayCell = false
-  highlightColor = ''
-  immortal = false
-  health = 1
-  constructor (pos: Point2, public stage: Stage, points: Point2[], v?: Vector2) {
+  public boundToCanvas = false
+  public isHighlighted = false
+  public isDisplayCell = false
+  public highlightColor = ''
+  public immortal = false
+  public health = 1
+  public constructor (pos: Point2, public stage: Stage, points: Point2[], v?: Vector2) {
     this.mass = defaultObjMass
     this.geo = new Geo(points, pos, v)
 
@@ -25,7 +24,7 @@ export default class Obj {
   }
 
   /* istanbul ignore next */
-  draw (ctx: CanvasRenderingContext2D, debug = false) : void {
+  public draw (ctx: CanvasRenderingContext2D, debug = false): void {
     ctx.strokeStyle = 'rgb(255,255,255)'
     if (this.isHighlighted) {
       ctx.strokeStyle = this.highlightColor
@@ -43,22 +42,22 @@ export default class Obj {
   }
 
   /* istanbul ignore next */
-  displayCell () : void {
+  public displayCell (): void {
     this.isDisplayCell = true
   }
 
   /* istanbul ignore next */
-  highlight (highlightColor = 'yellow') : void {
+  public highlight (highlightColor = 'yellow'): void {
     this.isHighlighted = true
     this.highlightColor = highlightColor
-    window.setTimeout(() => this.isHighlighted = false, 5000)
+    window.setTimeout((): boolean => this.isHighlighted = false, 5000)
   }
 
   /* istanbul ignore next */
-  tick (now?: number) : void {
+  public tick (now: number): void {
   }
 
-  intersects (o: Obj, i: number, cullQ: number[]) : void {
+  public intersects (o: Obj, i: number, cullQ: number[]): void {
     // f = ma
     // let fx = (this.geo.v.x / 16.7) * this.mass
     // let fy = (this.geo.v.y / 16.7) * this.mass

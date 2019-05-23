@@ -13,15 +13,15 @@ const {
   minRadius
 } = roid
 
-function getX (ang: number, mag: number) {
+function getX (ang: number, mag: number): number {
   return mag * Math.cos(ang)
 }
 
-function getY (ang: number, mag: number) {
+function getY (ang: number, mag: number): number {
   return mag * Math.sin(ang)
 }
 
-function getMag (max: number) {
+function getMag (max: number): number {
   let extra = 0
   if (Math.random() > 0.8) {
     extra = (-0.8 + Math.random()) * max * 0.25
@@ -29,7 +29,8 @@ function getMag (max: number) {
   return 0.8125 * max + 3 * (-0.5 + Math.random()) + extra
 }
 
-function generatePoints () : Point2[] {
+const s = 3
+function generatePoints (): Point2[] {
   // scalar
   const mrad = minRadius + maxRadius * Math.random() // max radius
 
@@ -38,7 +39,7 @@ function generatePoints () : Point2[] {
   const startX = s * (m + mrad)
   const startY = s * mrad
 
-  const points : Point2[] = []
+  const points: Point2[] = []
   points.push(new Point2(startX, startY))
   let i = 1
   let a = 0
@@ -61,11 +62,10 @@ function generatePoints () : Point2[] {
   return points
 }
 
-const s = 3
 export default class Roid extends Obj {
-  initialHealth: number
-  mass = mass * Math.random() // gigagrams
-  constructor (geo: GenPos, stage: Stage) {
+  public initialHealth: number
+  public mass = mass * Math.random() // gigagrams
+  public constructor (geo: GenPos, stage: Stage) {
     super(geo.pos, stage, generatePoints(), geo.v)
 
     this.path = pathFromPoints(this.geo.points, true)

@@ -25,6 +25,8 @@
     "@babel/preset-env": "^7.4.4",
     "@babel/preset-typescript": "^7.3.3",
     "@types/jest": "^24.0.12",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",
     "babel-polyfill": "^6.26.0",
@@ -83,12 +85,12 @@
   "eslintConfig": {
     "extends": [
       "eslint:recommended",
-      "plugin:react/recommended"
+      "plugin:@typescript-eslint/recommended"
     ],
     "plugins": [
       "react"
     ],
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "ecmaVersion": 6,
       "sourceType": "module",
@@ -108,7 +110,11 @@
       "no-case-declarations": 0,
       "no-console": 0,
       "no-unused-vars": 0,
-      "react/prop-types": 0
+      "react/prop-types": 0,
+      "indent": "off",
+      "@typescript-eslint/indent": ["error", 2],
+      "@typescript-eslint/no-parameter-properties": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { "args": "none" } ]
     }
   },
   "jest": {

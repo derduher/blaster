@@ -19,16 +19,16 @@ import {
 } from './config'
 
 interface Debug {
-  on: boolean,
-  fps: number,
-  text: string,
-  numUpdates: number,
-  itemL: number,
-  drawRate: number,
-  lastRender: number
+  on: boolean;
+  fps: number;
+  text: string;
+  numUpdates: number;
+  itemL: number;
+  drawRate: number;
+  lastRender: number;
 }
 
-const debug : Debug = {
+const debug: Debug = {
   on: false,
   fps: 50,
   text: '',
@@ -39,22 +39,22 @@ const debug : Debug = {
 }
 
 export default class Game {
-  updateIsReady: boolean
-  hitboxes: Set<Point2>
-  lastRender: number
-  ctrl: Controls
-  started: boolean
-  stage: Stage
-  ctx: CanvasRenderingContext2D | null
-  count: number
-  lastTick: number
-  isTouchInterface: boolean
-  craft: Craft
-  tickLength: number
-  stopMain: number
-  debug: Debug
-  hatches: Path2D
-  constructor (canvas : HTMLCanvasElement) {
+  public updateIsReady: boolean
+  public hitboxes: Set<Point2>
+  public lastRender: number
+  public ctrl: Controls
+  public started: boolean
+  public stage: Stage
+  public ctx: CanvasRenderingContext2D | null
+  public count: number
+  public lastTick: number
+  public isTouchInterface: boolean
+  public craft: Craft
+  public tickLength: number
+  public stopMain: number
+  public debug: Debug
+  public hatches: Path2D
+  public constructor (canvas: HTMLCanvasElement) {
     this.hatches = new Path2D()
     this.stopMain = 0
     this.updateIsReady = false
@@ -73,7 +73,7 @@ export default class Game {
 
     this.isTouchInterface = 'ontouchend' in document.documentElement
 
-    this.stage.canvas.onclick = () => {
+    this.stage.canvas.onclick = (): void => {
       if (this.isTouchInterface || this.started) {
         toggleFullScreen(this.stage.canvas)
       }
@@ -88,7 +88,7 @@ export default class Game {
     document.ontouchmove = this.ctrl.tm.bind(this.ctrl)
     document.addEventListener('touchend', this.ctrl.te.bind(this.ctrl))
     document.addEventListener('touchend', this.pausedOnTap.bind(this))
-    window.onresize = () => this.updateCanvasBoundaries()
+    window.onresize = (): void => this.updateCanvasBoundaries()
 
     this.craft = new Craft(this.stage, this.ctrl, new Point2(
       document.documentElement.clientWidth / 2 - craft.width / 2,
@@ -131,11 +131,11 @@ export default class Game {
     // this.stage.spatialManager.registerObject(p)
   }
 
-  updateReady () : void {
+  public updateReady (): void {
     this.updateIsReady = true
   }
 
-  main (tFrame: number) : void {
+  public main (tFrame: number): void {
     this.started = true
     var timeSinceTick
     var nextTick = this.lastTick + this.tickLength
@@ -183,7 +183,7 @@ export default class Game {
     this.lastRender = tFrame
   }
 
-  updateCanvasBoundaries () : void {
+  public updateCanvasBoundaries (): void {
     // @ts-ignore
     if (document[fullScreenElementProp]) {
       this.stage.canvas.width = window.screen.width
@@ -222,7 +222,7 @@ export default class Game {
     }
   }
 
-  updates (numTicks: number) : void {
+  public updates (numTicks: number): void {
     var i
     for (i = 0; i < numTicks; i++) {
       this.lastTick += this.tickLength
@@ -230,7 +230,7 @@ export default class Game {
     }
   }
 
-  drawBuckets () : void {
+  public drawBuckets (): void {
     let numPixels = this.stage.canvas.width * this.stage.canvas.height
     for (let i = 0; i < numPixels; i++) {
       let x = i % this.stage.canvas.width
@@ -243,7 +243,7 @@ export default class Game {
     }
   }
 
-  draw () : void {
+  public draw (): void {
     // @ts-ignore
     if (!window.hold && this.ctx) {
       this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
@@ -286,7 +286,7 @@ export default class Game {
         this.ctx.stroke(this.hatches)
         this.ctx.strokeStyle = 'green'
         this.ctx.lineWidth = 3
-        this.hitboxes.forEach((xy:Point2) => this.ctx && this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize))
+        this.hitboxes.forEach((xy: Point2): void|null => this.ctx && this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize))
         this.ctx.restore()
       }
     }

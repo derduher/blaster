@@ -5,13 +5,13 @@ import Geo from './Geo'
 import Point2 from './Point2'
 interface Reverse { [index: number]: PointLike}
 export default class SpatialManager {
-  cf: number
-  cols: number
-  rows: number
-  numbuckets: number
-  reverse: Reverse
-  buckets: Map<number,Set<Obj>>
-  constructor (public SceneWidth:number, public SceneHeight:number, public cellsize:number) {
+  private cf: number
+  private cols: number
+  private rows: number
+  public numbuckets: number
+  private reverse: Reverse
+  private buckets: Map<number,Set<Obj>>
+  public constructor (public SceneWidth: number, public SceneHeight: number, public cellsize: number) {
     this.cf = 1 / cellsize
 
     this.cols = Math.ceil(SceneWidth * this.cf)
@@ -29,14 +29,14 @@ export default class SpatialManager {
     this.clearBuckets()
   }
 
-  clearBuckets () : void {
+  public clearBuckets (): void {
     this.buckets.clear()
     for (let i = 0; i < this.numbuckets; i++) {
       this.buckets.set(i, new Set())
     }
   }
 
-  registerObject (obj: Obj) : void {
+  public registerObject (obj: Obj): void {
     for (let id of this.getIdForObject(obj.geo)) {
       let cell = this.buckets.get(id)
       /* istanbul ignore else */
@@ -46,8 +46,8 @@ export default class SpatialManager {
     }
   }
 
-  getIdForObject (geo: Geo) : Set<number> {
-    const bucketsObjIsIn:Set<number> = new Set()
+  public getIdForObject (geo: Geo): Set<number> {
+    const bucketsObjIsIn: Set<number> = new Set()
     const maxX = geo.pos.x + geo.aabb.max.x
     const maxY = geo.pos.y + geo.aabb.max.y
     const cf = this.cf
@@ -69,15 +69,15 @@ export default class SpatialManager {
     return bucketsObjIsIn
   }
 
-  static idForPoint (point: Point2, cf: number, cols: number) {
+  public static idForPoint (point: Point2, cf: number, cols: number): number {
     return (point.x * cf | 0) + (point.y * cf | 0) * cols | 0
   }
 
-  idForPoint (point: Point2) : number {
+  public idForPoint (point: Point2): number {
     return SpatialManager.idForPoint(point, this.cf, this.cols)
   }
 
-  static addBucket (x: number, y: number, cf: number, cols: number, set: Set<number>, numbuckets: number) : void {
+  public static addBucket (x: number, y: number, cf: number, cols: number, set: Set<number>, numbuckets: number): void {
     // ignore collisions offscreen
     const id = SpatialManager.idForPoint(new Point2(x, y), cf, cols)
     if (id >= 0 && id < numbuckets) {
@@ -85,7 +85,7 @@ export default class SpatialManager {
     }
   }
 
-  getNearby (geo: Geo) : Set<Obj> {
+  public getNearby (geo: Geo): Set<Obj> {
     const nearby = new Set()
     const ids = this.getIdForObject(geo)
 

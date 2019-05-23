@@ -1,14 +1,14 @@
 import Vector2 from './Vector2'
 import Point2 from './Point2'
-import { BoundingBox, PointLike } from './types'
+import { BoundingBox } from './types'
 import Obj from './Object'
 import { GenPos } from './roidPosFactory'
 
 export default class Geo implements GenPos {
-  aabb: BoundingBox
-  treatAsPoint = false
-  constructor (
-    public points : Point2[],
+  public aabb: BoundingBox
+  public treatAsPoint = false
+  public constructor (
+    public points: Point2[],
     public pos = new Point2(),
     public v = new Vector2(),
     public acc = new Vector2()
@@ -16,10 +16,10 @@ export default class Geo implements GenPos {
     this.aabb = Geo.getBBForPoints(points)
   }
 
-  static getBBForPoints (points: Point2[]):BoundingBox {
+  public static getBBForPoints (points: Point2[]): BoundingBox {
     const iv: BoundingBox = { min: new Point2(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY), max: new Point2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY) }
     return points.reduce(
-      (aabb: BoundingBox, point: Point2) => {
+      (aabb: BoundingBox, point: Point2): BoundingBox => {
         if (point.x < aabb.min.x) {
           aabb.min.x = point.x
         }
@@ -43,15 +43,15 @@ export default class Geo implements GenPos {
   }
 
   // A^2 + B^2 = C^2
-  distanceTo (pos: Point2): number {
+  public distanceTo (pos: Point2): number {
     return Math.sqrt(Math.pow(pos.x - this.pos.x, 2) + Math.pow(pos.y - this.pos.y, 2))
   }
 
-  distanceToObj (obj: Obj): number {
+  public distanceToObj (obj: Obj): number {
     return this.distanceTo(obj.geo.pos)
   }
   // This can probably be simplified.
-  aabbIntersects (b: Geo):boolean {
+  public aabbIntersects (b: Geo): boolean {
     let left // the object that is the most to the left
     let right
     let top
@@ -77,24 +77,24 @@ export default class Geo implements GenPos {
   }
 
   // http://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-  static crossProduct (a: Vector2|Point2, b: Vector2|Point2) : number {
+  public static crossProduct (a: Vector2|Point2, b: Vector2|Point2) : number {
     return a.x * b.y - b.x * a.y
   }
 
-  static isPointOnLine (aa: Point2, ab: Point2, b: Point2): boolean {
-    const aTmp:Point2 = new Point2(ab.x - aa.x, ab.y - aa.y)
-    const bTmp:Point2 = new Point2(b.x - aa.x, b.y - aa.y)
+  public static isPointOnLine (aa: Point2, ab: Point2, b: Point2): boolean {
+    const aTmp: Point2 = new Point2(ab.x - aa.x, ab.y - aa.y)
+    const bTmp: Point2 = new Point2(b.x - aa.x, b.y - aa.y)
     return Math.abs(Geo.crossProduct(aTmp, bTmp)) < Number.EPSILON
   }
 
-  static isPointRightOfLine (aa: Point2, ab: Point2, b: Point2) : boolean {
+  public static isPointRightOfLine (aa: Point2, ab: Point2, b: Point2): boolean {
     // Move the image, so that a.first is on (0|0)
-    const aTmp:Point2 = new Point2(ab.x - aa.x, ab.y - aa.y)
-    const bTmp:Point2 = new Point2(b.x - aa.x, b.y - aa.y)
+    const aTmp: Point2 = new Point2(ab.x - aa.x, ab.y - aa.y)
+    const bTmp: Point2 = new Point2(b.x - aa.x, b.y - aa.y)
     return Geo.crossProduct(aTmp, bTmp) < 0
   }
 
-  static segmentTouchesOrCrosses (aa: Point2, ab: Point2, ba: Point2, bb: Point2) : boolean {
+  public static segmentTouchesOrCrosses (aa: Point2, ab: Point2, ba: Point2, bb: Point2) : boolean {
     return Geo.isPointOnLine(aa, ab, ba) ||
     Geo.isPointOnLine(aa, ab, bb) || (
       Geo.isPointRightOfLine(aa, ab, ba) !==
@@ -102,11 +102,11 @@ export default class Geo implements GenPos {
     )
   }
 
-  static getSegmentBB (a: Point2, b: Point2) {
+  public static getSegmentBB (a: Point2, b: Point2): Point2[] {
     return [new Point2(Math.min(a.x, b.x), Math.min(a.y, b.y)), new Point2(Math.max(a.x, b.x), Math.max(a.y, b.y))]
   }
 
-  static segmentsBBIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
+  public static segmentsBBIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
     var firstbb = Geo.getSegmentBB(aa, ab)
     var secondbb = Geo.getSegmentBB(ba, bb)
     return firstbb[0].x <= secondbb[1].x &&
@@ -115,13 +115,13 @@ export default class Geo implements GenPos {
     firstbb[1].y >= secondbb[0].y
   }
 
-  static segmentsIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
+  public static segmentsIntersect (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
     return Geo.segmentsBBIntersect(aa, ab, ba, bb) &&
     Geo.segmentTouchesOrCrosses(aa, ab, ba, bb) &&
     Geo.segmentTouchesOrCrosses(ba, bb, aa, ab)
   }
 
-  static pointsAtPos (points: Point2[], pos: Point2): Point2[] {
+  public static pointsAtPos (points: Point2[], pos: Point2): Point2[] {
     var i
     var atPos = []
     for (i = 0; i < points.length; i++) {
@@ -130,7 +130,7 @@ export default class Geo implements GenPos {
     return atPos
   }
 
-  intersectsWith (ogeo: Geo): boolean {
+  public intersectsWith (ogeo: Geo): boolean {
     let collision = false
     let points
     let point

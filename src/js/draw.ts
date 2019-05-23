@@ -1,5 +1,5 @@
 import Point2 from './Point2'
-export function pathFromPoints (points:Point2[], closePath = true) {
+export function pathFromPoints (points: Point2[], closePath = true): Path2D {
   const path = new Path2D()
   const firstPoint = points[0]
   path.moveTo(firstPoint.x, firstPoint.y)
@@ -15,7 +15,7 @@ export function pathFromPoints (points:Point2[], closePath = true) {
   return path
 }
 
-export function pathFromSegments (segments: Array<Point2[]>) {
+export function pathFromSegments (segments: Point2[][]): Path2D {
   const path = new Path2D()
 
   for (let points of segments) {
