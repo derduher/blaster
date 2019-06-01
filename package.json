@@ -21,14 +21,14 @@
   },
   "homepage": "https://nimblerendition.com",
   "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
     "@babel/preset-typescript": "^7.3.3",
-    "@types/jest": "^24.0.12",
+    "@types/jest": "^24.0.13",
     "@typescript-eslint/eslint-plugin": "^1.9.0",
     "@typescript-eslint/parser": "^1.9.0",
     "babel-eslint": "^10.0.1",
-    "babel-loader": "^8.0.5",
+    "babel-loader": "^8.0.6",
     "babel-polyfill": "^6.26.0",
     "babel-preset-minify": "^0.5.0",
     "clean-webpack-plugin": "^2.0.2",
@@ -38,17 +38,17 @@
     "html-webpack-template": "^6.2.0",
     "jasmine": "^3.4.0",
     "jest": "^24.8.0",
-    "jest-canvas-mock": "^2.0.0",
+    "jest-canvas-mock": "^2.1.0",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "serviceworker-webpack-plugin": "^1.0.1",
     "source-map": "~0.7.3",
     "standard": "^12.0.1",
     "style-loader": "^0.23.1",
-    "typescript": "^3.4.5",
-    "webpack": "^4.31.0",
+    "typescript": "^3.5.1",
+    "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
-    "webpack-dev-server": "^3.3.1",
+    "webpack-dev-server": "^3.5.1",
     "webpack-merge": "^4.2.1"
   },
   "standard": {
@@ -112,9 +112,17 @@
       "no-unused-vars": 0,
       "react/prop-types": 0,
       "indent": "off",
-      "@typescript-eslint/indent": ["error", 2],
+      "@typescript-eslint/indent": [
+        "error",
+        2
+      ],
       "@typescript-eslint/no-parameter-properties": "off",
-      "@typescript-eslint/no-unused-vars": ["error", { "args": "none" } ]
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "args": "none"
+        }
+      ]
     }
   },
   "jest": {
