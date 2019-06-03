@@ -11,6 +11,8 @@ phases:
     commands:
       - echo Build started on `date`
       - npm ci
+      - npm run test
+      - npm run coverage
       - npm run build
   post_build:
     commands:

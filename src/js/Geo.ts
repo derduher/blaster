@@ -94,7 +94,7 @@ export default class Geo implements GenPos {
     return Geo.crossProduct(aTmp, bTmp) < 0
   }
 
-  public static segmentTouchesOrCrosses (aa: Point2, ab: Point2, ba: Point2, bb: Point2) : boolean {
+  public static segmentTouchesOrCrosses (aa: Point2, ab: Point2, ba: Point2, bb: Point2): boolean {
     return Geo.isPointOnLine(aa, ab, ba) ||
     Geo.isPointOnLine(aa, ab, bb) || (
       Geo.isPointRightOfLine(aa, ab, ba) !==

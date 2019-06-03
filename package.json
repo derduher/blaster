@@ -13,10 +13,11 @@
   "author": "Patrick Weygand",
   "main": "index.js",
   "scripts": {
-    "pretty": "eslint --fix 'src/**/*.ts'",
     "build": "webpack --config webpack.prod.js",
+    "pretty": "eslint --fix 'src/**/*.ts'",
+    "coverage": "codecov --token=9530801e-4ebe-4249-b3db-28762b62eda1",
     "start": "webpack-dev-server --open --config webpack.dev.js",
-    "test": "tsc && jest && codecov --token=9530801e-4ebe-4249-b3db-28762b62eda1",
+    "test": "tsc && jest",
     "upload": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --delete --profile derduher --cache-control 'public, max-age=31540000' --exclude '*.html'",
     "upload-html": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --profile derduher --cache-control 'public, max-age=600' --exclude '*' --include '*.html'",
     "watch": "webpack --progress --watch --config webpack.dev.js"
