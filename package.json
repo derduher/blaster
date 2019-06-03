@@ -14,8 +14,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
-    "pretty": "eslint --fix 'src/**/*.ts'",
     "coverage": "codecov --token=9530801e-4ebe-4249-b3db-28762b62eda1",
+    "pretty": "eslint --fix 'src/**/*.ts'",
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "test": "tsc && jest",
     "upload": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --delete --profile derduher --cache-control 'public, max-age=31540000' --exclude '*.html'",

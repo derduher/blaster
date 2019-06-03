@@ -150,7 +150,7 @@ export default class Craft extends Obj {
     )
 
     this.stage.items.push(p)
-    this.stage.spatialManager.registerObject(p)
+    this.stage.spatialManager.registerObject(p, p.geo)
     this.lastFire = now
   }
 }
