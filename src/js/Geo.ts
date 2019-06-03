@@ -77,7 +77,7 @@ export default class Geo implements GenPos {
   }
 
   // http://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-  public static crossProduct (a: Vector2|Point2, b: Vector2|Point2) : number {
+  public static crossProduct (a: Vector2|Point2, b: Vector2|Point2): number {
     return a.x * b.y - b.x * a.y
   }
 

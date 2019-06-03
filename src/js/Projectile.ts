@@ -4,7 +4,6 @@ import Obj from './Object'
 import {
   projectile
 } from './config.js'
-import Geo from './Geo'
 import Stage from './Stage'
 import Point2 from './Point2'
 import Vector2 from './Vector2'

@@ -5,8 +5,8 @@ import Vector2 from './Vector2'
 import { generateStage, generateObj } from './spec-helper'
 
 describe('Projectile', () => {
-  let projectile:Projectile
-  let stage:Stage
+  let projectile: Projectile
+  let stage: Stage
   beforeEach(() => {
     stage = generateStage()
     projectile = new Projectile(new Point2(), new Vector2(), stage)

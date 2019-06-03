@@ -1,7 +1,6 @@
 import Point2 from './Point2'
 import Obj from './Object'
 import Projectile from './Projectile'
-import Geo from './Geo'
 import Stage from './Stage'
 import Controls from './Controls'
 import Vector2 from './Vector2'

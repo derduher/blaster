@@ -1,5 +1,5 @@
 import Stage from './Stage'
-import SpatialManager from './SpatialManager'
+import SpatialManager from 'spatial-hashmap'
 import Roid from './Roid'
 import Craft from './Craft'
 // import NPC from './NPC.js'
@@ -67,7 +67,7 @@ export default class Game {
     this.debug.lastRender = this.lastRender
 
     // @ts-ignore
-    const spatialManager = new SpatialManager(nativeWidth, nativeHeight, cellSize)
+    const spatialManager = new SpatialManager<Obj>(nativeWidth, nativeHeight, cellSize)
     this.stage = new Stage(canvas, spatialManager)
     this.started = false
 
@@ -94,7 +94,7 @@ export default class Game {
       document.documentElement.clientWidth / 2 - craft.width / 2,
       document.documentElement.clientHeight - craft.width - this.stage.padding
     ))
-    this.stage.spatialManager.registerObject(this.craft)
+    this.stage.spatialManager.registerObject(this.craft, this.craft.geo)
     this.stage.items.push(this.craft)
     this.stage.craft = this.craft
 
@@ -215,7 +215,7 @@ export default class Game {
     // }
     // }
     this.stage.spatialManager = new SpatialManager(nativeWidth, nativeHeight, cellSize)
-    this.stage.items.forEach(this.stage.spatialManager.registerObject, this.stage.spatialManager)
+    this.stage.items.forEach((i): void => this.stage.spatialManager.registerObject(i, i.geo))
     if (this.started && !this.stopMain) {
       this.draw()
       this.showPause()
@@ -294,7 +294,7 @@ export default class Game {
 
   /* eslint-disable no-mixed-operators */
   // I don't remember what the intended order of ops is on this
-  boundNTick (i:Obj, tickTime:number) : boolean {
+  boundNTick (i: Obj, tickTime: number): boolean {
     i.tick(tickTime)
     var x = i.geo.pos.x + i.geo.v.x
     var y = i.geo.pos.y + i.geo.v.y
@@ -322,20 +322,20 @@ export default class Game {
     }
 
     if (!cull) {
-      this.stage.spatialManager.registerObject(i)
+      this.stage.spatialManager.registerObject(i, i.geo)
     }
     return cull
   }
   /* eslint-enable no-mixed-operators */
 
   // o other object
-  testIntersect (item: Obj, i:number, o: Obj, cullQ: number[]) : void {
+  testIntersect (item: Obj, i: number, o: Obj, cullQ: number[]): void {
     if (item !== o && item.geo.intersectsWith(o.geo)) {
       item.intersects(o, i, cullQ)
     }
   }
 
-  update (tickTime:number) : void {
+  update (tickTime: number): void {
     if (this.ctrl.p) {
       this.togglePause()
     }
@@ -344,7 +344,7 @@ export default class Game {
       this.stage.items.push(new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage))
     }
 
-    this.stage.spatialManager.clearBuckets()
+    this.stage.spatialManager.clearMap()
     for (let i = 0; i < this.stage.items.length; i++) {
       if (this.boundNTick(this.stage.items[i], tickTime)) {
         cullQ.push(i)
@@ -376,16 +376,16 @@ export default class Game {
     }
 
     var culled = 0
-    cullQ.sort(function (a, b) {
+    cullQ.sort(function (a, b): number {
       if (a < b) {
         return -1
       }
       return a > b ? 1 : 0
     })
-    cullQ.forEach(v => this.stage.items.splice(v - culled++, 1))
+    cullQ.forEach((v): Obj[] => this.stage.items.splice(v - culled++, 1))
   }
 
-  messageModal (msg:string[]) : void {
+  messageModal (msg: string[]): void {
     if (this.ctx) {
       let x = this.stage.canvas.width / 2
       let y = this.stage.canvas.height / 2
@@ -400,7 +400,7 @@ export default class Game {
     }
   }
 
-  showInstructions () : void {
+  showInstructions (): void {
     let msg = []
     if (this.isTouchInterface) {
       msg[0] = 'Tap to start'
@@ -417,7 +417,7 @@ export default class Game {
     this.messageModal(msg)
   }
 
-  showPause () : void {
+  showPause (): void {
     let msg = []
 
     if (this.isTouchInterface) {
@@ -429,23 +429,23 @@ export default class Game {
     this.messageModal(msg)
   }
 
-  pausedOnKeyUp (e:KeyboardEvent) : void {
+  pausedOnKeyUp (e: KeyboardEvent): void {
     if (!this.stopMain && e.keyCode === 32) {
       this.resume()
     }
   }
 
-  pausedOnTap (e: TouchEvent) : void {
+  pausedOnTap (e: TouchEvent): void {
     if (!this.stopMain) {
       this.resume()
     }
   }
-  _pause () : void {
+  _pause (): void {
     window.cancelAnimationFrame(this.stopMain)
     this.stopMain = 0
   }
 
-  togglePause () : void {
+  togglePause (): void {
     if (this.stopMain) {
       this._pause()
     } else {
@@ -453,12 +453,12 @@ export default class Game {
     }
   }
 
-  pause () : void {
+  pause (): void {
     this._pause()
     this.showPause()
   }
 
-  resume () : void {
+  resume (): void {
     // prevents the engine from trying to catch up from all the lost cycles
     // before pause
     this.lastTick = window.performance.now()
