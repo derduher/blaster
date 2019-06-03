@@ -1,12 +1,10 @@
 import Geo from './Geo'
 import Point2 from './Point2'
-import Obj from './Object'
-import { BoundingBox } from './types'
 import { generateObj } from './spec-helper'
 describe('Geo', () => {
-  let geo:Geo
-  let geo2:Geo
-  let geo3:Geo
+  let geo: Geo
+  let geo2: Geo
+  let geo3: Geo
   beforeEach(() => {
     geo = new Geo([new Point2(), new Point2(0, 10), new Point2(10, 10)])
     geo2 = new Geo([new Point2(3, 3), new Point2(20, 3), new Point2(3, 20)])

@@ -1,7 +1,6 @@
 import Point2 from './Point2'
 import Obj from './Object'
 import Projectile from './Projectile'
-import Geo from './Geo'
 import Stage from './Stage'
 import Controls from './Controls'
 import Vector2 from './Vector2'
@@ -151,7 +150,7 @@ export default class Craft extends Obj {
     )
 
     this.stage.items.push(p)
-    this.stage.spatialManager.registerObject(p)
+    this.stage.spatialManager.registerObject(p, p.geo)
     this.lastFire = now
   }
 }

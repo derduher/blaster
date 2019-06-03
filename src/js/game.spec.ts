@@ -1,18 +1,17 @@
 import Game from './Game'
 import Obj from './Object'
 import Stage from './Stage'
-import Point2 from './Point2'
-import SpatialManager from './SpatialManager'
+import SpatialManager from 'spatial-hashmap'
 import Roid from './Roid'
 import { generateObj } from './spec-helper'
 
 describe('Game', () => {
-  let game:Game
-  let stage:Stage
-  let when:number
-  let o:Obj
+  let game: Game
+  let stage: Stage
+  let when: number
+  let o: Obj
   beforeEach(() => {
-    stage = new Stage(document.createElement('canvas'), new SpatialManager(1000, 1000, 10))
+    stage = new Stage(document.createElement('canvas'), new SpatialManager<Obj>(1000, 1000, 10))
     o = generateObj(stage)
     game = new Game(document.createElement('canvas'))
     when = performance.now()

@@ -1,12 +1,12 @@
 // @ts-ignore: No idea how to handle dynamic props on document
 import { fullScreenElementProp } from './fullscreen'
 
-interface keyBindings {
-  [index: number]: string
+interface KeyBindings {
+  [index: number]: string;
 }
 
-interface document {
-  [index: string]: any
+interface Document {
+  [index: string]: any;
 }
 
 const a = 65
@@ -15,7 +15,7 @@ const w = 87
 const s = 83
 const q = 81
 const r = 82
-const t = 84
+// const t = 84
 const space = 32
 const left = 37
 const right = 39
@@ -29,7 +29,7 @@ const e = 69
 export default class Controls {
   toggle: Set<string>
   pressActivated: Set<string>
-  cfg: keyBindings
+  cfg: KeyBindings
   [index: string]: any
   touch = false
   touchX = 0
@@ -63,7 +63,7 @@ export default class Controls {
   }
 
   /* istanbul ignore next */
-  kd (e : KeyboardEvent) {
+  kd (e: KeyboardEvent): void {
     const action = this.cfg[e.keyCode]
     if (this.pressActivated.has(action)) {
       this[action] = true
@@ -71,7 +71,7 @@ export default class Controls {
   }
 
   /* istanbul ignore next */
-  ku (e : KeyboardEvent) {
+  ku (e: KeyboardEvent): void {
     const action = this.cfg[e.keyCode]
     if (this.pressActivated.has(action)) {
       this[action] = false
@@ -83,7 +83,7 @@ export default class Controls {
   }
 
   /* istanbul ignore next */
-  ts (e : TouchEvent) {
+  ts (e: TouchEvent): void {
     // @ts-ignore: No idea how to handle dynamic props on document
     if (document[fullScreenElementProp]) {
       this.touch = true
@@ -92,7 +92,7 @@ export default class Controls {
   }
 
   /* istanbul ignore next */
-  tm (e : TouchEvent) {
+  tm (e: TouchEvent): void {
     // @ts-ignore: No idea how to handle dynamic props on document
     if (document[fullScreenElementProp]) {
       var t = e.changedTouches[0]
@@ -104,7 +104,7 @@ export default class Controls {
   }
 
   /* istanbul ignore next */
-  te (e : TouchEvent) {
+  te (e: TouchEvent): void {
     this.touch = false
     this.f = false
     // @ts-ignore: No idea how to handle dynamic props on document
