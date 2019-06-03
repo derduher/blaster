@@ -1,14 +1,16 @@
 import Stage from './Stage'
-import Geo from './Geo'
 import Point2 from './Point2'
 import Obj from './Object'
-import SpatialManager from './SpatialManager'
+import SpatialManager from 'spatial-hashmap'
 import { generateObj } from './spec-helper'
 describe('Object', () => {
-  let stage:Stage
-  let o:Obj
+  let stage: Stage
+  let o: Obj
   beforeEach(() => {
-    stage = new Stage(document.createElement('canvas'), new SpatialManager(1000, 1000, 10))
+    stage = new Stage(
+      document.createElement('canvas'),
+      new SpatialManager(1000, 1000, 10)
+    )
     o = generateObj(stage)
   })
 

@@ -1,5 +1,5 @@
 import Stage from './Stage'
-import SpatialManager from './SpatialManager'
+import SpatialManager from 'spatial-hashmap'
 import Roid from './Roid'
 import Craft from './Craft'
 // import NPC from './NPC.js'
@@ -19,13 +19,13 @@ import {
 } from './config'
 
 interface Debug {
-  on: boolean;
-  fps: number;
-  text: string;
-  numUpdates: number;
-  itemL: number;
-  drawRate: number;
-  lastRender: number;
+  on: boolean
+  fps: number
+  text: string
+  numUpdates: number
+  itemL: number
+  drawRate: number
+  lastRender: number
 }
 
 const debug: Debug = {
@@ -54,7 +54,7 @@ export default class Game {
   public stopMain: number
   public debug: Debug
   public hatches: Path2D
-  public constructor (canvas: HTMLCanvasElement) {
+  public constructor(canvas: HTMLCanvasElement) {
     this.hatches = new Path2D()
     this.stopMain = 0
     this.updateIsReady = false
@@ -67,7 +67,11 @@ export default class Game {
     this.debug.lastRender = this.lastRender
 
     // @ts-ignore
-    const spatialManager = new SpatialManager(nativeWidth, nativeHeight, cellSize)
+    const spatialManager = new SpatialManager<Obj>(
+      nativeWidth,
+      nativeHeight,
+      cellSize
+    )
     this.stage = new Stage(canvas, spatialManager)
     this.started = false
 
@@ -90,11 +94,15 @@ export default class Game {
     document.addEventListener('touchend', this.pausedOnTap.bind(this))
     window.onresize = (): void => this.updateCanvasBoundaries()
 
-    this.craft = new Craft(this.stage, this.ctrl, new Point2(
-      document.documentElement.clientWidth / 2 - craft.width / 2,
-      document.documentElement.clientHeight - craft.width - this.stage.padding
-    ))
-    this.stage.spatialManager.registerObject(this.craft)
+    this.craft = new Craft(
+      this.stage,
+      this.ctrl,
+      new Point2(
+        document.documentElement.clientWidth / 2 - craft.width / 2,
+        document.documentElement.clientHeight - craft.width - this.stage.padding
+      )
+    )
+    this.stage.spatialManager.registerObject(this.craft, this.craft.geo)
     this.stage.items.push(this.craft)
     this.stage.craft = this.craft
 
@@ -131,11 +139,11 @@ export default class Game {
     // this.stage.spatialManager.registerObject(p)
   }
 
-  public updateReady (): void {
+  public updateReady(): void {
     this.updateIsReady = true
   }
 
-  public main (tFrame: number): void {
+  public main(tFrame: number): void {
     this.started = true
     var timeSinceTick
     var nextTick = this.lastTick + this.tickLength
@@ -183,7 +191,7 @@ export default class Game {
     this.lastRender = tFrame
   }
 
-  public updateCanvasBoundaries (): void {
+  public updateCanvasBoundaries(): void {
     // @ts-ignore
     if (document[fullScreenElementProp]) {
       this.stage.canvas.width = window.screen.width
@@ -214,15 +222,21 @@ export default class Game {
     // this.stage.items.push(new Roid(this.stage.canvas.width, i*90, j*90))
     // }
     // }
-    this.stage.spatialManager = new SpatialManager(nativeWidth, nativeHeight, cellSize)
-    this.stage.items.forEach(this.stage.spatialManager.registerObject, this.stage.spatialManager)
+    this.stage.spatialManager = new SpatialManager<Obj>(
+      nativeWidth,
+      nativeHeight,
+      cellSize
+    )
+    this.stage.items.forEach(
+      (obj): void => this.stage.spatialManager.registerObject(obj, obj.geo)
+    )
     if (this.started && !this.stopMain) {
       this.draw()
       this.showPause()
     }
   }
 
-  public updates (numTicks: number): void {
+  public updates(numTicks: number): void {
     var i
     for (i = 0; i < numTicks; i++) {
       this.lastTick += this.tickLength
@@ -230,12 +244,14 @@ export default class Game {
     }
   }
 
-  public drawBuckets (): void {
+  public drawBuckets(): void {
     let numPixels = this.stage.canvas.width * this.stage.canvas.height
     for (let i = 0; i < numPixels; i++) {
       let x = i % this.stage.canvas.width
       let y = (i / this.stage.canvas.width) | 0
-      let pct = 100 * this.stage.spatialManager.idForPoint(new Point2(x, y)) / this.stage.spatialManager.numbuckets
+      let pct =
+        (100 * this.stage.spatialManager.idForPoint(new Point2(x, y))) /
+        this.stage.spatialManager.numbuckets
       if (this.ctx) {
         this.ctx.fillStyle = `hsl(270, 10%, ${pct}%)`
         this.ctx.fillRect(x, y, 1, 1)
@@ -243,26 +259,36 @@ export default class Game {
     }
   }
 
-  public draw (): void {
+  public draw(): void {
     // @ts-ignore
     if (!window.hold && this.ctx) {
-      this.ctx.clearRect(0, 0, this.stage.canvas.width, this.stage.canvas.height)
+      this.ctx.clearRect(
+        0,
+        0,
+        this.stage.canvas.width,
+        this.stage.canvas.height
+      )
     }
     if (this.ctx) {
       this.ctx.save()
     }
     const deviceWidth = this.stage.canvas.width
     const deviceHeight = this.stage.canvas.height
-    const scaleFitNative = Math.min(deviceWidth / nativeWidth, deviceHeight / nativeHeight)
+    const scaleFitNative = Math.min(
+      deviceWidth / nativeWidth,
+      deviceHeight / nativeHeight
+    )
     // const scaleFillNative = Math.max(deviceWidth / nativeWidth, deviceHeight / nativeHeight)
     const scale = scaleFitNative
 
     if (this.ctx) {
       this.ctx.setTransform(
-        scale, 0, // or use scaleFillNative
-        0, scale,
-        deviceWidth / 2 | 0,
-        deviceHeight / 2 | 0
+        scale,
+        0, // or use scaleFillNative
+        0,
+        scale,
+        (deviceWidth / 2) | 0,
+        (deviceHeight / 2) | 0
       )
       let offsetDeviceTop = -(deviceHeight / scale) / 2
       let offsetDeviceLeft = -(deviceWidth / scale) / 2
@@ -281,12 +307,19 @@ export default class Game {
         this.ctx.fillText(this.debug.fps.toFixed(1), 0, fs)
         this.ctx.fillText(this.debug.itemL + '', 0, fs * 2)
         this.ctx.fillText(this.debug.numUpdates + '', 0, fs * 3)
-        this.ctx.fillText(this.debug.text, this.stage.canvas.width / 2, this.stage.canvas.height / 2)
+        this.ctx.fillText(
+          this.debug.text,
+          this.stage.canvas.width / 2,
+          this.stage.canvas.height / 2
+        )
 
         this.ctx.stroke(this.hatches)
         this.ctx.strokeStyle = 'green'
         this.ctx.lineWidth = 3
-        this.hitboxes.forEach((xy: Point2): void|null => this.ctx && this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize))
+        this.hitboxes.forEach(
+          (xy: Point2): void | null =>
+            this.ctx && this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize)
+        )
         this.ctx.restore()
       }
     }
@@ -294,7 +327,7 @@ export default class Game {
 
   /* eslint-disable no-mixed-operators */
   // I don't remember what the intended order of ops is on this
-  boundNTick (i:Obj, tickTime:number) : boolean {
+  public boundNTick(i: Obj, tickTime: number): boolean {
     i.tick(tickTime)
     var x = i.geo.pos.x + i.geo.v.x
     var y = i.geo.pos.y + i.geo.v.y
@@ -302,8 +335,10 @@ export default class Game {
     i.geo.v.y += i.geo.acc.y
     var cull = false
 
-    if (((i.geo.v.x <= 0 || x < this.stage.xmax - i.geo.aabb.max.x) && (i.geo.v.x >= 0 || x > this.stage.xmin)) ||
-      !i.boundToCanvas && x < this.stage.xmax && x > -100
+    if (
+      ((i.geo.v.x <= 0 || x < this.stage.xmax - i.geo.aabb.max.x) &&
+        (i.geo.v.x >= 0 || x > this.stage.xmin)) ||
+      (!i.boundToCanvas && x < this.stage.xmax && x > -100)
     ) {
       i.geo.pos.x = x
     } else if (!i.boundToCanvas) {
@@ -312,8 +347,11 @@ export default class Game {
       i.geo.v.x = 0
     }
 
-    if (((i.geo.v.y <= 0 || y < this.stage.ymax - i.geo.aabb.max.y) && (i.geo.v.y >= 0 || y > this.stage.ymin)) ||
-      !i.boundToCanvas && y < this.stage.ymax && y > -100) {
+    if (
+      ((i.geo.v.y <= 0 || y < this.stage.ymax - i.geo.aabb.max.y) &&
+        (i.geo.v.y >= 0 || y > this.stage.ymin)) ||
+      (!i.boundToCanvas && y < this.stage.ymax && y > -100)
+    ) {
       i.geo.pos.y = y
     } else if (!i.boundToCanvas) {
       cull = true
@@ -322,29 +360,34 @@ export default class Game {
     }
 
     if (!cull) {
-      this.stage.spatialManager.registerObject(i)
+      this.stage.spatialManager.registerObject(i, i.geo)
     }
     return cull
   }
   /* eslint-enable no-mixed-operators */
 
   // o other object
-  testIntersect (item: Obj, i:number, o: Obj, cullQ: number[]) : void {
+  public testIntersect(item: Obj, i: number, o: Obj, cullQ: number[]): void {
     if (item !== o && item.geo.intersectsWith(o.geo)) {
       item.intersects(o, i, cullQ)
     }
   }
 
-  update (tickTime:number) : void {
+  public update(tickTime: number): void {
     if (this.ctrl.p) {
       this.togglePause()
     }
     var cullQ = []
     if (Math.random() > 0.99) {
-      this.stage.items.push(new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage))
+      this.stage.items.push(
+        new Roid(
+          roidPosFactory(this.stage.canvas.width, this.stage.canvas.height),
+          this.stage
+        )
+      )
     }
 
-    this.stage.spatialManager.clearBuckets()
+    this.stage.spatialManager.clearMap()
     for (let i = 0; i < this.stage.items.length; i++) {
       if (this.boundNTick(this.stage.items[i], tickTime)) {
         cullQ.push(i)
@@ -370,13 +413,15 @@ export default class Game {
       // this.testIntersect(this.stage.items[i], i, this.stage.items[j], cullQ)
       // }
       // }
-      for (let o of this.stage.spatialManager.getNearby(this.stage.items[i].geo)) {
+      for (let o of this.stage.spatialManager.getNearby(
+        this.stage.items[i].geo
+      )) {
         this.testIntersect(this.stage.items[i], i, o, cullQ)
       }
     }
 
     var culled = 0
-    cullQ.sort(function (a, b) {
+    cullQ.sort(function(a, b) {
       if (a < b) {
         return -1
       }
@@ -385,7 +430,7 @@ export default class Game {
     cullQ.forEach(v => this.stage.items.splice(v - culled++, 1))
   }
 
-  messageModal (msg:string[]) : void {
+  public messageModal(msg: string[]): void {
     if (this.ctx) {
       let x = this.stage.canvas.width / 2
       let y = this.stage.canvas.height / 2
@@ -400,7 +445,7 @@ export default class Game {
     }
   }
 
-  showInstructions () : void {
+  public showInstructions(): void {
     let msg = []
     if (this.isTouchInterface) {
       msg[0] = 'Tap to start'
@@ -417,7 +462,7 @@ export default class Game {
     this.messageModal(msg)
   }
 
-  showPause () : void {
+  public showPause(): void {
     let msg = []
 
     if (this.isTouchInterface) {
@@ -429,23 +474,23 @@ export default class Game {
     this.messageModal(msg)
   }
 
-  pausedOnKeyUp (e:KeyboardEvent) : void {
+  public pausedOnKeyUp(e: KeyboardEvent): void {
     if (!this.stopMain && e.keyCode === 32) {
       this.resume()
     }
   }
 
-  pausedOnTap (e: TouchEvent) : void {
+  public pausedOnTap(e: TouchEvent): void {
     if (!this.stopMain) {
       this.resume()
     }
   }
-  _pause () : void {
+  private _pause(): void {
     window.cancelAnimationFrame(this.stopMain)
     this.stopMain = 0
   }
 
-  togglePause () : void {
+  public togglePause(): void {
     if (this.stopMain) {
       this._pause()
     } else {
@@ -453,12 +498,12 @@ export default class Game {
     }
   }
 
-  pause () : void {
+  public pause(): void {
     this._pause()
     this.showPause()
   }
 
-  resume () : void {
+  public resume(): void {
     // prevents the engine from trying to catch up from all the lost cycles
     // before pause
     this.lastTick = window.performance.now()

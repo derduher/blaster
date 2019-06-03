@@ -4,12 +4,14 @@
   "description": "game",
   "main": "index.js",
   "scripts": {
+    "pretty": "eslint --fix 'src/**/*.ts' && pretty-quick --staged",
     "upload": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --delete --profile derduher --cache-control 'public, max-age=31540000' --exclude '*.html'",
     "upload-html": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --profile derduher --cache-control 'public, max-age=600' --exclude '*' --include '*.html'",
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "watch": "webpack --progress --watch --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "test": "tsc && jest && codecov --token=9530801e-4ebe-4249-b3db-28762b62eda1"
+    "test": "tsc && jest",
+    "coverage": "codecov --token=9530801e-4ebe-4249-b3db-28762b62eda1"
   },
   "repository": {
     "type": "git"
@@ -34,13 +36,19 @@
     "clean-webpack-plugin": "^2.0.2",
     "copy-webpack-plugin": "^5.0.3",
     "css-loader": "^2.1.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "html-webpack-plugin": "^3.2.0",
     "html-webpack-template": "^6.2.0",
+    "husky": "^2.3.0",
     "jasmine": "^3.4.0",
     "jest": "^24.8.0",
     "jest-canvas-mock": "^2.1.0",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
+    "prettier": "1.17.1",
+    "pretty-quick": "^1.11.0",
     "serviceworker-webpack-plugin": "^1.0.1",
     "source-map": "~0.7.3",
     "standard": "^12.0.1",
@@ -80,7 +88,8 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.4.4",
-    "codecov": "^3.5.0"
+    "codecov": "^3.5.0",
+    "spatial-hashmap": "^0.1.0"
   },
   "eslintConfig": {
     "extends": [
@@ -122,8 +131,21 @@
         {
           "args": "none"
         }
-      ]
-    }
+      ],
+      "@typescript-eslint/member-delimiter-style": "none",
+      "@typescript-eslint/explicit-member-accessibility": "no-public"
+    },
+    "overrides": [
+      {
+        "files": [
+          "*-test.ts",
+          "*.spec.ts"
+        ],
+        "rules": {
+          "@typescript-eslint/explicit-function-return-type": "off"
+        }
+      }
+    ]
   },
   "jest": {
     "collectCoverage": true,
@@ -136,5 +158,13 @@
       "!src/js/**/*.spec.*",
       "!src/js/types.ts"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run pretty",
+      "pre-push": "npm test",
+      "post-checkout": "npm i",
+      "post-merge": "npm i"
+    }
   }
 }

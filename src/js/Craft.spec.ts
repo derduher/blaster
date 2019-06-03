@@ -1,15 +1,12 @@
-import Stage from './Stage'
-import Geo from './Geo'
 import Point2 from './Point2'
 import Controls from './Controls'
 import Craft from './Craft'
 import Projectile from './Projectile'
-import SpatialManager from './SpatialManager'
 import { generateStage } from './spec-helper'
 
 describe('Craft', () => {
-  let controls:Controls
-  let craft:Craft
+  let controls: Controls
+  let craft: Craft
   beforeEach(() => {
     controls = new Controls()
     craft = new Craft(generateStage(), controls, new Point2())
@@ -42,7 +39,7 @@ describe('Craft', () => {
       expect(craft.geo.acc.x).toBe(0)
     })
   })
-  
+
   describe('fire', () => {
     it('marks the last time fire happened', () => {
       craft.fire(10)

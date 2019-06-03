@@ -10,8 +10,9 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - npm ci
+      - ENV=CI npm ci
       - npm run build
+      - npm run coverage
   post_build:
     commands:
       - echo Build completed on `date`

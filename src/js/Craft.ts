@@ -1,14 +1,11 @@
 import Point2 from './Point2'
 import Obj from './Object'
 import Projectile from './Projectile'
-import Geo from './Geo'
 import Stage from './Stage'
 import Controls from './Controls'
 import Vector2 from './Vector2'
 import { pathFromPoints, pathFromSegments } from './draw'
-import {
-  craft
-} from './config'
+import { craft } from './config'
 const {
   rateOfFire,
   speed,
@@ -39,13 +36,13 @@ export default class Craft extends Obj {
   public health = health
   public mass = mass // Gg
   private currentWeapon = 0
-  public constructor (stage: Stage, ctrl: Controls, pos: Point2) {
+  public constructor(stage: Stage, ctrl: Controls, pos: Point2) {
     super(pos, stage, geo.flat())
     this.weaponConfigurations = [
-      Math.random() * 20 | 0,
-      Math.random() * 20 | 0,
-      Math.random() * 20 | 0,
-      Math.random() * 20 | 0
+      (Math.random() * 20) | 0,
+      (Math.random() * 20) | 0,
+      (Math.random() * 20) | 0,
+      (Math.random() * 20) | 0
     ]
 
     this.originalPath = this.path = pathFromSegments(geo)
@@ -53,7 +50,7 @@ export default class Craft extends Obj {
     this.ctrl = ctrl
   }
 
-  public tick (now: number): void {
+  public tick(now: number): void {
     const lastFireDelta = now - this.lastFire
 
     // set ctrl dir
@@ -61,10 +58,10 @@ export default class Craft extends Obj {
       this.geo.acc.x = negDir
     } else if (this.ctrl.r && !this.ctrl.l) {
       this.geo.acc.x = posDir
-    } else if (this.ctrl.autoBreak && (
-      this.geo.v.x > speed ||
-      this.geo.v.x < -speed
-    )) {
+    } else if (
+      this.ctrl.autoBreak &&
+      (this.geo.v.x > speed || this.geo.v.x < -speed)
+    ) {
       if (this.geo.v.x > speed) {
         this.geo.acc.x = negDir
       } else if (this.geo.v.x < -speed) {
@@ -79,10 +76,10 @@ export default class Craft extends Obj {
       this.geo.acc.y = posDir
     } else if (this.ctrl.u && !this.ctrl.d) {
       this.geo.acc.y = negDir
-    } else if (this.ctrl.autoBreak && (
-      this.geo.v.y > speed ||
-      this.geo.v.y < -speed
-    )) {
+    } else if (
+      this.ctrl.autoBreak &&
+      (this.geo.v.y > speed || this.geo.v.y < -speed)
+    ) {
       if (this.geo.v.y > speed) {
         this.geo.acc.y = negDir
       } else if (this.geo.v.y < -speed) {
@@ -127,31 +124,29 @@ export default class Craft extends Obj {
     }
   }
 
-  public nextConfiguration (): void {
-    this.currentWeapon = (this.currentWeapon + 1) % this.weaponConfigurations.length
+  public nextConfiguration(): void {
+    this.currentWeapon =
+      (this.currentWeapon + 1) % this.weaponConfigurations.length
   }
 
-  public prevConfiguration (): void {
-    this.currentWeapon = Math.abs(this.currentWeapon - 1 % this.weaponConfigurations.length)
+  public prevConfiguration(): void {
+    this.currentWeapon = Math.abs(
+      this.currentWeapon - (1 % this.weaponConfigurations.length)
+    )
   }
 
-  public fire (now: number): void {
+  public fire(now: number): void {
     const size = this.weaponConfigurations[this.currentWeapon]
     const pos = new Point2(
       this.geo.pos.x + this.geo.aabb.max.x / 2 + this.geo.v.x + 10 - size / 2,
       this.geo.pos.y - size + 5
     )
 
-    const velY = Math.sqrt(2 * barrelLength * force / size)
-    const p = new Projectile(
-      pos,
-      new Vector2(0, -velY),
-      this.stage,
-      size
-    )
+    const velY = Math.sqrt((2 * barrelLength * force) / size)
+    const p = new Projectile(pos, new Vector2(0, -velY), this.stage, size)
 
     this.stage.items.push(p)
-    this.stage.spatialManager.registerObject(p)
+    this.stage.spatialManager.registerObject(p, p.geo)
     this.lastFire = now
   }
 }
