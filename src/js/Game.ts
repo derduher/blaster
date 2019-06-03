@@ -235,7 +235,7 @@ export default class Game {
     for (let i = 0; i < numPixels; i++) {
       let x = i % this.stage.canvas.width
       let y = (i / this.stage.canvas.width) | 0
-      let pct = 100 * this.stage.spatialManager.idForPoint(new Point2(x, y)) / this.stage.spatialManager.numbuckets
+      let pct = 100 * this.stage.spatialManager.idForPoint(new Point2(x, y)) / this.stage.spatialManager.numBuckets
       if (this.ctx) {
         this.ctx.fillStyle = `hsl(270, 10%, ${pct}%)`
         this.ctx.fillRect(x, y, 1, 1)
