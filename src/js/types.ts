@@ -1,4 +1,4 @@
-import Point2 from './Point2.js'
+import Point2 from "./Point2.js";
 export interface PointLike {
   x: number;
   y: number;

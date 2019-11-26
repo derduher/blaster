@@ -34,46 +34,47 @@
     "env": {
       "browser": true,
       "es6": true,
-      "jasmine": true,
       "jest": true,
-      "mocha": true,
       "node": true
     },
     "extends": [
       "eslint:recommended",
-      "plugin:@typescript-eslint/recommended"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "*-test.ts",
-          "*.spec.ts"
-        ],
-        "rules": {
-          "@typescript-eslint/explicit-function-return-type": "off"
-        }
-      }
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier/@typescript-eslint",
+      "plugin:prettier/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-      "ecmaVersion": 6,
+      "ecmaVersion": 2018,
       "sourceType": "module",
       "ecmaFeatures": {
         "jsx": true
       }
     },
     "plugins": [
-      "react"
+      "jest",
+      "@typescript-eslint"
     ],
     "rules": {
       "no-case-declarations": 0,
       "no-console": 0,
       "no-unused-vars": 0,
-      "react/prop-types": 0,
       "indent": "off",
-      "@typescript-eslint/indent": [
+      "lines-between-class-members": [
         "error",
-        2
+        "always",
+        {
+          "exceptAfterSingleLine": true
+        }
+      ],
+      "padding-line-between-statements": [
+        "error",
+        {
+          "blankLine": "always",
+          "prev": "multiline-expression",
+          "next": "multiline-expression"
+        }
       ],
       "@typescript-eslint/no-parameter-properties": "off",
       "@typescript-eslint/no-unused-vars": [
@@ -82,7 +83,7 @@
           "args": "none"
         }
       ],
-      "@typescript-eslint/explicit-member-accessibility": "no-public"
+      "@typescript-eslint/explicit-member-accessibility": "off"
     }
   },
   "jest": {
@@ -98,69 +99,45 @@
     ]
   },
   "dependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
     "spatial-hashmap": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.4",
-    "@babel/preset-env": "^7.5.4",
-    "@babel/preset-typescript": "^7.3.3",
-    "@types/jest": "^24.0.15",
-    "@typescript-eslint/eslint-plugin": "^1.12.0",
-    "@typescript-eslint/parser": "^1.12.0",
-    "babel-eslint": "^10.0.2",
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/preset-typescript": "^7.7.4",
+    "@types/jest": "^24.0.23",
+    "@typescript-eslint/eslint-plugin": "^2.9.0",
+    "@typescript-eslint/parser": "^2.9.0",
+    "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-minify": "^0.5.0",
-    "clean-webpack-plugin": "^2.0.2",
-    "codecov": "^3.5.0",
-    "copy-webpack-plugin": "^5.0.3",
-    "css-loader": "^2.1.1",
-    "eslint": "^5.16.0",
+    "babel-preset-minify": "^0.5.1",
+    "clean-webpack-plugin": "^3.0.0",
+    "codecov": "^3.6.1",
+    "copy-webpack-plugin": "^5.0.5",
+    "css-loader": "^3.2.0",
+    "eslint": "^6.7.1",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-jest": "^23.0.4",
+    "eslint-plugin-prettier": "^3.1.1",
     "html-webpack-plugin": "^3.2.0",
     "html-webpack-template": "^6.2.0",
-    "husky": "^2.7.0",
-    "jasmine": "^3.4.0",
-    "jest": "^24.8.0",
-    "jest-canvas-mock": "^2.1.0",
-    "less": "^3.9.0",
+    "husky": "^3.1.0",
+    "jasmine": "^3.5.0",
+    "jest": "^24.9.0",
+    "jest-canvas-mock": "^2.2.0",
+    "less": "^3.10.3",
     "less-loader": "^5.0.0",
+    "prettier": "^1.19.1",
     "serviceworker-webpack-plugin": "^1.0.1",
-    "sort-package-json": "^1.22.1",
+    "sort-package-json": "^1.24.0",
     "source-map": "~0.7.3",
-    "standard": "^12.0.1",
-    "style-loader": "^0.23.1",
-    "typescript": "^3.5.3",
-    "webpack": "^4.35.3",
-    "webpack-cli": "^3.3.6",
-    "webpack-dev-server": "^3.7.2",
-    "webpack-merge": "^4.2.1"
-  },
-  "standard": {
-    "globals": [
-      "Path2D",
-      "describe",
-      "xdescribe",
-      "it",
-      "xit",
-      "beforeAll",
-      "afterAll",
-      "beforeEach",
-      "afterEach",
-      "expect",
-      "fetch",
-      "Event",
-      "browser",
-      "FocusEvent",
-      "FormData",
-      "URL",
-      "jest",
-      "browser"
-    ],
-    "ignore": [],
-    "parser": "typescript-eslint-parser",
-    "plugins": [
-      "typescript"
-    ]
+    "style-loader": "^1.0.0",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0",
+    "webpack-merge": "^4.2.2"
   }
 }

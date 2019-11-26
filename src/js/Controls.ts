@@ -1,115 +1,136 @@
-// @ts-ignore: No idea how to handle dynamic props on document
-import { fullScreenElementProp } from './fullscreen'
+enum Actions {
+  left,
+  right,
+  up,
+  down,
+  fire,
+  weaponNext,
+  weaponPrev,
+  toggleFS,
+  autoBreak,
+  pause
+}
+const pressActivated = new Set([
+  Actions.left,
+  Actions.right,
+  Actions.up,
+  Actions.down,
+  Actions.pause,
+  Actions.weaponNext,
+  Actions.weaponPrev,
+  Actions.fire
+]);
+const toggle = new Set([Actions.autoBreak, Actions.toggleFS]);
 
 interface KeyBindings {
-  [index: number]: string;
+  KeyA: Actions.left;
+  ArrowLeft: Actions.left;
+  KeyD: Actions.right;
+  ArrowRight: Actions.right;
+  KeyW: Actions.up;
+  ArrowUp: Actions.up;
+  KeyS: Actions.down;
+  ArrowDown: Actions.down;
+  Space: Actions.fire;
+  KeyQ: Actions.weaponPrev;
+  KeyE: Actions.weaponPrev;
+  Escape: Actions.toggleFS;
+  KeyR: Actions.autoBreak;
+  KeyF: Actions.toggleFS;
 }
+const keyBindings: KeyBindings = {
+  KeyA: Actions.left,
+  ArrowLeft: Actions.left,
+  KeyD: Actions.right,
+  ArrowRight: Actions.right,
+  KeyW: Actions.up,
+  ArrowUp: Actions.up,
+  KeyS: Actions.down,
+  ArrowDown: Actions.down,
+  Space: Actions.fire,
+  KeyQ: Actions.weaponPrev,
+  KeyE: Actions.weaponPrev,
+  Escape: Actions.toggleFS,
+  KeyR: Actions.autoBreak,
+  KeyF: Actions.toggleFS
+};
 
-interface Document {
-  [index: string]: any;
-}
-
-const a = 65
-const d = 68
-const w = 87
-const s = 83
-const q = 81
-const r = 82
-// const t = 84
-const space = 32
-const left = 37
-const right = 39
-const up = 38
-const down = 40
-const esc = 27
-const f = 70
-// const r = 82
-const e = 69
+const codeToAction = (code: KeyboardEvent["code"]): Actions | undefined => {
+  return keyBindings[code as keyof KeyBindings];
+};
 
 export default class Controls {
-  toggle: Set<string>
-  pressActivated: Set<string>
-  cfg: KeyBindings
-  [index: string]: any
-  touch = false
-  touchX = 0
-  touchY = 0
-  l = false
-  r = false
-  u = false
-  d = false
-  f = false
-  weaponNext = false
-  weaponPrev = false
-  toggleFS = false
-  p = false
-  autoBreak = false
+  touch = false;
+  touchX = 0;
+  touchY = 0;
+  left = false;
+  right = false;
+  up = false;
+  down = false;
+  fire = false;
+  weaponNext = false;
+  weaponPrev = false;
+  toggleFS = false;
+  pause = false;
+  autoBreak = false;
 
-  constructor () {
-    this.cfg = {}
-    this.cfg[a] = this.cfg[left] = 'l'
-    this.cfg[d] = this.cfg[right] = 'r'
-    this.cfg[w] = this.cfg[up] = 'u'
-    this.cfg[s] = this.cfg[down] = 'd'
-    this.cfg[space] = 'f'
-    this.cfg[q] = 'weaponPrev'
-    this.cfg[e] = 'weaponNext'
-    this.cfg[esc] = 'toggleFS'
-    this.cfg[r] = 'autoBreak'
-    this.cfg[f] = 'p'
-
-    this.pressActivated = new Set(['l', 'r', 'u', 'd', 'p', 'weaponNext', 'weaponPrev', 'f'])
-    this.toggle = new Set(['autoBreak', 'toggleFS'])
-  }
-
-  /* istanbul ignore next */
-  kd (e: KeyboardEvent): void {
-    const action = this.cfg[e.keyCode]
-    if (this.pressActivated.has(action)) {
-      this[action] = true
+  setAction(action: Actions, value: boolean): void {
+    switch (action) {
+      case Actions.up:
+        this.up = value;
+        break;
+      case Actions.right:
+        this.right = value;
+        break;
+      case Actions.down:
+        this.down = value;
+        break;
+      case Actions.left:
+        this.left = value;
+        break;
+      case Actions.fire:
+        this.fire = value;
+        break;
+      case Actions.weaponNext:
+        this.weaponNext = value;
+        break;
+      case Actions.weaponPrev:
+        this.weaponPrev = value;
+        break;
+      case Actions.pause:
+        this.pause = value;
+        break;
+      case Actions.toggleFS:
+        this.toggleFS = value;
+        break;
+      case Actions.autoBreak:
+        this.autoBreak = value;
+        break;
     }
   }
 
-  /* istanbul ignore next */
-  ku (e: KeyboardEvent): void {
-    const action = this.cfg[e.keyCode]
-    if (this.pressActivated.has(action)) {
-      this[action] = false
-    }
-
-    if (this.toggle.has(action)) {
-      this[action] = !this[action]
+  kd({ code }: KeyboardEvent): void {
+    const action = codeToAction(code);
+    if (action !== undefined && pressActivated.has(action)) {
+      this.setAction(action, true);
     }
   }
 
-  /* istanbul ignore next */
-  ts (e: TouchEvent): void {
-    // @ts-ignore: No idea how to handle dynamic props on document
-    if (document[fullScreenElementProp]) {
-      this.touch = true
-      e.preventDefault()
-    }
-  }
+  ku({ code }: KeyboardEvent): void {
+    const action = codeToAction(code);
+    if (action !== undefined) {
+      console.log(action);
+      if (pressActivated.has(action)) {
+        this.setAction(action, false);
+      }
 
-  /* istanbul ignore next */
-  tm (e: TouchEvent): void {
-    // @ts-ignore: No idea how to handle dynamic props on document
-    if (document[fullScreenElementProp]) {
-      var t = e.changedTouches[0]
-      this.touchX = t.pageX
-      this.touchY = t.pageY
-      this.f = true
-      e.preventDefault()
-    }
-  }
-
-  /* istanbul ignore next */
-  te (e: TouchEvent): void {
-    this.touch = false
-    this.f = false
-    // @ts-ignore: No idea how to handle dynamic props on document
-    if (document[fullScreenElementProp]) {
-      e.preventDefault()
+      if (toggle.has(action)) {
+        if (action === Actions.toggleFS) {
+          this.setAction(action, !this.toggleFS);
+        } else if (action === Actions.autoBreak) {
+          this.setAction(action, !this.toggleFS);
+        }
+      }
     }
   }
 }

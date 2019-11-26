@@ -1,55 +1,58 @@
-import Point2 from './Point2'
-import Vector2 from './Vector2'
-import Projectile from './Projectile'
-import Obj from './Object'
-const pSpeed = 100
+import Point2 from "./Point2";
+import Vector2 from "./Vector2";
+import Projectile from "./Projectile";
+import Obj from "./Object";
+const pSpeed = 100;
 
 export default class NPC extends Obj {
-  constructor (pos, stage) {
-    super(pos, stage)
-    this.lastFire = window.performance.now() - pSpeed
-    this.width = 10
+  constructor(pos, stage) {
+    super(pos, stage);
+    this.lastFire = window.performance.now() - pSpeed;
+    this.width = 10;
     this.geo.aabb.max = {
       x: this.width,
       y: this.width
-    }
+    };
 
-    this.path.moveTo(0, 0)
-    this.geo.points.push(new Point2(0, 0))
+    this.path.moveTo(0, 0);
+    this.geo.points.push(new Point2(0, 0));
 
-    this.path.lineTo(this.width, 0)
-    this.geo.points.push(new Point2(this.width, 0))
+    this.path.lineTo(this.width, 0);
+    this.geo.points.push(new Point2(this.width, 0));
 
-    this.path.lineTo(this.width / 2, this.width)
-    this.geo.points.push(new Point2(this.width / 2, this.width))
+    this.path.lineTo(this.width / 2, this.width);
+    this.geo.points.push(new Point2(this.width / 2, this.width));
 
-    this.path.closePath()
-    this.health = 100
+    this.path.closePath();
+    this.health = 100;
   }
 
-  ai () {
-    let found = false
+  ai() {
+    let found = false;
 
-    if (Math.abs(this.geo.pos.x - this.stage.craft.geo.pos.x) < this.stage.craft.width) {
-      this.firing = true
-      found = true
+    if (
+      Math.abs(this.geo.pos.x - this.stage.craft.geo.pos.x) <
+      this.stage.craft.width
+    ) {
+      this.firing = true;
+      found = true;
     }
 
     if (!found) {
-      this.firing = false
+      this.firing = false;
     }
   }
 
-  tick (now) {
-    var pdt = now - this.lastFire
+  tick(now) {
+    const pdt = now - this.lastFire;
 
-    this.ai()
+    this.ai();
 
     if (this.firing && pdt > pSpeed) {
-      let p = new Projectile(this, new Vector2(0, 4))
-      this.stage.items.push(p)
-      this.stage.spatialManager.registerObject(p)
-      this.lastFire = now
+      const p = new Projectile(this, new Vector2(0, 4));
+      this.stage.items.push(p);
+      this.stage.spatialManager.registerObject(p);
+      this.lastFire = now;
     }
   }
 }

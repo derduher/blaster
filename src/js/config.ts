@@ -1,10 +1,10 @@
-import Point2 from './Point2'
+import Point2 from "./Point2";
 
-export const fpsFilter = 75
-export const cellSize = 256
-export const nativeWidth = 1920
-export const nativeHeight = 1080
-export const tickLength = 16.7
+export const fpsFilter = 75;
+export const cellSize = 256;
+export const nativeWidth = 1920;
+export const nativeHeight = 1080;
+export const tickLength = 16.7;
 
 export const craft = {
   mass: 8,
@@ -22,12 +22,14 @@ export const craft = {
       new Point2(19, 20),
       new Point2(15, 20),
       new Point2(15, 44.95)
-    ], [
+    ],
+    [
       new Point2(49, 28.45),
       new Point2(49, 20),
       new Point2(53, 20),
       new Point2(53, 44.95)
-    ], [
+    ],
+    [
       new Point2(28, 10),
       new Point2(40, 10),
       new Point2(58, 66),
@@ -60,20 +62,20 @@ export const craft = {
       new Point2(32, 78)
     ]
   }
-}
+};
 
-export const defaultObjMass = 1
+export const defaultObjMass = 1;
 export const projectile = {
   mass: 0.1,
   width: 6,
   health: 10
-}
+};
 
 export const roid = {
   numPoints: 12,
   mass: 6e4,
   maxRadius: 28,
   minRadius: 4
-}
+};
 
-export const stagePadding = 3
+export const stagePadding = 3;
