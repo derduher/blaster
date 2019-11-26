@@ -18,8 +18,8 @@
     "pretty": "eslint --fix 'src/**/*.ts'",
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "test": "tsc && jest",
-    "upload": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --delete --profile derduher --cache-control 'public, max-age=31540000' --exclude '*.html'",
-    "upload-html": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --profile derduher --cache-control 'public, max-age=600' --exclude '*' --include '*.html'",
+    "upload": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --delete --cache-control 'public, max-age=31540000' --exclude '*.html'",
+    "upload-html": "aws s3 sync build/ s3://aws-website-blaster-2d3g4 --cache-control 'public, max-age=600' --exclude '*' --include '*.html'",
     "watch": "webpack --progress --watch --config webpack.dev.js"
   },
   "husky": {
