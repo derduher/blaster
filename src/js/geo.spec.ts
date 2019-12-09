@@ -293,6 +293,7 @@ describe("Geo", () => {
   });
 
   describe("pointsAtPos", () => {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     it("", () => {});
   });
 
