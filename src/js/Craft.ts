@@ -15,7 +15,7 @@ const {
   health,
   immortal,
   geo,
-  thruster
+  thruster,
 } = craft;
 
 const leftThrusterPath = pathFromPoints(thruster.left);
@@ -42,7 +42,7 @@ export default class Craft extends Obj {
       (Math.random() * 20) | 0,
       (Math.random() * 20) | 0,
       (Math.random() * 20) | 0,
-      (Math.random() * 20) | 0
+      (Math.random() * 20) | 0,
     ];
 
     this.originalPath = this.path = pathFromSegments(geo);

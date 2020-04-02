@@ -19,7 +19,7 @@ export default class Geo implements GenPos {
   public static getBBForPoints(points: Point2[]): BoundingBox {
     const iv: BoundingBox = {
       min: new Point2(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY),
-      max: new Point2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY)
+      max: new Point2(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY),
     };
     return points.reduce((aabb: BoundingBox, point: Point2): BoundingBox => {
       if (point.x < aabb.min.x) {
@@ -114,7 +114,7 @@ export default class Geo implements GenPos {
   public static getSegmentBB(a: Point2, b: Point2): Point2[] {
     return [
       new Point2(Math.min(a.x, b.x), Math.min(a.y, b.y)),
-      new Point2(Math.max(a.x, b.x), Math.max(a.y, b.y))
+      new Point2(Math.max(a.x, b.x), Math.max(a.y, b.y)),
     ];
   }
 

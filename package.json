@@ -25,9 +25,9 @@
   "husky": {
     "hooks": {
       "pre-commit": "sort-package-json && npm run pretty",
-      "pre-push": "npm test",
       "post-checkout": "npm i",
-      "post-merge": "npm i"
+      "post-merge": "npm i",
+      "pre-push": "npm test"
     }
   },
   "eslintConfig": {
@@ -37,6 +37,18 @@
       "jest": true,
       "node": true
     },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "jest",
+      "@typescript-eslint"
+    ],
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/eslint-recommended",
@@ -44,22 +56,7 @@
       "prettier/@typescript-eslint",
       "plugin:prettier/recommended"
     ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaVersion": 2018,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
-    "plugins": [
-      "jest",
-      "@typescript-eslint"
-    ],
     "rules": {
-      "no-case-declarations": 0,
-      "no-console": 0,
-      "no-unused-vars": 0,
       "indent": "off",
       "lines-between-class-members": [
         "error",
@@ -68,6 +65,9 @@
           "exceptAfterSingleLine": true
         }
       ],
+      "no-case-declarations": 0,
+      "no-console": 0,
+      "no-unused-vars": 0,
       "padding-line-between-statements": [
         "error",
         {
@@ -76,14 +76,14 @@
           "next": "multiline-expression"
         }
       ],
+      "@typescript-eslint/explicit-member-accessibility": "off",
       "@typescript-eslint/no-parameter-properties": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
           "args": "none"
         }
-      ],
-      "@typescript-eslint/explicit-member-accessibility": "off"
+      ]
     }
   },
   "jest": {

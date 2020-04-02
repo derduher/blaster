@@ -13,7 +13,7 @@ import {
   nativeWidth,
   nativeHeight,
   tickLength,
-  craft
+  craft,
 } from "./config";
 
 interface Debug {
@@ -33,7 +33,7 @@ const debug: Debug = {
   numUpdates: 0,
   itemL: 0,
   drawRate: 250,
-  lastRender: Number.POSITIVE_INFINITY
+  lastRender: Number.POSITIVE_INFINITY,
 };
 
 export default class Game {
@@ -415,7 +415,7 @@ export default class Game {
     }
 
     let culled = 0;
-    cullQ.sort(function(a, b): number {
+    cullQ.sort(function (a, b): number {
       if (a < b) {
         return -1;
       }

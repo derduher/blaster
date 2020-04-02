@@ -9,6 +9,6 @@ export interface GenPos {
 export default function genPos(width: number, height: number): GenPos {
   return {
     pos: new Point2(Math.random() * width, -100),
-    v: new Vector2(0.2 * (-0.5 + Math.random()), Math.random())
+    v: new Vector2(0.2 * (-0.5 + Math.random()), Math.random()),
   };
 }

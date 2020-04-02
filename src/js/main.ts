@@ -25,7 +25,7 @@ function init(): void {
       console.log("failed to register serviceworker", e);
     });
     registerEvents(registration, {
-      onUpdateReady: () => game.updateReady()
+      onUpdateReady: () => game.updateReady(),
     });
   }
 }

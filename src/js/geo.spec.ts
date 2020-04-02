@@ -11,7 +11,7 @@ describe("Geo", () => {
     geo3 = new Geo([
       new Point2(40, 40),
       new Point2(40, 50),
-      new Point2(50, 50)
+      new Point2(50, 50),
     ]);
   });
 

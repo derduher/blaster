@@ -8,7 +8,7 @@ enum Actions {
   weaponPrev,
   toggleFS,
   autoBreak,
-  pause
+  pause,
 }
 const pressActivated = new Set([
   Actions.left,
@@ -18,7 +18,7 @@ const pressActivated = new Set([
   Actions.pause,
   Actions.weaponNext,
   Actions.weaponPrev,
-  Actions.fire
+  Actions.fire,
 ]);
 const toggle = new Set([Actions.autoBreak, Actions.toggleFS]);
 
@@ -52,7 +52,7 @@ const keyBindings: KeyBindings = {
   KeyE: Actions.weaponPrev,
   Escape: Actions.toggleFS,
   KeyR: Actions.autoBreak,
-  KeyF: Actions.toggleFS
+  KeyF: Actions.toggleFS,
 };
 
 const codeToAction = (code: KeyboardEvent["code"]): Actions | undefined => {
