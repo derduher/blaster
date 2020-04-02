@@ -43,7 +43,7 @@ describe("Game", () => {
 
     it("updates the proportial to how long its been since last call", () => {
       game.main(when);
-      expect(game.updates).toHaveBeenCalledWith(1);
+      expect(game.updates).toHaveBeenCalledWith(0);
       game.main(when + 17);
       expect(game.updates).toHaveBeenNthCalledWith(2, 1);
       game.main(when + 32);
