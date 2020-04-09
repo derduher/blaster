@@ -123,7 +123,7 @@
     "eslint-plugin-prettier": "^3.1.2",
     "html-webpack-plugin": "^4.0.4",
     "html-webpack-template": "^6.2.0",
-    "husky": "^4.2.3",
+    "husky": "^4.2.4",
     "jasmine": "^3.5.0",
     "jest": "^25.2.7",
     "jest-canvas-mock": "^2.2.0",
