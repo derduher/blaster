@@ -124,7 +124,7 @@
     "html-webpack-plugin": "^4.3.0",
     "html-webpack-template": "^6.2.0",
     "husky": "^4.2.5",
-    "jasmine": "^3.5.0",
+    "jasmine": "^3.6.1",
     "jest": "^26.4.0",
     "jest-canvas-mock": "^2.2.0",
     "less": "^3.11.1",
