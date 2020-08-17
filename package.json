@@ -127,7 +127,7 @@
     "jasmine": "^3.6.1",
     "jest": "^26.4.0",
     "jest-canvas-mock": "^2.2.0",
-    "less": "^3.11.1",
+    "less": "^3.12.2",
     "less-loader": "^5.0.0",
     "prettier": "^2.0.5",
     "serviceworker-webpack-plugin": "^1.0.1",
