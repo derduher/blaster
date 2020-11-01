@@ -1,10 +1,10 @@
 import "../css/normalize.min.css";
 import "../css/main.less";
 import Game from "./Game";
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import runtime from "serviceworker-webpack-plugin/lib/runtime";
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import registerEvents from "serviceworker-webpack-plugin/lib/browser/registerEvents";
 
