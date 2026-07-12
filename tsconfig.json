@@ -14,7 +14,8 @@
 		"isolatedModules": true,
     "esModuleInterop": true,
     "allowJs": true,
-    "lib": ["dom", "esnext"]
+    "lib": ["dom", "esnext"],
+    "types": ["jest"]
   },
   "include": ["src/js/**/*"],
   "exclude": ["node_modules", "src/js/sw.js", "**/*.spec.*"]
