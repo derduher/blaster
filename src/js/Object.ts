@@ -19,7 +19,7 @@ export default class Obj {
     pos: Point2,
     public stage: Stage,
     points: Point2[],
-    v?: Vector2
+    v?: Vector2,
   ) {
     this.mass = defaultObjMass;
     this.geo = new Geo(points, pos, v);
@@ -58,7 +58,7 @@ export default class Obj {
   }
 
   /* istanbul ignore next */
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   public tick(now: number): void {}
 
   public intersects(o: Obj, i: number, cullQ: number[]): void {

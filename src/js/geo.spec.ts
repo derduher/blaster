@@ -26,7 +26,7 @@ describe("Geo", () => {
   describe("distanceToObj", () => {
     it("unwraps passed in obj to its position", () => {
       const obj = generateObj();
-      spyOn(geo, "distanceTo");
+      jest.spyOn(geo, "distanceTo");
       geo.distanceToObj(obj);
       expect(geo.distanceTo).toHaveBeenCalledWith(obj.geo.pos);
     });
@@ -57,13 +57,13 @@ describe("Geo", () => {
   describe("isPointOnLine", () => {
     it("returns true when provided point is on line", () => {
       expect(
-        Geo.isPointOnLine(new Point2(), new Point2(1, 1), new Point2(2, 2))
+        Geo.isPointOnLine(new Point2(), new Point2(1, 1), new Point2(2, 2)),
       ).toBeTruthy();
     });
 
     it("returns false when provided point is not on line", () => {
       expect(
-        Geo.isPointOnLine(new Point2(), new Point2(5), new Point2(3, 4))
+        Geo.isPointOnLine(new Point2(), new Point2(5), new Point2(3, 4)),
       ).toBeFalsy();
     });
   });
@@ -71,17 +71,29 @@ describe("Geo", () => {
   describe("isPointRightOfLine", () => {
     it("returns true when provided point right of line", () => {
       expect(
-        Geo.isPointRightOfLine(new Point2(), new Point2(1, 1), new Point2(2, 1))
+        Geo.isPointRightOfLine(
+          new Point2(),
+          new Point2(1, 1),
+          new Point2(2, 1),
+        ),
       ).toBeTruthy();
     });
 
     it("returns false when provided point is left or on line", () => {
       expect(
-        Geo.isPointRightOfLine(new Point2(), new Point2(1, 1), new Point2(2, 2))
+        Geo.isPointRightOfLine(
+          new Point2(),
+          new Point2(1, 1),
+          new Point2(2, 2),
+        ),
       ).toBeFalsy();
 
       expect(
-        Geo.isPointRightOfLine(new Point2(), new Point2(1, 1), new Point2(1, 2))
+        Geo.isPointRightOfLine(
+          new Point2(),
+          new Point2(1, 1),
+          new Point2(1, 2),
+        ),
       ).toBeFalsy();
     });
   });
@@ -93,8 +105,8 @@ describe("Geo", () => {
           new Point2(),
           new Point2(2, 2),
           new Point2(1, 1),
-          new Point2(1, 2)
-        )
+          new Point2(1, 2),
+        ),
       ).toBeTruthy();
     });
 
@@ -104,8 +116,8 @@ describe("Geo", () => {
           new Point2(1, 0),
           new Point2(1, 2),
           new Point2(0, 1),
-          new Point2(2, 1)
-        )
+          new Point2(2, 1),
+        ),
       ).toBeTruthy();
     });
 
@@ -117,8 +129,8 @@ describe("Geo", () => {
           new Point2(1, 0),
           new Point2(1, 2),
           new Point2(0, 3),
-          new Point2(2, 3)
-        )
+          new Point2(2, 3),
+        ),
       ).toBeTruthy();
 
       //  |
@@ -129,8 +141,8 @@ describe("Geo", () => {
           new Point2(1, 0),
           new Point2(1, 2),
           new Point2(1, 3),
-          new Point2(1, 4)
-        )
+          new Point2(1, 4),
+        ),
       ).toBeTruthy();
     });
 
@@ -141,8 +153,8 @@ describe("Geo", () => {
           new Point2(1, 0),
           new Point2(1, 2),
           new Point2(2, 0),
-          new Point2(2, 2)
-        )
+          new Point2(2, 2),
+        ),
       ).toBeFalsy();
     });
   });
@@ -164,8 +176,8 @@ describe("Geo", () => {
           new Point2(),
           new Point2(5, 5),
           new Point2(3, 3),
-          new Point2(6, 6)
-        )
+          new Point2(6, 6),
+        ),
       ).toBeTruthy();
 
       expect(
@@ -173,8 +185,8 @@ describe("Geo", () => {
           new Point2(),
           new Point2(5, 5),
           new Point2(5, 5),
-          new Point2(6, 6)
-        )
+          new Point2(6, 6),
+        ),
       ).toBeTruthy();
 
       // inside
@@ -183,8 +195,8 @@ describe("Geo", () => {
           new Point2(),
           new Point2(5, 5),
           new Point2(1, 1),
-          new Point2(3, 3)
-        )
+          new Point2(3, 3),
+        ),
       ).toBeTruthy();
     });
 
@@ -194,8 +206,8 @@ describe("Geo", () => {
           new Point2(),
           new Point2(5, 5),
           new Point2(10, 10),
-          new Point2(100, 100)
-        )
+          new Point2(100, 100),
+        ),
       ).toBeFalsy();
 
       expect(
@@ -203,8 +215,8 @@ describe("Geo", () => {
           new Point2(),
           new Point2(5, 5),
           new Point2(10, 0),
-          new Point2(100, 100)
-        )
+          new Point2(100, 100),
+        ),
       ).toBeFalsy();
     });
   });
@@ -216,8 +228,8 @@ describe("Geo", () => {
           new Point2(1, 0),
           new Point2(1, 2),
           new Point2(0, 1),
-          new Point2(2, 1)
-        )
+          new Point2(2, 1),
+        ),
       ).toBeTruthy();
     });
 
@@ -227,8 +239,8 @@ describe("Geo", () => {
           new Point2(),
           new Point2(2, 2),
           new Point2(1, 1),
-          new Point2(1, 2)
-        )
+          new Point2(1, 2),
+        ),
       ).toBeTruthy();
     });
 
@@ -240,8 +252,8 @@ describe("Geo", () => {
           new Point2(1, 0),
           new Point2(1, 2),
           new Point2(0, 3),
-          new Point2(2, 3)
-        )
+          new Point2(2, 3),
+        ),
       ).toBeFalsy();
 
       //  |
@@ -252,8 +264,8 @@ describe("Geo", () => {
           new Point2(1, 0),
           new Point2(1, 2),
           new Point2(1, 3),
-          new Point2(1, 4)
-        )
+          new Point2(1, 4),
+        ),
       ).toBeFalsy();
     });
 
@@ -268,8 +280,8 @@ describe("Geo", () => {
           new Point2(0, 5),
           new Point2(5, 0),
           new Point2(4, 3),
-          new Point2(6, 3)
-        )
+          new Point2(6, 3),
+        ),
       ).toBeFalsy();
 
       expect(
@@ -277,8 +289,8 @@ describe("Geo", () => {
           new Point2(0, 5),
           new Point2(5, 0),
           new Point2(4, 3),
-          new Point2(5, 3)
-        )
+          new Point2(5, 3),
+        ),
       ).toBeFalsy();
 
       expect(
@@ -286,14 +298,13 @@ describe("Geo", () => {
           new Point2(0, 5),
           new Point2(5, 0),
           new Point2(4, 3),
-          new Point2(4.5, 3)
-        )
+          new Point2(4.5, 3),
+        ),
       ).toBeFalsy();
     });
   });
 
   describe("pointsAtPos", () => {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     it("", () => {});
   });
 
@@ -311,7 +322,7 @@ describe("Geo", () => {
     it("returns true for a point inside another geometry", () => {
       const otherGeo = new Geo(
         [new Point2(), new Point2(1, 1)],
-        new Point2(5, 5)
+        new Point2(5, 5),
       );
       otherGeo.treatAsPoint = true;
       geo.points.push(new Point2(10, 0));
@@ -325,7 +336,7 @@ describe("Geo", () => {
       // |/ . <--- point
       const otherGeo = new Geo(
         [new Point2(), new Point2(1, 1)],
-        new Point2(9, 1)
+        new Point2(9, 1),
       );
       otherGeo.treatAsPoint = true;
       expect(geo.aabbIntersects(otherGeo)).toBe(true);
@@ -339,7 +350,7 @@ describe("Geo", () => {
       // |/ o <--- other geo
       const otherGeo = new Geo(
         [new Point2(), new Point2(0, 2), new Point2(2, 2)],
-        new Point2(9, 1)
+        new Point2(9, 1),
       );
       expect(geo.aabbIntersects(otherGeo)).toBe(true);
       expect(geo.intersectsWith(otherGeo)).toBe(false);

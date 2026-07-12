@@ -11,7 +11,7 @@ export default class Geo implements GenPos {
     public points: Point2[],
     public pos = new Point2(),
     public v = new Vector2(),
-    public acc = new Vector2()
+    public acc = new Vector2(),
   ) {
     this.aabb = Geo.getBBForPoints(points);
   }
@@ -45,7 +45,7 @@ export default class Geo implements GenPos {
   // A^2 + B^2 = C^2
   public distanceTo(pos: Point2): number {
     return Math.sqrt(
-      Math.pow(pos.x - this.pos.x, 2) + Math.pow(pos.y - this.pos.y, 2)
+      Math.pow(pos.x - this.pos.x, 2) + Math.pow(pos.y - this.pos.y, 2),
     );
   }
 
@@ -102,7 +102,7 @@ export default class Geo implements GenPos {
     aa: Point2,
     ab: Point2,
     ba: Point2,
-    bb: Point2
+    bb: Point2,
   ): boolean {
     return (
       Geo.isPointOnLine(aa, ab, ba) ||
@@ -122,7 +122,7 @@ export default class Geo implements GenPos {
     aa: Point2,
     ab: Point2,
     ba: Point2,
-    bb: Point2
+    bb: Point2,
   ): boolean {
     const firstbb = Geo.getSegmentBB(aa, ab);
     const secondbb = Geo.getSegmentBB(ba, bb);
@@ -138,7 +138,7 @@ export default class Geo implements GenPos {
     aa: Point2,
     ab: Point2,
     ba: Point2,
-    bb: Point2
+    bb: Point2,
   ): boolean {
     return (
       Geo.segmentsBBIntersect(aa, ab, ba, bb) &&
@@ -178,7 +178,7 @@ export default class Geo implements GenPos {
       }
       point = new Point2(
         point.pos.x + point.aabb.max.x / 2,
-        point.pos.y + point.aabb.max.y / 2
+        point.pos.y + point.aabb.max.y / 2,
       );
       // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
       for (let i = 0, prev = points.length - 1; i < points.length; prev = i++) {
@@ -209,7 +209,7 @@ export default class Geo implements GenPos {
               points[i],
               points[prev],
               opoints[oi],
-              opoints[oprev]
+              opoints[oprev],
             )
           ) {
             collision = true;

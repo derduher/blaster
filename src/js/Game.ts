@@ -67,7 +67,7 @@ export default class Game {
     const spatialManager = new SpatialManager<Obj>(
       nativeWidth,
       nativeHeight,
-      cellSize
+      cellSize,
     );
     this.stage = new Stage(canvas, spatialManager);
     this.started = false;
@@ -92,8 +92,10 @@ export default class Game {
       this.ctrl,
       new Point2(
         document.documentElement.clientWidth / 2 - craft.width / 2,
-        document.documentElement.clientHeight - craft.width - this.stage.padding
-      )
+        document.documentElement.clientHeight -
+          craft.width -
+          this.stage.padding,
+      ),
     );
     this.stage.spatialManager.registerObject(this.craft, this.craft.geo);
     this.stage.items.push(this.craft);
@@ -140,7 +142,6 @@ export default class Game {
     const nextTick = this.lastTick + this.tickLength;
     let numTicks = 0;
     let ud = false;
-    let thisFrameFPS = 60.1;
 
     this.stopMain = window.requestAnimationFrame(this.main.bind(this));
 
@@ -148,7 +149,7 @@ export default class Game {
       ud = tFrame - this.debug.lastRender > this.debug.drawRate;
 
       if (ud) {
-        thisFrameFPS = 1000 / (tFrame - this.lastRender);
+        const thisFrameFPS = 1000 / (tFrame - this.lastRender);
         this.debug.fps += (thisFrameFPS - this.debug.fps) / fpsFilter;
         this.debug.lastRender = tFrame;
         this.debug.itemL = this.stage.items.length;
@@ -204,11 +205,6 @@ export default class Game {
     this.stage.ymax = nativeHeight - this.stage.padding;
 
     this.hatches = new Path2D();
-    const w = cellSize;
-    let max = this.stage.canvas.width / w;
-    if (this.stage.canvas.height / w > max) {
-      max = this.stage.canvas.height / w;
-    }
     // this.debug.text++
     // this.stage.items = []
     // for (var i=0; i<8; i++) {
@@ -219,11 +215,11 @@ export default class Game {
     this.stage.spatialManager = new SpatialManager(
       nativeWidth,
       nativeHeight,
-      cellSize
+      cellSize,
     );
 
     this.stage.items.forEach((i): void =>
-      this.stage.spatialManager.registerObject(i, i.geo)
+      this.stage.spatialManager.registerObject(i, i.geo),
     );
     if (this.started && !this.stopMain) {
       this.draw();
@@ -260,7 +256,7 @@ export default class Game {
         0,
         0,
         this.stage.canvas.width,
-        this.stage.canvas.height
+        this.stage.canvas.height,
       );
     }
     if (this.ctx) {
@@ -270,7 +266,7 @@ export default class Game {
     const deviceHeight = this.stage.canvas.height;
     const scaleFitNative = Math.min(
       deviceWidth / nativeWidth,
-      deviceHeight / nativeHeight
+      deviceHeight / nativeHeight,
     );
     // const scaleFillNative = Math.max(deviceWidth / nativeWidth, deviceHeight / nativeHeight)
     const scale = scaleFitNative;
@@ -282,7 +278,7 @@ export default class Game {
         0,
         scale,
         (deviceWidth / 2) | 0,
-        (deviceHeight / 2) | 0
+        (deviceHeight / 2) | 0,
       );
       const offsetDeviceTop = -(deviceHeight / scale) / 2;
       const offsetDeviceLeft = -(deviceWidth / scale) / 2;
@@ -304,7 +300,7 @@ export default class Game {
         this.ctx.fillText(
           this.debug.text,
           this.stage.canvas.width / 2,
-          this.stage.canvas.height / 2
+          this.stage.canvas.height / 2,
         );
 
         this.ctx.stroke(this.hatches);
@@ -312,14 +308,13 @@ export default class Game {
         this.ctx.lineWidth = 3;
         this.hitboxes.forEach(
           (xy: Point2): void | null =>
-            this.ctx && this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize)
+            this.ctx && this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize),
         );
         this.ctx.restore();
       }
     }
   }
 
-  /* eslint-disable no-mixed-operators */
   // I don't remember what the intended order of ops is on this
   boundNTick(i: Obj, tickTime: number): boolean {
     i.tick(tickTime);
@@ -358,7 +353,6 @@ export default class Game {
     }
     return cull;
   }
-  /* eslint-enable no-mixed-operators */
 
   // o other object
   testIntersect(item: Obj, i: number, o: Obj, cullQ: number[]): void {
@@ -376,8 +370,8 @@ export default class Game {
       this.stage.items.push(
         new Roid(
           roidPosFactory(this.stage.canvas.width, this.stage.canvas.height),
-          this.stage
-        )
+          this.stage,
+        ),
       );
     }
 
@@ -408,7 +402,7 @@ export default class Game {
       // }
       // }
       for (const o of this.stage.spatialManager.getNearby(
-        this.stage.items[i].geo
+        this.stage.items[i].geo,
       )) {
         this.testIntersect(this.stage.items[i], i, o, cullQ);
       }

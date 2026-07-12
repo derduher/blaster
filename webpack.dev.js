@@ -1,5 +1,5 @@
 const webpack = require('webpack')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const common = require('./webpack.common.js')
 
 module.exports = merge(common, {
@@ -9,7 +9,7 @@ module.exports = merge(common, {
     new webpack.HotModuleReplacementPlugin()
   ],
   devServer: {
-    contentBase: './build',
+    static: './build',
     hot: true,
     compress: true
   }

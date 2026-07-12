@@ -4,7 +4,7 @@ import Obj from "./Object";
 import SpatialManager from "spatial-hashmap";
 
 export function generateStage(
-  spatial = new SpatialManager<Obj>(1000, 1000, 10)
+  spatial = new SpatialManager<Obj>(1000, 1000, 10),
 ): Stage {
   return new Stage(document.createElement("canvas"), spatial);
 }

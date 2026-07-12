@@ -1,7 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const ServiceWorkerWebpackPlugin = require("serviceworker-webpack-plugin");
+const { InjectManifest } = require("workbox-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
@@ -13,10 +13,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "src/index.html"
     }),
-    new ServiceWorkerWebpackPlugin({
-      entry: "./src/js/sw.js"
+    new InjectManifest({
+      swSrc: "./src/js/sw.js",
+      swDest: "sw.js"
     }),
-    new CopyWebpackPlugin([{ from: "static" }])
+    new CopyWebpackPlugin({ patterns: [{ from: "static" }] })
   ],
   recordsOutputPath: path.join(__dirname, "build", "records.json"),
   optimization: {
@@ -78,8 +79,9 @@ module.exports = {
           {
             loader: "less-loader",
             options: {
-              strictMath: true,
-              noIeCompat: true
+              lessOptions: {
+                strictMath: true
+              }
             }
           }
         ]

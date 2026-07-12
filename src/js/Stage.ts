@@ -12,7 +12,7 @@ export default class Stage {
   public ymax: number;
   public constructor(
     public canvas: HTMLCanvasElement,
-    public spatialManager: SpatialManager<Obj>
+    public spatialManager: SpatialManager<Obj>,
   ) {
     this.items = [];
     this.padding = stagePadding;

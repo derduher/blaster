@@ -1,12 +1,32 @@
 import "../css/normalize.min.css";
 import "../css/main.less";
 import Game from "./Game";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import runtime from "serviceworker-webpack-plugin/lib/runtime";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import registerEvents from "serviceworker-webpack-plugin/lib/browser/registerEvents";
+
+async function registerServiceWorker(onUpdateReady: () => void): Promise<void> {
+  const registration = await navigator.serviceWorker
+    .register("/sw.js")
+    .catch((e: unknown) => {
+      console.log("failed to register serviceworker", e);
+      return undefined;
+    });
+  if (!registration) {
+    return;
+  }
+  if (registration.waiting) {
+    onUpdateReady();
+  }
+  registration.addEventListener("updatefound", () => {
+    const installing = registration.installing;
+    installing?.addEventListener("statechange", () => {
+      if (
+        installing.state === "installed" &&
+        navigator.serviceWorker.controller
+      ) {
+        onUpdateReady();
+      }
+    });
+  });
+}
 
 let game: Game;
 function init(): void {
@@ -21,12 +41,7 @@ function init(): void {
     }
   });
   if ("serviceWorker" in navigator) {
-    const registration = runtime.register().catch((e: any) => {
-      console.log("failed to register serviceworker", e);
-    });
-    registerEvents(registration, {
-      onUpdateReady: () => game.updateReady(),
-    });
+    void registerServiceWorker(() => game.updateReady());
   }
 }
 

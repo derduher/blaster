@@ -14,7 +14,7 @@ describe("Roid", () => {
   it("generates random points", () => {
     expect(roid.geo.points.length).toBeGreaterThan(2);
     expect(new Roid(genPos(1000, 1000), stage).geo.points[0].x).not.toBe(
-      roid.geo.points[0].x
+      roid.geo.points[0].x,
     );
   });
 });

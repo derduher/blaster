@@ -37,7 +37,7 @@ function generatePoints(): Point2[] {
   const points: Point2[] = [];
   points.push(new Point2(startX, startY));
   let i = 1;
-  let a = 0;
+  let a: number;
   const inc = (2 * Math.PI) / numPoints;
   let x;
   let y;

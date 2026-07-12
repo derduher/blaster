@@ -15,7 +15,7 @@ export default class Projectile extends Obj {
     pos: Point2,
     v: Vector2,
     stage: Stage,
-    diameter = defaultWidth
+    diameter = defaultWidth,
   ) {
     super(pos, stage, [new Point2()], v);
     this.diameter = diameter;
@@ -37,7 +37,7 @@ export default class Projectile extends Obj {
       this.diameter / 2,
       this.diameter / 2,
       0,
-      2 * Math.PI
+      2 * Math.PI,
     );
     ctx.fill();
     ctx.stroke();

@@ -131,7 +131,7 @@ export default class Craft extends Obj {
 
   public prevConfiguration(): void {
     this.currentWeapon = Math.abs(
-      this.currentWeapon - (1 % this.weaponConfigurations.length)
+      this.currentWeapon - (1 % this.weaponConfigurations.length),
     );
   }
 
@@ -139,7 +139,7 @@ export default class Craft extends Obj {
     const size = this.weaponConfigurations[this.currentWeapon];
     const pos = new Point2(
       this.geo.pos.x + this.geo.aabb.max.x / 2 + this.geo.v.x + 10 - size / 2,
-      this.geo.pos.y - size + 5
+      this.geo.pos.y - size + 5,
     );
 
     const velY = Math.sqrt((2 * barrelLength * force) / size);

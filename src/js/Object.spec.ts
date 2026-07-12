@@ -9,7 +9,7 @@ describe("Object", () => {
   beforeEach(() => {
     stage = new Stage(
       document.createElement("canvas"),
-      new SpatialManager(1000, 1000, 10)
+      new SpatialManager(1000, 1000, 10),
     );
     o = generateObj(stage);
   });
