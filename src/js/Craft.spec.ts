@@ -44,7 +44,7 @@ describe("Craft", () => {
 
   describe("fire", () => {
     it("adds the new projectile to the spatialManager", () => {
-      jest.spyOn(craft.stage.spatialManager, "registerObject");
+      vi.spyOn(craft.stage.spatialManager, "registerObject");
       craft.fire(1);
       expect(craft.stage.spatialManager.registerObject).toHaveBeenCalled();
     });

@@ -3,20 +3,21 @@
     "sourceMap": true,
     "outDir": "./dist/",
     "noEmit": true,
+    "skipLibCheck": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
     "strict": true,
     "module": "esnext",
     "target": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "jsx": "react",
 		"isolatedModules": true,
     "esModuleInterop": true,
     "allowJs": true,
     "lib": ["dom", "esnext"],
-    "types": ["jest"]
+    "types": ["vite/client", "vite-plugin-pwa/client", "vitest/globals"]
   },
   "include": ["src/js/**/*"],
-  "exclude": ["node_modules", "src/js/sw.js", "**/*.spec.*"]
+  "exclude": ["node_modules", "**/*.spec.*"]
 }

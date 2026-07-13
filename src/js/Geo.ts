@@ -60,18 +60,22 @@ export default class Geo implements GenPos {
     let top;
     let bottom;
     if (this.pos.x + this.aabb.min.x < b.pos.x + b.aabb.min.x) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       left = this;
       right = b;
     } else {
       left = b;
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       right = this;
     }
 
     if (this.pos.y + this.aabb.min.y < b.pos.y + b.aabb.min.y) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       top = this;
       bottom = b;
     } else {
       top = b;
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       bottom = this;
     }
 
@@ -168,6 +172,7 @@ export default class Geo implements GenPos {
       // o.highlight('green')
       // game._pause()
       if (this.treatAsPoint) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         point = this;
         polyPos = ogeo.pos;
         points = ogeo.points;

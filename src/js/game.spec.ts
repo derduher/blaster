@@ -17,7 +17,7 @@ describe("Game", () => {
     );
     o = generateObj(stage);
     game = new Game(document.createElement("canvas"));
-    when = game.lastTick;
+    when = performance.now();
   });
 
   it("instantiates", () => {
@@ -26,9 +26,11 @@ describe("Game", () => {
 
   describe("main", () => {
     beforeEach(() => {
-      jest.spyOn(window, "requestAnimationFrame");
-      jest.spyOn(game, "draw");
-      jest.spyOn(game, "updates");
+      vi.spyOn(window, "requestAnimationFrame");
+      vi.spyOn(game, "draw");
+      vi.spyOn(game, "updates").mockImplementation(() => {
+        /* isolate main()'s tick-count computation from real tick side effects */
+      });
     });
 
     it("schedules its next call", () => {
@@ -46,7 +48,7 @@ describe("Game", () => {
       expect(game.updates).toHaveBeenCalledWith(0);
       game.main(when + 17);
       expect(game.updates).toHaveBeenNthCalledWith(2, 1);
-      game.main(when + 51);
+      game.main(when + 32);
       expect(game.updates).toHaveBeenNthCalledWith(3, 2);
     });
   });
@@ -64,7 +66,7 @@ describe("Game", () => {
     it("culls elements when they go out of bounds", () => {
       o.geo.v.x = -100;
       o.geo.v.y = -100;
-      jest.spyOn(game.stage.spatialManager, "registerObject");
+      vi.spyOn(game.stage.spatialManager, "registerObject");
       expect(game.boundNTick(o, 1)).toBe(true);
       expect(o.geo.v.x).toBe(-100);
       expect(o.geo.v.y).toBe(-100);
@@ -82,15 +84,15 @@ describe("Game", () => {
 
   describe("update", () => {
     it("generates roids", () => {
-      jest.spyOn(Math, "random").mockReturnValue(1);
-      jest.spyOn(game, "boundNTick");
+      vi.spyOn(Math, "random").mockReturnValue(1);
+      vi.spyOn(game, "boundNTick");
       game.update(1);
       expect(game.stage.items[1] instanceof Roid).toBe(true);
     });
 
     it("culls objects that are out of bounds", () => {
-      jest.spyOn(Math, "random").mockReturnValue(1);
-      jest.spyOn(game, "boundNTick").mockReturnValue(true);
+      vi.spyOn(Math, "random").mockReturnValue(1);
+      vi.spyOn(game, "boundNTick").mockReturnValue(true);
       game.update(1);
       expect(game.stage.items.length).toBe(0);
     });
@@ -99,11 +101,9 @@ describe("Game", () => {
       const nearby = new Set();
       nearby.add(o);
       nearby.add(generateObj(stage));
-      jest.spyOn(game, "boundNTick");
-      jest.spyOn(game, "testIntersect");
-      jest
-        .spyOn(game.stage.spatialManager, "getNearby")
-        .mockReturnValue(nearby);
+      vi.spyOn(game, "boundNTick");
+      vi.spyOn(game, "testIntersect");
+      vi.spyOn(game.stage.spatialManager, "getNearby").mockReturnValue(nearby);
       game.update(1);
       expect(game.testIntersect).toHaveBeenCalled();
     });
