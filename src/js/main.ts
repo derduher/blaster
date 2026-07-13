@@ -1,32 +1,7 @@
 import "../css/normalize.min.css";
 import "../css/main.less";
 import Game from "./Game";
-
-async function registerServiceWorker(onUpdateReady: () => void): Promise<void> {
-  const registration = await navigator.serviceWorker
-    .register("/sw.js")
-    .catch((e: unknown) => {
-      console.log("failed to register serviceworker", e);
-      return undefined;
-    });
-  if (!registration) {
-    return;
-  }
-  if (registration.waiting) {
-    onUpdateReady();
-  }
-  registration.addEventListener("updatefound", () => {
-    const installing = registration.installing;
-    installing?.addEventListener("statechange", () => {
-      if (
-        installing.state === "installed" &&
-        navigator.serviceWorker.controller
-      ) {
-        onUpdateReady();
-      }
-    });
-  });
-}
+import { registerSW } from "virtual:pwa-register";
 
 let game: Game;
 function init(): void {
@@ -41,7 +16,14 @@ function init(): void {
     }
   });
   if ("serviceWorker" in navigator) {
-    void registerServiceWorker(() => game.updateReady());
+    registerSW({
+      onNeedRefresh() {
+        game.updateReady();
+      },
+      onRegisterError(error: unknown) {
+        console.log("failed to register serviceworker", error);
+      },
+    });
   }
 }
 

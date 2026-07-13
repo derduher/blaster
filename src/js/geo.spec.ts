@@ -26,7 +26,7 @@ describe("Geo", () => {
   describe("distanceToObj", () => {
     it("unwraps passed in obj to its position", () => {
       const obj = generateObj();
-      jest.spyOn(geo, "distanceTo");
+      vi.spyOn(geo, "distanceTo");
       geo.distanceToObj(obj);
       expect(geo.distanceTo).toHaveBeenCalledWith(obj.geo.pos);
     });

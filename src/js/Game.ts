@@ -142,6 +142,7 @@ export default class Game {
     const nextTick = this.lastTick + this.tickLength;
     let numTicks = 0;
     let ud = false;
+    let thisFrameFPS: number;
 
     this.stopMain = window.requestAnimationFrame(this.main.bind(this));
 
@@ -149,7 +150,7 @@ export default class Game {
       ud = tFrame - this.debug.lastRender > this.debug.drawRate;
 
       if (ud) {
-        const thisFrameFPS = 1000 / (tFrame - this.lastRender);
+        thisFrameFPS = 1000 / (tFrame - this.lastRender);
         this.debug.fps += (thisFrameFPS - this.debug.fps) / fpsFilter;
         this.debug.lastRender = tFrame;
         this.debug.itemL = this.stage.items.length;
