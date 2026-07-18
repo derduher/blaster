@@ -40,3 +40,13 @@ Everything lives in `src/js/`. Composition: `Game` wires input and drives `World
 - Husky 9 hooks: pre-commit runs lint-staged (eslint --fix + sort-package-json, re-staged), pre-push runs `npm test`.
 - CI: `.github/workflows/ci.yml` tests on every push/PR; the deploy job runs only on master with a concurrency guard.
 - Never commit secrets (the Codecov token was removed; coverage is vitest-only now).
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs live as GitHub issues in `derduher/blaster` (via the `gh` CLI). See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
