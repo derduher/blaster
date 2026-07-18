@@ -8,26 +8,39 @@ const { mass, width: defaultWidth, health } = projectile;
 export default class Projectile extends Obj {
   public boundToCanvas = false;
   private diameter: number;
+  private bounce: boolean;
   public mass = mass; // Gg
   public health = health;
-  // why is this being handed a pre crafted geometry?
   public constructor(
     pos: Point2,
     v: Vector2,
     stage: Stage,
     diameter = defaultWidth,
+    opts: { bounce?: boolean } = {},
   ) {
-    super(pos, stage, [new Point2()], v);
+    // the projectile is drawn as a circle; its bounding square is enough
+    // geometry for collision, since it is treated as its center point
+    super(
+      pos,
+      stage,
+      [
+        new Point2(0, 0),
+        new Point2(diameter, 0),
+        new Point2(diameter, diameter),
+        new Point2(0, diameter),
+      ],
+      v,
+    );
     this.diameter = diameter;
-    this.geo.aabb.max.x = this.diameter;
-    this.geo.aabb.max.y = this.diameter;
+    this.bounce = opts.bounce ?? projectile.bounce;
     this.geo.treatAsPoint = true;
   }
 
   /* istanbul ignore next */
   public draw(ctx: CanvasRenderingContext2D /*, debug = false */): void {
     ctx.translate(this.geo.pos.x, this.geo.pos.y);
-    ctx.fillStyle = "rgb(255,255,255)";
+    // bouncing shots get a distinct color so players can tell them apart
+    ctx.fillStyle = this.bounce ? "rgb(80,200,255)" : "rgb(255,255,255)";
     if (this.isHighlighted) {
       ctx.fillStyle = this.highlightColor;
     }
@@ -41,23 +54,43 @@ export default class Projectile extends Obj {
     );
     ctx.fill();
     ctx.stroke();
-    // if (debug) {
-    // ctx.font = '18px roboto'
-    // ctx.fillText(`${this.geo.pos.x},${this.geo.pos.y}`, 100, 10)
-    // }
-    // if (this.isDisplayCell) {
-    // ctx.font = '24px roboto'
-    // ctx.fillText(window.spatial.getIdForObject(this.geo).join(', '), 10, 0)
-    // }
   }
 
-  /* istanbul ignore next */
-  public displayCell(): void {
-    this.isDisplayCell = true;
-  }
-
-  public intersects(o: Obj, i: number, cullQ: number[]): void {
+  public intersects(o: Obj): void {
     o.health -= 10;
-    super.intersects(o, i, cullQ);
+    if (this.bounce) {
+      this.reflectOff(o);
+      this.highlight();
+      o.highlight();
+      return;
+    }
+    super.intersects(o);
+  }
+
+  // elastic ricochet: reflect velocity across the line between the two
+  // centers, but only while approaching, so an overlapping projectile
+  // doesn't flip back and forth on consecutive ticks
+  private reflectOff(o: Obj): void {
+    const nx =
+      this.geo.pos.x +
+      (this.geo.aabb.min.x + this.geo.aabb.max.x) / 2 -
+      (o.geo.pos.x + (o.geo.aabb.min.x + o.geo.aabb.max.x) / 2);
+    const ny =
+      this.geo.pos.y +
+      (this.geo.aabb.min.y + this.geo.aabb.max.y) / 2 -
+      (o.geo.pos.y + (o.geo.aabb.min.y + o.geo.aabb.max.y) / 2);
+    const len = Math.sqrt(nx * nx + ny * ny);
+    if (len === 0) {
+      // dead-center overlap has no meaningful normal; just turn around
+      this.geo.v.x *= -1;
+      this.geo.v.y *= -1;
+      return;
+    }
+    const dot = (this.geo.v.x * nx + this.geo.v.y * ny) / len;
+    if (dot >= 0) {
+      return;
+    }
+    this.geo.v.x -= (2 * dot * nx) / len;
+    this.geo.v.y -= (2 * dot * ny) / len;
   }
 }

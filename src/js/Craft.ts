@@ -28,6 +28,8 @@ const negDir = speed * -1;
 
 export default class Craft extends Obj {
   private weaponConfigurations: number[];
+  // the last weapon slot ricochets off targets instead of being destroyed
+  private weaponBounce: boolean[];
   public ctrl: Controls;
   private originalPath: Path2D;
   private lastFire = 0;
@@ -38,12 +40,14 @@ export default class Craft extends Obj {
   private currentWeapon = 0;
   public constructor(stage: Stage, ctrl: Controls, pos: Point2) {
     super(pos, stage, geo.flat());
+    // projectile sizes; must stay >= 1 or fire()'s velocity math divides by 0
     this.weaponConfigurations = [
-      (Math.random() * 20) | 0,
-      (Math.random() * 20) | 0,
-      (Math.random() * 20) | 0,
-      (Math.random() * 20) | 0,
+      1 + ((Math.random() * 19) | 0),
+      1 + ((Math.random() * 19) | 0),
+      1 + ((Math.random() * 19) | 0),
+      1 + ((Math.random() * 19) | 0),
     ];
+    this.weaponBounce = [false, false, false, true];
 
     this.originalPath = this.path = pathFromSegments(geo);
 
@@ -98,12 +102,16 @@ export default class Craft extends Obj {
       this.fire(now);
     }
 
+    // consume the action so one press switches one weapon, however long
+    // the key is held
     if (this.ctrl.weaponNext) {
       this.nextConfiguration();
+      this.ctrl.weaponNext = false;
     }
 
     if (this.ctrl.weaponPrev) {
-      this.nextConfiguration();
+      this.prevConfiguration();
+      this.ctrl.weaponPrev = false;
     }
 
     if (this.geo.acc.x !== 0 || this.geo.acc.y !== 0) {
@@ -124,26 +132,36 @@ export default class Craft extends Obj {
     }
   }
 
+  public get weaponIndex(): number {
+    return this.currentWeapon;
+  }
+
   public nextConfiguration(): void {
     this.currentWeapon =
       (this.currentWeapon + 1) % this.weaponConfigurations.length;
   }
 
   public prevConfiguration(): void {
-    this.currentWeapon = Math.abs(
-      this.currentWeapon - (1 % this.weaponConfigurations.length),
-    );
+    const len = this.weaponConfigurations.length;
+    this.currentWeapon = (this.currentWeapon + len - 1) % len;
   }
 
   public fire(now: number): void {
     const size = this.weaponConfigurations[this.currentWeapon];
+    const hullCenterX = (this.geo.aabb.min.x + this.geo.aabb.max.x) / 2;
     const pos = new Point2(
-      this.geo.pos.x + this.geo.aabb.max.x / 2 + this.geo.v.x + 10 - size / 2,
-      this.geo.pos.y - size + 5,
+      this.geo.pos.x + hullCenterX - size / 2,
+      this.geo.pos.y + this.geo.aabb.min.y - size,
     );
 
     const velY = Math.sqrt((2 * barrelLength * force) / size);
-    const p = new Projectile(pos, new Vector2(0, -velY), this.stage, size);
+    const p = new Projectile(
+      pos,
+      new Vector2(this.geo.v.x, this.geo.v.y - velY),
+      this.stage,
+      size,
+      { bounce: this.weaponBounce[this.currentWeapon] },
+    );
 
     this.stage.items.push(p);
     this.stage.spatialManager.registerObject(p, p.geo);

@@ -69,6 +69,9 @@ export const projectile = {
   mass: 0.1,
   width: 6,
   health: 10,
+  // when true, projectiles ricochet off whatever they hit instead of
+  // being destroyed on impact
+  bounce: false,
 };
 
 export const roid = {

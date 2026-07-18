@@ -1,10 +1,10 @@
 import Stage from "./Stage";
 import Point2 from "./Point2";
 import Obj from "./Object";
-import SpatialManager from "spatial-hashmap";
+import SpatialHash from "./SpatialHash";
 
 export function generateStage(
-  spatial = new SpatialManager<Obj>(1000, 1000, 10),
+  spatial = new SpatialHash<Obj>(1000, 1000, 10),
 ): Stage {
   return new Stage(document.createElement("canvas"), spatial);
 }

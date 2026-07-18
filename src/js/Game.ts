@@ -1,12 +1,11 @@
 import Stage from "./Stage";
-import SpatialManager from "spatial-hashmap";
-import Roid from "./Roid";
+import SpatialHash from "./SpatialHash";
 import Craft from "./Craft";
-// import NPC from './NPC.js'
 import Point2 from "./Point2";
 import Obj from "./Object";
 import Controls from "./Controls";
-import roidPosFactory from "./roidPosFactory";
+import World from "./World";
+import Renderer, { DebugStats } from "./Renderer";
 import {
   fpsFilter,
   cellSize,
@@ -16,17 +15,7 @@ import {
   craft,
 } from "./config";
 
-interface Debug {
-  on: boolean;
-  fps: number;
-  text: string;
-  numUpdates: number;
-  itemL: number;
-  drawRate: number;
-  lastRender: number;
-}
-
-const debug: Debug = {
+const debug: DebugStats = {
   on: false,
   fps: 50,
   text: "",
@@ -36,27 +25,28 @@ const debug: Debug = {
   lastRender: Number.POSITIVE_INFINITY,
 };
 
+/**
+ * Composition root and fixed-timestep game loop. Simulation lives in
+ * World, drawing in Renderer; Game wires input and drives both.
+ */
 export default class Game {
   public updateIsReady: boolean;
-  public hitboxes: Set<Point2>;
+  private applyUpdate?: (reloadPage?: boolean) => Promise<void>;
   public lastRender: number;
   public ctrl: Controls;
   public started: boolean;
   public stage: Stage;
-  public ctx: CanvasRenderingContext2D | null;
-  public count: number;
+  public world: World;
+  public renderer: Renderer;
   public lastTick: number;
   public isTouchInterface: boolean;
   public craft: Craft;
   public tickLength: number;
   public stopMain: number;
-  public debug: Debug;
-  public hatches: Path2D;
+  public debug: DebugStats;
   public constructor(canvas: HTMLCanvasElement) {
-    this.hatches = new Path2D();
     this.stopMain = 0;
     this.updateIsReady = false;
-    this.hitboxes = new Set();
     this.debug = debug;
     this.lastRender = window.performance.now();
     this.tickLength = tickLength;
@@ -64,76 +54,71 @@ export default class Game {
     this.lastTick = this.lastRender;
     this.debug.lastRender = this.lastRender;
 
-    const spatialManager = new SpatialManager<Obj>(
-      nativeWidth,
-      nativeHeight,
-      cellSize,
+    this.stage = new Stage(
+      canvas,
+      new SpatialHash<Obj>(nativeWidth, nativeHeight, cellSize),
     );
-    this.stage = new Stage(canvas, spatialManager);
+    this.world = new World(this.stage);
+    this.renderer = new Renderer(this.stage);
     this.started = false;
 
     this.isTouchInterface = "ontouchend" in document.documentElement;
 
-    this.stage.canvas.onclick = (): void => {
+    this.stage.canvas.addEventListener("click", (): void => {
       if (this.isTouchInterface || this.started) {
-        this.stage.canvas.requestFullscreen();
+        this.stage.canvas.requestFullscreen?.();
       }
-      if (!this.started) {
+      if (!this.stopMain) {
         this.resume();
       }
-    };
+    });
     document.addEventListener("keyup", this.pausedOnKeyUp.bind(this));
     document.addEventListener("keyup", this.ctrl.ku.bind(this.ctrl));
-    document.onkeydown = this.ctrl.kd.bind(this.ctrl);
-    window.onresize = (): void => this.updateCanvasBoundaries();
+    document.addEventListener("keydown", this.ctrl.kd.bind(this.ctrl));
+    window.addEventListener("resize", (): void =>
+      this.updateCanvasBoundaries(),
+    );
+    // keys released while unfocused would otherwise stick
+    window.addEventListener("blur", (): void => this.ctrl.reset());
+
+    const onTouch = (e: TouchEvent): void => {
+      const t = e.touches[0];
+      if (t) {
+        const native = this.deviceToNative(t.clientX, t.clientY);
+        this.ctrl.setTouch(native.x, native.y);
+      }
+      e.preventDefault?.();
+    };
+    this.stage.canvas.addEventListener("touchstart", onTouch);
+    this.stage.canvas.addEventListener("touchmove", onTouch);
+    this.stage.canvas.addEventListener("touchend", (): void =>
+      this.ctrl.clearTouch(),
+    );
 
     this.craft = new Craft(
       this.stage,
       this.ctrl,
       new Point2(
-        document.documentElement.clientWidth / 2 - craft.width / 2,
-        document.documentElement.clientHeight -
-          craft.width -
-          this.stage.padding,
+        nativeWidth / 2 - craft.width / 2,
+        nativeHeight - craft.width - this.stage.padding,
       ),
     );
     this.stage.spatialManager.registerObject(this.craft, this.craft.geo);
     this.stage.items.push(this.craft);
     this.stage.craft = this.craft;
 
-    this.ctx = this.stage.canvas.getContext("2d");
     this.updateCanvasBoundaries();
-    if (this.ctx) {
-      this.ctx.fillStyle = "rgb(255,255,255)";
-      this.ctx.strokeStyle = "rgb(255,255,255)";
-      this.ctx.save();
-      this.ctx.save();
-    }
-    this.showInstructions();
-    this.count = 0;
-
-    // this.npc = new NPC(new Point2(document.documentElement.clientWidth / 2, document.documentElement.clientHeight / 4), this.stage)
-    // this.stage.spatialManager.registerObject(this.npc)
-    // this.stage.items.push(this.npc)
-
-    // let roid = new Roid(roidPosFactory(this.stage.canvas.width, this.stage.canvas.height), this.stage)
-    // window.roid = roid
-    // this.stage.items.push(roid)
-    // this.stage.spatialManager.registerObject(roid)
-
-    // let p = new Projectile({geo: {
-    // pos: {x: (this.stage.canvas.width / 2) + roid.width / 2, y: (this.stage.canvas.height / 2) + roid.width / 2},
-    // v: {x: 0, y: 0}
-    // },
-    // width: 20
-    // }, {x: 0, y: 0})
-    // window.p = p
-    // this.stage.items.push(p)
-    // this.stage.spatialManager.registerObject(p)
   }
 
-  public updateReady(): void {
+  public get ctx(): CanvasRenderingContext2D | null {
+    return this.renderer.ctx;
+  }
+
+  public updateReady(
+    applyUpdate: (reloadPage?: boolean) => Promise<void>,
+  ): void {
     this.updateIsReady = true;
+    this.applyUpdate = applyUpdate;
   }
 
   public main(tFrame: number): void {
@@ -158,23 +143,28 @@ export default class Game {
     }
 
     if (this.ctrl.toggleFS) {
+      // consume the toggle: it's a one-shot action, not a held state
+      this.ctrl.toggleFS = false;
       this.pause();
       if (document.fullscreenElement) {
         document.exitFullscreen();
       } else {
-        this.stage.canvas.requestFullscreen();
+        this.stage.canvas.requestFullscreen?.();
       }
+      // don't let this frame's draw() wipe the pause overlay
+      return;
     }
 
     // If tFrame < nextTick then 0 ticks need to be updated (0 is default for numTicks).
     // If tFrame = nextTick then 1 tick needs to be updated (and so forth).
-    // Note: As we mention in summary, you should keep track of how large numTicks is.
-    // If it is large, then either your game was asleep, or the machine cannot keep up.
     if (tFrame > nextTick) {
       timeSinceTick = tFrame - this.lastTick;
       numTicks = (timeSinceTick / this.tickLength) | 0;
       if (numTicks > 4) {
         numTicks = 4;
+        // drop the unpaid time debt, or the game fast-forwards at 4x
+        // after every stall until game time catches up to wall time
+        this.lastTick = tFrame - numTicks * this.tickLength;
       }
     }
 
@@ -189,262 +179,58 @@ export default class Game {
   }
 
   public updateCanvasBoundaries(): void {
-    if (document.fullscreenElement) {
-      this.stage.canvas.width = window.screen.width;
-      this.stage.canvas.height = window.screen.height;
-    } else {
-      this.stage.canvas.width = window.innerWidth;
-      this.stage.canvas.height = window.innerHeight;
-    }
+    this.renderer.resize();
 
-    this.stage.canvas.style.width = this.stage.canvas.width + "px";
-    this.stage.canvas.style.height = this.stage.canvas.height + "px";
-
-    this.stage.xmax = nativeWidth - this.stage.padding;
-    this.stage.xmin = this.stage.padding;
-    this.stage.ymin = this.stage.padding;
-    this.stage.ymax = nativeHeight - this.stage.padding;
-
-    this.hatches = new Path2D();
-    // this.debug.text++
-    // this.stage.items = []
-    // for (var i=0; i<8; i++) {
-    // for (var j=0;j < 5; j++) {
-    // this.stage.items.push(new Roid(this.stage.canvas.width, i*90, j*90))
-    // }
-    // }
-    this.stage.spatialManager = new SpatialManager(
-      nativeWidth,
-      nativeHeight,
-      cellSize,
-    );
-
+    // the spatial hash indexes native space, which never changes size;
+    // re-register everything only because a redraw may need it below
+    this.stage.spatialManager.clearMap();
     this.stage.items.forEach((i): void =>
       this.stage.spatialManager.registerObject(i, i.geo),
     );
-    if (this.started && !this.stopMain) {
+
+    // resizing wipes the canvas; restore whatever screen was showing
+    if (!this.started) {
+      this.showInstructions();
+    } else if (!this.stopMain) {
       this.draw();
       this.showPause();
     }
   }
 
   public updates(numTicks: number): void {
-    let i;
-    for (i = 0; i < numTicks; i++) {
+    for (let i = 0; i < numTicks; i++) {
       this.lastTick += this.tickLength;
       this.update(this.lastTick);
     }
   }
 
-  public drawBuckets(): void {
-    const numPixels = this.stage.canvas.width * this.stage.canvas.height;
-    for (let i = 0; i < numPixels; i++) {
-      const x = i % this.stage.canvas.width;
-      const y = (i / this.stage.canvas.width) | 0;
-      const pct =
-        (100 * this.stage.spatialManager.idForPoint(new Point2(x, y))) /
-        this.stage.spatialManager.numBuckets;
-      if (this.ctx) {
-        this.ctx.fillStyle = `hsl(270, 10%, ${pct}%)`;
-        this.ctx.fillRect(x, y, 1, 1);
-      }
+  public update(tickTime: number): void {
+    if (this.ctrl.pause) {
+      this.ctrl.pause = false;
+      this.togglePause();
     }
+    this.world.step(tickTime);
   }
 
   public draw(): void {
-    if (this.ctx) {
-      this.ctx.clearRect(
-        0,
-        0,
-        this.stage.canvas.width,
-        this.stage.canvas.height,
-      );
-    }
-    if (this.ctx) {
-      this.ctx.save();
-    }
-    const deviceWidth = this.stage.canvas.width;
-    const deviceHeight = this.stage.canvas.height;
-    const scaleFitNative = Math.min(
-      deviceWidth / nativeWidth,
-      deviceHeight / nativeHeight,
-    );
-    // const scaleFillNative = Math.max(deviceWidth / nativeWidth, deviceHeight / nativeHeight)
-    const scale = scaleFitNative;
-
-    if (this.ctx) {
-      this.ctx.setTransform(
-        scale,
-        0, // or use scaleFillNative
-        0,
-        scale,
-        (deviceWidth / 2) | 0,
-        (deviceHeight / 2) | 0,
-      );
-      const offsetDeviceTop = -(deviceHeight / scale) / 2;
-      const offsetDeviceLeft = -(deviceWidth / scale) / 2;
-      this.ctx.translate(offsetDeviceLeft, offsetDeviceTop);
-      // console.log(scale, deviceWidth, deviceHeight, this.stage.xmax, this.stage.ymax)
-      const fs = 70;
-      for (let i = 0; i < this.stage.items.length; i++) {
-        this.ctx.save();
-        this.stage.items[i].draw(this.ctx, this.debug.on);
-        this.ctx.restore();
-      }
-      this.ctx.restore();
-
-      if (this.debug.on) {
-        this.ctx.font = "64px roboto";
-        this.ctx.fillText(this.debug.fps.toFixed(1), 0, fs);
-        this.ctx.fillText(this.debug.itemL + "", 0, fs * 2);
-        this.ctx.fillText(this.debug.numUpdates + "", 0, fs * 3);
-        this.ctx.fillText(
-          this.debug.text,
-          this.stage.canvas.width / 2,
-          this.stage.canvas.height / 2,
-        );
-
-        this.ctx.stroke(this.hatches);
-        this.ctx.strokeStyle = "green";
-        this.ctx.lineWidth = 3;
-        this.hitboxes.forEach(
-          (xy: Point2): void | null =>
-            this.ctx && this.ctx.strokeRect(xy.x, xy.y, cellSize, cellSize),
-        );
-        this.ctx.restore();
-      }
-    }
-  }
-
-  // I don't remember what the intended order of ops is on this
-  boundNTick(i: Obj, tickTime: number): boolean {
-    i.tick(tickTime);
-    const x = i.geo.pos.x + i.geo.v.x;
-    const y = i.geo.pos.y + i.geo.v.y;
-    i.geo.v.x += i.geo.acc.x;
-    i.geo.v.y += i.geo.acc.y;
-    let cull = false;
-
-    if (
-      ((i.geo.v.x <= 0 || x < this.stage.xmax - i.geo.aabb.max.x) &&
-        (i.geo.v.x >= 0 || x > this.stage.xmin)) ||
-      (!i.boundToCanvas && x < this.stage.xmax && x > -100)
-    ) {
-      i.geo.pos.x = x;
-    } else if (!i.boundToCanvas) {
-      cull = true;
-    } else {
-      i.geo.v.x = 0;
-    }
-
-    if (
-      ((i.geo.v.y <= 0 || y < this.stage.ymax - i.geo.aabb.max.y) &&
-        (i.geo.v.y >= 0 || y > this.stage.ymin)) ||
-      (!i.boundToCanvas && y < this.stage.ymax && y > -100)
-    ) {
-      i.geo.pos.y = y;
-    } else if (!i.boundToCanvas) {
-      cull = true;
-    } else {
-      i.geo.v.y = 0;
-    }
-
-    if (!cull) {
-      this.stage.spatialManager.registerObject(i, i.geo);
-    }
-    return cull;
-  }
-
-  // o other object
-  testIntersect(item: Obj, i: number, o: Obj, cullQ: number[]): void {
-    if (item !== o && item.geo.intersectsWith(o.geo)) {
-      item.intersects(o, i, cullQ);
-    }
-  }
-
-  update(tickTime: number): void {
-    if (this.ctrl.pause) {
-      this.togglePause();
-    }
-    const cullQ = [];
-    if (Math.random() > 0.99) {
-      this.stage.items.push(
-        new Roid(
-          roidPosFactory(this.stage.canvas.width, this.stage.canvas.height),
-          this.stage,
-        ),
-      );
-    }
-
-    this.stage.spatialManager.clearMap();
-    for (let i = 0; i < this.stage.items.length; i++) {
-      if (this.boundNTick(this.stage.items[i], tickTime)) {
-        cullQ.push(i);
-      }
-    }
-
-    if (this.debug.on) {
-      this.hitboxes = new Set();
-      for (let i = 0; i < this.stage.canvas.width; i += cellSize) {
-        for (let j = 0; j < this.stage.canvas.height; j += cellSize) {
-          this.hitboxes.add(new Point2(i, j));
-        }
-      }
-    }
-    let i;
-
-    /**
-     * for every item on stage, look for items nearby and test whether they intersect
-     */
-    for (i = 0; i < this.stage.items.length; i++) {
-      // for (let j = 0; j < this.stage.items.length; j++) {
-      // if (i !== j) {
-      // this.testIntersect(this.stage.items[i], i, this.stage.items[j], cullQ)
-      // }
-      // }
-      for (const o of this.stage.spatialManager.getNearby(
-        this.stage.items[i].geo,
-      )) {
-        this.testIntersect(this.stage.items[i], i, o, cullQ);
-      }
-    }
-
-    let culled = 0;
-    cullQ.sort(function (a, b): number {
-      if (a < b) {
-        return -1;
-      }
-      return a > b ? 1 : 0;
-    });
-    cullQ.forEach((v): Obj[] => this.stage.items.splice(v - culled++, 1));
+    this.renderer.draw(this.debug);
   }
 
   messageModal(msg: string[]): void {
-    if (this.ctx) {
-      const x = this.stage.canvas.width / 2;
-      const y = this.stage.canvas.height / 2;
-      this.ctx.textAlign = "center";
-      this.ctx.font = "64px roboto";
-      this.ctx.fillText(msg[0], x, y);
-      if (msg.length > 1) {
-        this.ctx.font = "48px roboto";
-        this.ctx.fillText(msg[1], x, y + 72);
-      }
-      this.ctx.restore();
-    }
+    this.renderer.messageModal(msg);
+  }
+
+  deviceToNative(x: number, y: number): Point2 {
+    return this.renderer.deviceToNative(x, y);
   }
 
   showInstructions(): void {
     const msg = [];
     if (this.isTouchInterface) {
       msg[0] = "Tap to start";
-    } else {
-      msg[0] = "Click to start";
-    }
-
-    if (this.isTouchInterface) {
       msg[1] = "drag to move the craft";
     } else {
+      msg[0] = "Click to start";
       msg[1] = "use wasd/arrow keys to move, spacebar to fire";
     }
 
@@ -460,18 +246,20 @@ export default class Game {
       msg[0] = "Press space to resume";
     }
 
+    if (this.updateIsReady && !this.isTouchInterface) {
+      msg[1] = "update available - press U to apply";
+    }
+
     this.messageModal(msg);
   }
 
   pausedOnKeyUp(e: KeyboardEvent): void {
-    if (!this.stopMain && e.keyCode === 32) {
+    if (!this.stopMain && e.code === "Space") {
       this.resume();
     }
-  }
 
-  pausedOnTap(e: TouchEvent): void {
-    if (!this.stopMain) {
-      this.resume();
+    if (!this.stopMain && e.code === "KeyU" && this.applyUpdate) {
+      this.applyUpdate(true);
     }
   }
 

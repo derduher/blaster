@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
-    "outDir": "./dist/",
     "noEmit": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
@@ -11,13 +9,11 @@
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "bundler",
-    "jsx": "react",
-		"isolatedModules": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
-    "allowJs": true,
     "lib": ["dom", "esnext"],
     "types": ["vite/client", "vite-plugin-pwa/client", "vitest/globals"]
   },
-  "include": ["src/js/**/*"],
-  "exclude": ["node_modules", "**/*.spec.*"]
+  "include": ["src/js/**/*", "vitest.setup.ts"],
+  "exclude": ["node_modules"]
 }

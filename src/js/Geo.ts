@@ -7,6 +7,9 @@ import { GenPos } from "./roidPosFactory";
 export default class Geo implements GenPos {
   public aabb: BoundingBox;
   public treatAsPoint = false;
+  private _rotation = 0;
+  // reused by worldPoints() so collision tests allocate nothing per call
+  private scratch: Point2[] = [];
   public constructor(
     public points: Point2[],
     public pos = new Point2(),
@@ -14,6 +17,85 @@ export default class Geo implements GenPos {
     public acc = new Vector2(),
   ) {
     this.aabb = Geo.getBBForPoints(points);
+  }
+
+  public get rotation(): number {
+    return this._rotation;
+  }
+
+  public set rotation(radians: number) {
+    this._rotation = radians;
+    this.refreshAABB();
+  }
+
+  // model-space centroid; rotation pivots around it
+  private centroid(): Point2 {
+    let x = 0;
+    let y = 0;
+    for (const p of this.points) {
+      x += p.x;
+      y += p.y;
+    }
+    return new Point2(x / this.points.length, y / this.points.length);
+  }
+
+  // recompute the AABB from the current points and rotation; call after
+  // mutating points or rotation
+  public refreshAABB(): void {
+    if (this._rotation === 0) {
+      this.aabb = Geo.getBBForPoints(this.points);
+      return;
+    }
+    this.aabb = Geo.getBBForPoints(this.localPoints([]));
+  }
+
+  // points rotated in model space (no position applied), written into out
+  private localPoints(out: Point2[]): Point2[] {
+    const cos = Math.cos(this._rotation);
+    const sin = Math.sin(this._rotation);
+    const c = this.centroid();
+    for (let i = 0; i < this.points.length; i++) {
+      const dx = this.points[i].x - c.x;
+      const dy = this.points[i].y - c.y;
+      const x = c.x + dx * cos - dy * sin;
+      const y = c.y + dx * sin + dy * cos;
+      if (out[i]) {
+        out[i].x = x;
+        out[i].y = y;
+      } else {
+        out[i] = new Point2(x, y);
+      }
+    }
+    out.length = this.points.length;
+    return out;
+  }
+
+  // the polygon in world space: rotated around the centroid, then
+  // translated by pos; reuses a scratch buffer, so the result is only
+  // valid until the next call on this Geo
+  public worldPoints(): Point2[] {
+    if (this._rotation === 0) {
+      const n = this.points.length;
+      for (let i = 0; i < n; i++) {
+        if (this.scratch[i]) {
+          this.scratch[i].x = this.points[i].x + this.pos.x;
+          this.scratch[i].y = this.points[i].y + this.pos.y;
+        } else {
+          this.scratch[i] = new Point2(
+            this.points[i].x + this.pos.x,
+            this.points[i].y + this.pos.y,
+          );
+        }
+      }
+      this.scratch.length = n;
+      return this.scratch;
+    }
+    this.localPoints(this.scratch);
+    for (const p of this.scratch) {
+      p.x += this.pos.x;
+      p.y += this.pos.y;
+    }
+    return this.scratch;
   }
 
   public static getBBForPoints(points: Point2[]): BoundingBox {
@@ -80,7 +162,8 @@ export default class Geo implements GenPos {
     }
 
     return (
-      right.aabb.min.x < left.aabb.max.x && bottom.aabb.min.y < top.aabb.max.y
+      right.pos.x + right.aabb.min.x < left.pos.x + left.aabb.max.x &&
+      bottom.pos.y + bottom.aabb.min.y < top.pos.y + top.aabb.max.y
     );
   }
 
@@ -151,58 +234,34 @@ export default class Geo implements GenPos {
     );
   }
 
-  public static pointsAtPos(points: Point2[], pos: Point2): Point2[] {
-    let i;
-    const atPos = [];
-    for (i = 0; i < points.length; i++) {
-      atPos[i] = new Point2(points[i].x + pos.x, points[i].y + pos.y);
-    }
-    return atPos;
-  }
-
   public intersectsWith(ogeo: Geo): boolean {
     let collision = false;
-    let points;
-    let point;
-    let polyPos;
 
     if (!this.aabbIntersects(ogeo)) {
       return false;
     } else if (this.treatAsPoint || ogeo.treatAsPoint) {
-      // o.highlight('green')
-      // game._pause()
-      if (this.treatAsPoint) {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        point = this;
-        polyPos = ogeo.pos;
-        points = ogeo.points;
-      } else {
-        point = ogeo;
-        points = this.points;
-        polyPos = this.pos;
-      }
-      point = new Point2(
-        point.pos.x + point.aabb.max.x / 2,
-        point.pos.y + point.aabb.max.y / 2,
+      const pointGeo = this.treatAsPoint ? this : ogeo;
+      const polyGeo = this.treatAsPoint ? ogeo : this;
+      const points = polyGeo.worldPoints();
+      const point = new Point2(
+        pointGeo.pos.x + (pointGeo.aabb.min.x + pointGeo.aabb.max.x) / 2,
+        pointGeo.pos.y + (pointGeo.aabb.min.y + pointGeo.aabb.max.y) / 2,
       );
       // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
       for (let i = 0, prev = points.length - 1; i < points.length; prev = i++) {
         if (
-          polyPos.y + points[i].y > point.y !==
-            polyPos.y + points[prev].y > point.y &&
+          points[i].y > point.y !== points[prev].y > point.y &&
           point.x <
-            ((points[prev].x - points[i].x) *
-              (point.y - (polyPos.y + points[i].y))) /
+            ((points[prev].x - points[i].x) * (point.y - points[i].y)) /
               (points[prev].y - points[i].y) +
-              polyPos.x +
               points[i].x
         ) {
           collision = !collision;
         }
       }
     } else {
-      points = Geo.pointsAtPos(this.points, this.pos);
-      const opoints = Geo.pointsAtPos(ogeo.points, ogeo.pos);
+      const points = this.worldPoints();
+      const opoints = ogeo.worldPoints();
       for (let i = 0, prev = points.length - 1; i < points.length; prev = i++) {
         for (
           let oi = 0, oprev = opoints.length - 1;

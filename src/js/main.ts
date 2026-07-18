@@ -1,5 +1,5 @@
 import "../css/normalize.min.css";
-import "../css/main.less";
+import "../css/main.css";
 import Game from "./Game";
 import { registerSW } from "virtual:pwa-register";
 
@@ -16,9 +16,9 @@ function init(): void {
     }
   });
   if ("serviceWorker" in navigator) {
-    registerSW({
+    const updateSW = registerSW({
       onNeedRefresh() {
-        game.updateReady();
+        game.updateReady(updateSW);
       },
       onRegisterError(error: unknown) {
         console.log("failed to register serviceworker", error);

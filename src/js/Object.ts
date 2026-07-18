@@ -5,16 +5,23 @@ import Point2 from "./Point2";
 import Vector2 from "./Vector2";
 
 export default class Obj {
+  private static nextId = 0;
+  public readonly id: number = Obj.nextId++;
   public mass: number;
   public geo: Geo;
   public path: Path2D;
 
+  public dead = false;
   public boundToCanvas = false;
-  public isHighlighted = false;
-  public isDisplayCell = false;
+  public highlightUntil = 0;
   public highlightColor = "";
   public immortal = false;
   public health = 1;
+
+  public get isHighlighted(): boolean {
+    return window.performance.now() < this.highlightUntil;
+  }
+
   public constructor(
     pos: Point2,
     public stage: Stage,
@@ -39,36 +46,23 @@ export default class Obj {
       ctx.font = "24px roboto";
       ctx.fillText(this.health + "", 10, 35);
     }
-    // if (this.isDisplayCell) {
-    // ctx.font = '24px roboto'
-    // ctx.fillText(window.spatial.getIdForObject(this.geo).join(', '), 10, 0)
-    // }
   }
 
-  /* istanbul ignore next */
-  public displayCell(): void {
-    this.isDisplayCell = true;
-  }
-
-  /* istanbul ignore next */
+  // a timestamp comparison instead of a setTimeout per collision: under
+  // sustained collisions the timers used to pile up by the hundreds
   public highlight(highlightColor = "yellow"): void {
-    this.isHighlighted = true;
     this.highlightColor = highlightColor;
-    window.setTimeout((): boolean => (this.isHighlighted = false), 5000);
+    this.highlightUntil = window.performance.now() + 5000;
   }
 
   /* istanbul ignore next */
 
   public tick(now: number): void {}
 
-  public intersects(o: Obj, i: number, cullQ: number[]): void {
-    // f = ma
-    // let fx = (this.geo.v.x / 16.7) * this.mass
-    // let fy = (this.geo.v.y / 16.7) * this.mass
+  // called once per collision per party; Game removes anything whose
+  // health is depleted after the collision pass
+  public intersects(o: Obj): void {
     this.health -= 10;
-    if (this.health <= 0 && this.immortal !== true) {
-      cullQ.push(i);
-    }
     this.highlight();
     o.highlight();
   }
