@@ -12,13 +12,7 @@ export default tseslint.config(
   prettierRecommended,
   {
     languageOptions: {
-      ecmaVersion: 2018,
       sourceType: "module",
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -62,5 +56,5 @@ export default tseslint.config(
         ...globals.vitest,
       },
     },
-  }
+  },
 );

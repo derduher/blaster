@@ -22,23 +22,7 @@ const pressActivated = new Set([
 ]);
 const toggle = new Set([Actions.autoBreak, Actions.toggleFS]);
 
-interface KeyBindings {
-  KeyA: Actions.left;
-  ArrowLeft: Actions.left;
-  KeyD: Actions.right;
-  ArrowRight: Actions.right;
-  KeyW: Actions.up;
-  ArrowUp: Actions.up;
-  KeyS: Actions.down;
-  ArrowDown: Actions.down;
-  Space: Actions.fire;
-  KeyQ: Actions.weaponPrev;
-  KeyE: Actions.weaponPrev;
-  Escape: Actions.toggleFS;
-  KeyR: Actions.autoBreak;
-  KeyF: Actions.toggleFS;
-}
-const keyBindings: KeyBindings = {
+const keyBindings = {
   KeyA: Actions.left,
   ArrowLeft: Actions.left,
   KeyD: Actions.right,
@@ -49,14 +33,15 @@ const keyBindings: KeyBindings = {
   ArrowDown: Actions.down,
   Space: Actions.fire,
   KeyQ: Actions.weaponPrev,
-  KeyE: Actions.weaponPrev,
+  KeyE: Actions.weaponNext,
+  KeyP: Actions.pause,
   Escape: Actions.toggleFS,
   KeyR: Actions.autoBreak,
   KeyF: Actions.toggleFS,
-};
+} satisfies Record<string, Actions>;
 
 const codeToAction = (code: KeyboardEvent["code"]): Actions | undefined => {
-  return keyBindings[code as keyof KeyBindings];
+  return keyBindings[code as keyof typeof keyBindings];
 };
 
 export default class Controls {
@@ -109,6 +94,30 @@ export default class Controls {
     }
   }
 
+  setTouch(x: number, y: number): void {
+    this.touch = true;
+    this.touchX = x;
+    this.touchY = y;
+  }
+
+  clearTouch(): void {
+    this.touch = false;
+  }
+
+  // clears held state so keys released while the window was unfocused
+  // don't stick
+  reset(): void {
+    this.left = false;
+    this.right = false;
+    this.up = false;
+    this.down = false;
+    this.fire = false;
+    this.weaponNext = false;
+    this.weaponPrev = false;
+    this.pause = false;
+    this.clearTouch();
+  }
+
   kd({ code }: KeyboardEvent): void {
     const action = codeToAction(code);
     if (action !== undefined && pressActivated.has(action)) {
@@ -119,7 +128,6 @@ export default class Controls {
   ku({ code }: KeyboardEvent): void {
     const action = codeToAction(code);
     if (action !== undefined) {
-      console.log(action);
       if (pressActivated.has(action)) {
         this.setAction(action, false);
       }
@@ -128,7 +136,7 @@ export default class Controls {
         if (action === Actions.toggleFS) {
           this.setAction(action, !this.toggleFS);
         } else if (action === Actions.autoBreak) {
-          this.setAction(action, !this.toggleFS);
+          this.setAction(action, !this.autoBreak);
         }
       }
     }

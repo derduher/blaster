@@ -1,10 +1,10 @@
 import Vector2 from "./Vector2";
 
 describe("Vector2", () => {
-  let v0;
-  let v1;
-  let v2;
-  let v3;
+  let v0: Vector2;
+  let v1: Vector2;
+  let v2: Vector2;
+  let v3: Vector2;
   beforeEach(() => {
     v0 = new Vector2();
     v1 = new Vector2(1, 3);

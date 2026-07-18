@@ -6,18 +6,6 @@ export default defineConfig({
   build: {
     outDir: "dist",
   },
-  css: {
-    preprocessorOptions: {
-      less: {
-        strictMath: true,
-      },
-    },
-    lightningcss: {
-      // src/css/normalize.min.css carries old IE star-hack/`/deep/` syntax
-      // that lightningcss otherwise rejects during minification.
-      errorRecovery: true,
-    },
-  },
   plugins: [
     VitePWA({
       registerType: "prompt",

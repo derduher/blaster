@@ -1,25 +1,32 @@
-import Stage from "./Stage";
 import Point2 from "./Point2";
 import Obj from "./Object";
-import SpatialManager from "spatial-hashmap";
-import { generateObj } from "./spec-helper";
+import { generateStage, generateObj } from "./spec-helper";
 describe("Object", () => {
-  let stage: Stage;
   let o: Obj;
   beforeEach(() => {
-    stage = new Stage(
-      document.createElement("canvas"),
-      new SpatialManager(1000, 1000, 10),
-    );
-    o = generateObj(stage);
+    o = generateObj(generateStage());
   });
 
-  it("decrements health on intersection", () => {
-    const cullQ: number[] = [];
-    const o2 = new Obj(new Point2(0, 0), stage, [new Point2()]);
+  it("decrements its own health on intersection", () => {
+    const o2 = new Obj(new Point2(0, 0), o.stage, [new Point2()]);
     const preObjHealth = o.health;
-    o.intersects(o2, 0, cullQ);
+    o.intersects(o2);
     expect(preObjHealth - 10).toBe(o.health);
-    expect(cullQ[0]).toBe(0);
+  });
+
+  describe("highlight", () => {
+    it("highlights for a limited time without leaking timers", () => {
+      const timers = vi.spyOn(window, "setTimeout");
+      o.highlight("red");
+      expect(o.isHighlighted).toBe(true);
+      expect(o.highlightColor).toBe("red");
+      expect(timers).not.toHaveBeenCalled();
+    });
+
+    it("expires the highlight", () => {
+      o.highlight();
+      o.highlightUntil = performance.now() - 1;
+      expect(o.isHighlighted).toBe(false);
+    });
   });
 });

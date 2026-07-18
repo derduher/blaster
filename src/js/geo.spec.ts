@@ -42,6 +42,98 @@ describe("Geo", () => {
       expect(geo.aabbIntersects(geo3)).toBe(false);
       expect(geo3.aabbIntersects(geo)).toBe(false);
     });
+
+    it("returns false for identical local boxes separated by position", () => {
+      // both are 10x10 boxes at the local origin, but far apart in the world
+      const a = new Geo(
+        [new Point2(), new Point2(10, 10)],
+        new Point2(100, 100),
+      );
+      const b = new Geo([new Point2(), new Point2(10, 10)], new Point2(0, 0));
+      expect(a.aabbIntersects(b)).toBe(false);
+      expect(b.aabbIntersects(a)).toBe(false);
+    });
+
+    it("returns true when position moves overlapping boxes together", () => {
+      const a = new Geo([new Point2(), new Point2(10, 10)], new Point2(5, 5));
+      const b = new Geo([new Point2(), new Point2(10, 10)], new Point2(0, 0));
+      expect(a.aabbIntersects(b)).toBe(true);
+      expect(b.aabbIntersects(a)).toBe(true);
+    });
+
+    it("detects overlap when local points are offset from the origin", () => {
+      // a's local box spans 20..30; at pos (25,0) its world box is
+      // x 45..55, y 20..30
+      const a = new Geo(
+        [new Point2(20, 20), new Point2(30, 30)],
+        new Point2(25, 0),
+      );
+      // b's local box spans 0..10; at pos (50,15) its world box is
+      // x 50..60, y 15..25
+      const b = new Geo([new Point2(), new Point2(10, 10)], new Point2(50, 15));
+      expect(a.aabbIntersects(b)).toBe(true);
+      expect(b.aabbIntersects(a)).toBe(true);
+    });
+  });
+
+  describe("rotation", () => {
+    const square = (): Point2[] => [
+      new Point2(0, 0),
+      new Point2(10, 0),
+      new Point2(10, 10),
+      new Point2(0, 10),
+    ];
+
+    it("recomputes the AABB from points rotated around the centroid", () => {
+      const g = new Geo(square());
+      g.rotation = Math.PI / 4;
+      const reach = 5 * Math.SQRT2;
+      expect(g.aabb.min.x).toBeCloseTo(5 - reach);
+      expect(g.aabb.max.x).toBeCloseTo(5 + reach);
+      expect(g.aabb.min.y).toBeCloseTo(5 - reach);
+      expect(g.aabb.max.y).toBeCloseTo(5 + reach);
+    });
+
+    it("restores the original AABB when rotated back to zero", () => {
+      const g = new Geo(square());
+      g.rotation = Math.PI / 4;
+      g.rotation = 0;
+      expect(g.aabb.min.x).toBeCloseTo(0);
+      expect(g.aabb.max.x).toBeCloseTo(10);
+    });
+
+    it("applies rotation and position to world points", () => {
+      const g = new Geo(square(), new Point2(100, 50));
+      g.rotation = Math.PI / 2;
+      // (0,0) is (-5,-5) from the centroid; a quarter turn maps it to
+      // (5,-5), i.e. local (10,0), so world (110, 50)
+      const wp = g.worldPoints();
+      expect(wp[0].x).toBeCloseTo(110);
+      expect(wp[0].y).toBeCloseTo(50);
+    });
+
+    it("detects collisions that only occur because of rotation", () => {
+      // a thin horizontal bar; the target sits below its right half
+      const bar = new Geo([
+        new Point2(0, 0),
+        new Point2(40, 0),
+        new Point2(40, 2),
+        new Point2(0, 2),
+      ]);
+      const target = new Geo(
+        [
+          new Point2(0, 0),
+          new Point2(4, 0),
+          new Point2(4, 4),
+          new Point2(0, 4),
+        ],
+        new Point2(18, 20),
+      );
+      expect(bar.intersectsWith(target)).toBe(false);
+      // standing the bar upright swings it down into the target
+      bar.rotation = Math.PI / 2;
+      expect(bar.intersectsWith(target)).toBe(true);
+    });
   });
 
   describe("crossProduct", () => {
@@ -302,10 +394,6 @@ describe("Geo", () => {
         ),
       ).toBeFalsy();
     });
-  });
-
-  describe("pointsAtPos", () => {
-    it("", () => {});
   });
 
   describe("intersectsWith", () => {
