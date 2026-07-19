@@ -1,4 +1,5 @@
 import Point2 from "./Point2";
+import Vector2 from "./Vector2";
 import Controls from "./Controls";
 import Craft from "./Craft";
 import Obj from "./Object";
@@ -137,7 +138,11 @@ describe("Craft", () => {
         const preHealth = p.health;
         const target = targetBelow(p);
         const preTargetHealth = target.health;
-        p.intersects(target);
+        const normal = new Vector2(
+          p.center.x - target.center.x,
+          p.center.y - target.center.y,
+        );
+        p.onHit({ other: target, normal });
         expect(p.health).toBe(preHealth - 10);
         expect(target.health).toBe(preTargetHealth - 10);
       });
@@ -154,7 +159,11 @@ describe("Craft", () => {
         const preHealth = p.health;
         const target = targetBelow(p);
         const preTargetHealth = target.health;
-        p.intersects(target);
+        const normal = new Vector2(
+          p.center.x - target.center.x,
+          p.center.y - target.center.y,
+        );
+        p.onHit({ other: target, normal });
         expect(p.geo.v.y).toBeLessThan(0);
         expect(p.health).toBe(preHealth); // bouncing shots survive the hit
         expect(target.health).toBe(preTargetHealth - 10);

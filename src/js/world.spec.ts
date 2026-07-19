@@ -141,8 +141,8 @@ describe("World", () => {
       vi.spyOn(Math, "random").mockReturnValue(0);
       const aCheck = vi.spyOn(a.geo, "intersectsWith");
       const bCheck = vi.spyOn(b.geo, "intersectsWith");
-      const aHit = vi.spyOn(a, "intersects");
-      const bHit = vi.spyOn(b, "intersects");
+      const aHit = vi.spyOn(a, "onHit");
+      const bHit = vi.spyOn(b, "onHit");
       world.step(1);
       // narrow phase runs once per pair, not once per direction
       expect(aCheck.mock.calls.length + bCheck.mock.calls.length).toBe(1);

@@ -3,8 +3,9 @@ import { defaultObjMass } from "./config";
 import Stage from "./Stage";
 import Point2 from "./Point2";
 import Vector2 from "./Vector2";
+import { Collidable, HitContext } from "./Collision";
 
-export default class Obj {
+export default class Obj implements Collidable {
   private static nextId = 0;
   public readonly id: number = Obj.nextId++;
   public mass: number;
@@ -20,6 +21,16 @@ export default class Obj {
 
   public get isHighlighted(): boolean {
     return window.performance.now() < this.highlightUntil;
+  }
+
+  // the collision reference point: the AABB midpoint in world space. Collision
+  // resolution builds the center-to-center normal from this, so it is the only
+  // geometry an entity exposes across the collision seam.
+  public get center(): Point2 {
+    return new Point2(
+      this.geo.pos.x + (this.geo.aabb.min.x + this.geo.aabb.max.x) / 2,
+      this.geo.pos.y + (this.geo.aabb.min.y + this.geo.aabb.max.y) / 2,
+    );
   }
 
   public constructor(
@@ -59,11 +70,13 @@ export default class Obj {
 
   public tick(now: number): void {}
 
-  // called once per collision per party; Game removes anything whose
-  // health is depleted after the collision pass
-  public intersects(o: Obj): void {
+  // invoked once per collision per party by resolveCollision; World removes
+  // anything whose health is depleted after the collision pass. The base rule:
+  // take damage and flash both parties. The provided normal is unused here —
+  // only ricocheting entities consume it.
+  public onHit(ctx: HitContext): void {
     this.health -= 10;
     this.highlight();
-    o.highlight();
+    ctx.other.highlight();
   }
 }

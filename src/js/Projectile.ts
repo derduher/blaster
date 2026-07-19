@@ -3,6 +3,7 @@ import { projectile } from "./config";
 import Stage from "./Stage";
 import Point2 from "./Point2";
 import Vector2 from "./Vector2";
+import { HitContext } from "./Collision";
 const { mass, width: defaultWidth, health } = projectile;
 
 export default class Projectile extends Obj {
@@ -56,29 +57,24 @@ export default class Projectile extends Obj {
     ctx.stroke();
   }
 
-  public intersects(o: Obj): void {
-    o.health -= 10;
+  public onHit(ctx: HitContext): void {
+    ctx.other.health -= 10;
     if (this.bounce) {
-      this.reflectOff(o);
+      this.reflectOff(ctx.normal);
       this.highlight();
-      o.highlight();
+      ctx.other.highlight();
       return;
     }
-    super.intersects(o);
+    super.onHit(ctx);
   }
 
-  // elastic ricochet: reflect velocity across the line between the two
-  // centers, but only while approaching, so an overlapping projectile
-  // doesn't flip back and forth on consecutive ticks
-  private reflectOff(o: Obj): void {
-    const nx =
-      this.geo.pos.x +
-      (this.geo.aabb.min.x + this.geo.aabb.max.x) / 2 -
-      (o.geo.pos.x + (o.geo.aabb.min.x + o.geo.aabb.max.x) / 2);
-    const ny =
-      this.geo.pos.y +
-      (this.geo.aabb.min.y + this.geo.aabb.max.y) / 2 -
-      (o.geo.pos.y + (o.geo.aabb.min.y + o.geo.aabb.max.y) / 2);
+  // elastic ricochet: reflect velocity across the collision normal handed in
+  // by resolveCollision (the raw center-to-center vector), but only while
+  // approaching, so an overlapping projectile doesn't flip back and forth on
+  // consecutive ticks
+  private reflectOff(normal: Vector2): void {
+    const nx = normal.x;
+    const ny = normal.y;
     const len = Math.sqrt(nx * nx + ny * ny);
     if (len === 0) {
       // dead-center overlap has no meaningful normal; just turn around

@@ -13,17 +13,17 @@ describe("Projectile", () => {
     projectile = new Projectile(new Point2(), new Vector2(), stage);
   });
 
-  it("decrements its own health on intersection", () => {
+  it("decrements its own health when it hits without bouncing", () => {
     const o = generateObj(stage);
     const preProjectileHealth = projectile.health;
-    projectile.intersects(o);
+    projectile.onHit({ other: o, normal: new Vector2() });
     expect(preProjectileHealth - 10).toBe(projectile.health);
   });
 
   it("damages the object it hits", () => {
     const o = generateObj(stage);
     const preTargetHealth = o.health;
-    projectile.intersects(o);
+    projectile.onHit({ other: o, normal: new Vector2() });
     expect(preTargetHealth - 10).toBe(o.health);
   });
 
@@ -38,6 +38,10 @@ describe("Projectile", () => {
     // a 20x20 target whose world center is (10, 30)
     const makeTarget = (): Obj => new Obj(new Point2(0, 20), stage, square(20));
 
+    // the center-to-center normal resolveCollision would hand the projectile
+    const normalTo = (p: Projectile, target: Obj): Vector2 =>
+      new Vector2(p.center.x - target.center.x, p.center.y - target.center.y);
+
     it("reflects off the target instead of dying", () => {
       const target = makeTarget();
       // 4px projectile centered at (10, 2), heading straight down
@@ -45,7 +49,7 @@ describe("Projectile", () => {
         bounce: true,
       });
       const preHealth = p.health;
-      p.intersects(target);
+      p.onHit({ other: target, normal: normalTo(p, target) });
       expect(p.geo.v.y).toBeLessThan(0);
       expect(p.health).toBe(preHealth);
     });
@@ -56,7 +60,7 @@ describe("Projectile", () => {
         bounce: true,
       });
       const preTargetHealth = target.health;
-      p.intersects(target);
+      p.onHit({ other: target, normal: normalTo(p, target) });
       expect(target.health).toBe(preTargetHealth - 10);
     });
 
@@ -65,7 +69,7 @@ describe("Projectile", () => {
       const p = new Projectile(new Point2(8, 0), new Vector2(0, -5), stage, 4, {
         bounce: true,
       });
-      p.intersects(target);
+      p.onHit({ other: target, normal: normalTo(p, target) });
       expect(p.geo.v.y).toBe(-5);
     });
 
@@ -73,7 +77,7 @@ describe("Projectile", () => {
       const target = makeTarget();
       const p = new Projectile(new Point2(8, 0), new Vector2(0, 5), stage, 4);
       const preHealth = p.health;
-      p.intersects(target);
+      p.onHit({ other: target, normal: normalTo(p, target) });
       expect(p.health).toBe(preHealth - 10);
       expect(p.geo.v.y).toBe(5);
     });
