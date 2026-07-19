@@ -2,6 +2,7 @@ import Stage from "./Stage";
 import Obj from "./Object";
 import Roid from "./Roid";
 import roidPosFactory from "./roidPosFactory";
+import { resolveCollision } from "./Collision";
 import { nativeWidth, nativeHeight } from "./config";
 
 /**
@@ -84,11 +85,10 @@ export default class World {
   }
 
   // processes the pair only when item.id < o.id so each collision is
-  // evaluated once, then notifies both parties
+  // evaluated once, then hands the confirmed pair to collision resolution
   public testIntersect(item: Obj, o: Obj): void {
     if (item.id < o.id && item.geo.intersectsWith(o.geo)) {
-      item.intersects(o);
-      o.intersects(item);
+      resolveCollision(item, o);
     }
   }
 }

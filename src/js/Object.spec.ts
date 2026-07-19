@@ -1,4 +1,5 @@
 import Point2 from "./Point2";
+import Vector2 from "./Vector2";
 import Obj from "./Object";
 import { generateStage, generateObj } from "./spec-helper";
 describe("Object", () => {
@@ -7,10 +8,10 @@ describe("Object", () => {
     o = generateObj(generateStage());
   });
 
-  it("decrements its own health on intersection", () => {
+  it("decrements its own health when hit", () => {
     const o2 = new Obj(new Point2(0, 0), o.stage, [new Point2()]);
     const preObjHealth = o.health;
-    o.intersects(o2);
+    o.onHit({ other: o2, normal: new Vector2() });
     expect(preObjHealth - 10).toBe(o.health);
   });
 
