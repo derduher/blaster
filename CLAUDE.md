@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-"Blaster" — an asteroids-style 2D shooter rendered on an HTML5 canvas. TypeScript, built with Vite, no UI framework and no runtime dependencies. Ships as a PWA (service worker via `vite-plugin-pwa`) and deploys to S3 (GitHub Actions `deploy` job on master; AWS CodeBuild also runs `buildspec.yml`).
+"Blaster" — an asteroids-style 2D shooter rendered on an HTML5 canvas. TypeScript, built with Vite, no UI framework and no runtime dependencies. Ships as a PWA (service worker via `vite-plugin-pwa`) and deploys to S3 (GitHub Actions `deploy` job on master).
 
 Hosted at `https://nimblerendition.com/blaster/` — one app among several on that domain, each under its own prefix in the shared bucket. The Vite `base`, the PWA `scope` and `navigateFallback`, `static/manifest.json`, and the `upload*` S3 prefixes all have to keep saying `/blaster/`; change one and change them all.
 
