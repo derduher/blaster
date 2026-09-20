@@ -1,19 +1,19 @@
 {
   "short_name": "blaster",
   "name": "blaster",
-  "start_url": "/",
+  "start_url": "/blaster/",
   "background_color": "#101010",
   "display": "standalone",
-  "scope": "/",
+  "scope": "/blaster/",
   "theme_color": "#101010",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/blaster/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/blaster/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

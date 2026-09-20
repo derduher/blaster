@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "game",
-  "homepage": "https://nimblerendition.com",
+  "homepage": "https://nimblerendition.com/blaster/",
   "bugs": {
     "url": "https://github.com/derduher/blaster/issues"
   },
@@ -22,8 +22,8 @@
     "test": "npm run typecheck && vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "upload": "aws s3 sync dist/ s3://aws-website-blaster-2d3g4 --delete --cache-control 'public, max-age=31540000' --exclude '*.html'",
-    "upload-html": "aws s3 sync dist/ s3://aws-website-blaster-2d3g4 --cache-control 'public, max-age=600' --exclude '*' --include '*.html'"
+    "upload": "aws s3 sync dist/ s3://aws-website-blaster-2d3g4/blaster/ --delete --cache-control 'public, max-age=31540000' --exclude '*.html' --exclude 'sw.js'",
+    "upload-html": "aws s3 sync dist/ s3://aws-website-blaster-2d3g4/blaster/ --cache-control 'no-cache, no-store, must-revalidate' --exclude '*' --include '*.html' --include 'sw.js'"
   },
   "lint-staged": {
     "*.{ts,js,mjs}": "eslint --fix",
